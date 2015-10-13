@@ -12,61 +12,95 @@ namespace PuppetMaster
     {
         static void Main(string[] args)
         {
-
+            PuppetMaster pm = new PuppetMaster();
+            pm.Start();
         }
     }
 
     class PuppetMaster
     {
-        private static String CONFIG_FILE_PATH = @"../config/config.txt";
-        private Dictionary<String, Entity> entities = new Dictionary<string, Entity>();
+        private static String CONFIG_FILE_PATH = @"../../config/config.txt";
+        private SystemNetwork network = new SystemNetwork();
 
-        /*
-         *  Function that reads the first 
-         */
+
         public void Start()
         {
-            String line = null;
+            Console.WriteLine("[INFO] Start reading configuration file...");
+            ReadConfigFile();
+            CreateNetwork();
+            Console.WriteLine("[INFO] Successfully generated the network, waiting input...");
+            RunMode();
+            Console.WriteLine("[INFO] Shutingdown the network...");
+            ShutDownNetwork();
+            Console.WriteLine("[INFO] All processes have been terminated, bye...");
+        }
 
-            Console.WriteLine("[INIT] Start reading configuration file...");
+        private void CreateNetwork()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RunMode()
+        {
+            String cmd = "";
+
+            while(!cmd.Equals("exit"))
+            {
+                cmd = Console.ReadLine();
+                processCommand(cmd);
+            }
+        }
+
+        private void ShutDownNetwork()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        #region "ConfigFileProcess"
+        public void ReadConfigFile()
+        {
+            String line = null;
+            int lineNr = 0;
+
             try
             {
                 StreamReader file = new StreamReader(CONFIG_FILE_PATH);
 
                 while ((line = file.ReadLine()) != null)
                 {
-                    ProcessLine(line);
+                    ProcessLine(line, lineNr++);
                 }
             } catch (Exception e)
             {
                 Console.WriteLine("[INIT] Failed to parse config file, exception: {0}", e.Message);
             }
         }
-
-        #region "ConfigFileProcess"
+        
+        
         /*
          *  Function that parses one line from the config file
          */
-        private void ProcessLine(string line)
+        private void ProcessLine(string line, int lineNr)
         {
             String[] splitedLine = line.Split(' ');
 
             switch (splitedLine[0].ToLower())
             {
                 case "site":
-                    ProcessSite(splitedLine);
+                    ProcessSite(splitedLine, lineNr);
                     break;
                 case "process":
-                    ProcessProcess(splitedLine);
+                    ProcessProcess(splitedLine, lineNr);
                     break;
                 case "routingpolicy":
-                    ProcessRouting(splitedLine);
+                    ProcessRouting(splitedLine, lineNr);
                     break;
                 case "ordering":
-                    ProcessOrdering(splitedLine);
+                    ProcessOrdering(splitedLine, lineNr);
                     break;
                 case "logginglevel":
-                    ProcessLoggingLevel(splitedLine);
+                    ProcessLoggingLevel(splitedLine, lineNr);
                     break;
                 default:
                     break;
@@ -79,27 +113,110 @@ namespace PuppetMaster
          *  Functions to process a config file line
          */
 
-        private void ProcessLoggingLevel(string[] splitedLine)
+        private void ProcessOrdering(string[] splitedLine, int lineNr)
         {
-            throw new NotImplementedException();
+            if (splitedLine.Length != 2 || (!"no".Equals(splitedLine[1].ToLower()) && !"fifo".Equals(splitedLine[1].ToLower()) && !"total".Equals(splitedLine[1].ToLower())))
+            {
+                throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Ordering]");
+            }
+
+            this.network.Ordering = splitedLine[1];
         }
 
-        private void ProcessOrdering(string[] splitedLine)
+        private void ProcessLoggingLevel(string[] splitedLine, int lineNr)
         {
-            throw new NotImplementedException();
+            if(splitedLine.Length != 2 || (!"full".Equals(splitedLine[1].ToLower()) && !"light".Equals(splitedLine[1].ToLower())))
+            {
+                throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [LoggingLevel]");
+            }
+
+            this.network.LogLevel = splitedLine[1];
         }
 
-        private void ProcessRouting(string[] splitedLine)
+        private void ProcessRouting(string[] splitedLine, int lineNr)
         {
-            throw new NotImplementedException();
+            if (splitedLine.Length != 2 || (!"flooding".Equals(splitedLine[1].ToLower()) && !"filter".Equals(splitedLine[1].ToLower())))
+            {
+                throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [RoutingPolicy]");
+            }
+
+            this.network.RoutingPolicy = splitedLine[1];
         }
 
-        private void ProcessProcess(string[] splitedLine)
+        private void ProcessProcess(string[] splitedLine, int lineNr)
         {
-            throw new NotImplementedException();
+            String targetEntityName, entityType, siteName, url;
+            Entity targetEntity;
+            Site parentSite;
+
+            if (splitedLine.Length != 8)
+            {
+                throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Process]");
+            }
+
+            targetEntityName = splitedLine[1].ToLower();
+            entityType = splitedLine[3].ToLower();
+            siteName = splitedLine[5].ToLower();
+            url = splitedLine[7].ToLower();
+
+            targetEntity = new Entity(targetEntityName, url, entityType);
+
+            if(!network.SiteMap.TryGetValue(siteName, out parentSite))
+            {
+                throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Process] site: " + siteName + " does not exist");
+            }
+
+            targetEntity.Site = parentSite;
+            parentSite.Entities.Add(targetEntityName, targetEntity);
+            network.AddEntity(targetEntity);
         }
 
-        private void ProcessSite(string[] splitedLine)
+        private void ProcessSite(string[] splitedLine, int lineNr)
+        {
+            String targetSiteName, parentSiteName;
+            Site targetSite, parentSite;
+
+            if (splitedLine.Length != 4)
+            {
+                throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Site]");
+            }
+
+            targetSiteName = splitedLine[1].ToLower();
+            parentSiteName = splitedLine[3].ToLower();
+
+            if(!network.SiteMap.TryGetValue(targetSiteName, out targetSite))
+            {
+                targetSite = new Site(targetSiteName);
+            }
+            
+            if(!"none".Equals(parentSiteName))
+            {
+                if (!network.SiteMap.TryGetValue(parentSiteName, out parentSite))
+                {
+                    parentSite = new Site(parentSiteName);
+                    network.AddSite(parentSite);
+                }
+
+                parentSite.Childrens.Add(targetSite);
+            }
+            else
+            {
+                parentSite = null;
+            }
+
+
+            targetSite.Parent = parentSite;
+            network.AddSite(targetSite);
+            
+            
+        }
+        #endregion
+
+        #region "NetworkCreation"
+        #endregion
+
+        #region "RunMode"
+        private void processCommand(string cmd)
         {
             throw new NotImplementedException();
         }
@@ -110,9 +227,11 @@ namespace PuppetMaster
     class SystemNetwork
     {
         #region "Attributes"
-        private String logLevel = null;
-        private String routingPolicy = null;
-        private String ordering = null;
+        private String logLevel = "light";
+        private String routingPolicy = "flooding";
+        private String ordering = "fifo";
+        private Dictionary<String, Entity> entities = new Dictionary<string, Entity>();
+        private Dictionary<String, Site> siteMap = new Dictionary<string, Site>();
         #endregion
 
         #region "Properties"
@@ -154,7 +273,56 @@ namespace PuppetMaster
                 ordering = value;
             }
         }
+
+        public Dictionary<string, Entity> Entities
+        {
+            get
+            {
+                return entities;
+            }
+
+            set
+            {
+                entities = value;
+            }
+        }
+
+        public Dictionary<string, Site> SiteMap
+        {
+            get
+            {
+                return siteMap;
+            }
+
+            set
+            {
+                siteMap = value;
+            }
+        }
         #endregion
+
+        public Site GetSite(String name)
+        {
+            Site target;
+            return SiteMap.TryGetValue(name, out target) ? target : null;
+        }
+
+        public void AddSite(Site newSite)
+        {
+            SiteMap.Add(newSite.Name, newSite);
+        }
+
+        public Entity GetEntity(String name)
+        {
+            Entity target;
+            return Entities.TryGetValue(name, out target) ? target : null;
+        }
+
+        public void AddEntity(Entity newEntity)
+        {
+            Entities.Add(newEntity.Name, newEntity);
+
+        }
     }
 
 }

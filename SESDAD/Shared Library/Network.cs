@@ -13,6 +13,7 @@ namespace Shared_Library
 
     public class Site
     {
+        private string name = null;
         private Site parent = null;
         private List<Site> childrens = new List<Site>(); 
         private Dictionary<String, Entity> entities = new Dictionary<string, Entity>(); //brokers + subscribers + publishers associated with the site
@@ -30,7 +31,51 @@ namespace Shared_Library
                 parent = value;
             }
         }
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+
+            set
+            {
+                name = value;
+            }
+        }
+
+        public List<Site> Childrens
+        {
+            get
+            {
+                return childrens;
+            }
+
+            set
+            {
+                childrens = value;
+            }
+        }
+
+        public Dictionary<string, Entity> Entities
+        {
+            get
+            {
+                return entities;
+            }
+
+            set
+            {
+                entities = value;
+            }
+        }
         #endregion
+
+        public Site(String name)
+        {
+            this.name = name;
+        }
     }
 
     public class Entity
@@ -38,6 +83,7 @@ namespace Shared_Library
         private Site site = null;
         private String name = null;
         private String url = null;
+        private String type = null;
         private RemoteEntity entityProxy = null;
 
         #region "Properties"
@@ -92,7 +138,26 @@ namespace Shared_Library
                 entityProxy = value;
             }
         }
+
+        public string Type
+        {
+            get
+            {
+                return type;
+            }
+
+            set
+            {
+                type = value;
+            }
+        }
         #endregion
 
+        public Entity(String name, String url, String type)
+        {
+            this.name = name;
+            this.url = url;
+            this.type = type;
+        }
     }
 }
