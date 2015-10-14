@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Shared_Library
 {
-    
+    public interface RemoteEntity
+    {
+        void sendMenssage(String message);
+    }
+
     public class SysConfig
     {
         #region "Attributes"

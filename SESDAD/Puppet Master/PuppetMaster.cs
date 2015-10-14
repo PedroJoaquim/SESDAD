@@ -20,6 +20,8 @@ namespace PuppetMaster
     class PuppetMaster
     {
         private static String CONFIG_FILE_PATH = @"../../config/config.txt";
+        private static String EXIT_CMD = "exit";
+
         private SystemNetwork network = new SystemNetwork();
 
 
@@ -27,6 +29,7 @@ namespace PuppetMaster
         {
             Console.WriteLine("[INFO] Start reading configuration file...");
             ReadConfigFile();
+            Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
             CreateNetwork();
             Console.WriteLine("[INFO] Successfully generated the network, waiting input...");
             RunMode();
@@ -37,14 +40,26 @@ namespace PuppetMaster
 
         private void CreateNetwork()
         {
-            throw new NotImplementedException();
+            try
+            {
+                foreach (KeyValuePair<string, Site> entry in network.SiteMap)
+                {
+                    DeploySite(entry.Value);
+                }
+            }
+            catch(Exception)
+            {
+                //TODO 
+            }
+
         }
+
 
         private void RunMode()
         {
             String cmd = "";
 
-            while(!cmd.Equals("exit"))
+            while(!cmd.Equals(EXIT_CMD))
             {
                 cmd = Console.ReadLine();
                 processCommand(cmd);
@@ -120,7 +135,7 @@ namespace PuppetMaster
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Ordering]");
             }
 
-            this.network.Ordering = splitedLine[1];
+            this.network.Ordering = splitedLine[1].ToLower();
         }
 
         private void ProcessLoggingLevel(string[] splitedLine, int lineNr)
@@ -130,7 +145,7 @@ namespace PuppetMaster
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [LoggingLevel]");
             }
 
-            this.network.LogLevel = splitedLine[1];
+            this.network.LogLevel = splitedLine[1].ToLower();
         }
 
         private void ProcessRouting(string[] splitedLine, int lineNr)
@@ -140,7 +155,7 @@ namespace PuppetMaster
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [RoutingPolicy]");
             }
 
-            this.network.RoutingPolicy = splitedLine[1];
+            this.network.RoutingPolicy = splitedLine[1].ToLower();
         }
 
         private void ProcessProcess(string[] splitedLine, int lineNr)
@@ -197,7 +212,7 @@ namespace PuppetMaster
                     network.AddSite(parentSite);
                 }
 
-                parentSite.Childrens.Add(targetSite);
+                parentSite.Children.Add(targetSite);
             }
             else
             {
@@ -213,6 +228,22 @@ namespace PuppetMaster
         #endregion
 
         #region "NetworkCreation"
+        private void DeploySite(Site site)
+        {
+
+            foreach (KeyValuePair<string, Entity> entry in site.Entities)
+            {
+                launchProcess(entry.Value);
+            }
+
+        }
+
+        private void launchProcess(Entity ent)
+        {
+            List<Tuple<String, String>> connections = ent.GetConnectionsUrl();
+            //TODO
+            return;
+        }
         #endregion
 
         #region "RunMode"
@@ -321,7 +352,6 @@ namespace PuppetMaster
         public void AddEntity(Entity newEntity)
         {
             Entities.Add(newEntity.Name, newEntity);
-
         }
     }
 

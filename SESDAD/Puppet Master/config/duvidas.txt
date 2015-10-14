@@ -1,0 +1,2 @@
+#entidades nos sites tem o mesmo ip?
+#entidades na maquina do puppet master estao com localhost?
