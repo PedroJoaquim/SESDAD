@@ -2,3 +2,11 @@
 /SESDAD/Puppet Master/obj
 /SESDAD/Shared Library/bin
 /SESDAD/Shared Library/obj
+/SESDAD/Puppet Master Slave/bin
+/SESDAD/Puppet Master Slave/obj
+/SESDAD/Broker/bin
+/SESDAD/Broker/obj
+/SESDAD/Publisher/bin
+/SESDAD/Publisher/obj
+/SESDAD/Subscriber/bin
+/SESDAD/Subscriber/obj
