@@ -233,9 +233,27 @@ namespace PuppetMaster
 
             foreach (KeyValuePair<string, Entity> entry in site.Entities)
             {
-                launchProcess(entry.Value);
+                if (IsRemoteEntity(entry.Value))
+                {
+                    launchProcess(entry.Value);
+                }
+                else
+                {
+                    launchRemoteProcess(entry.Value);
+                }
+                
             }
 
+        }
+
+        private void launchRemoteProcess(Entity value)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool IsRemoteEntity(Entity value)
+        {
+            return value.Url.ToLower().Contains("localhost");
         }
 
         private void launchProcess(Entity ent)
