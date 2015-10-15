@@ -240,10 +240,8 @@ namespace PuppetMaster
                 else
                 {
                     launchRemoteProcess(entry.Value);
-                }
-                
+                }   
             }
-
         }
 
         private void launchRemoteProcess(Entity value)
@@ -259,7 +257,8 @@ namespace PuppetMaster
         private void launchProcess(Entity ent)
         {
             List<Tuple<String, String>> connections = ent.GetConnectionsUrl();
-            //TODO
+
+
             return;
         }
         #endregion
