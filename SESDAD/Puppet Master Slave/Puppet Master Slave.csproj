@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Build\puppet_master_slave\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -50,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Shared Library PM\Shared Library PM.csproj">
+      <Project>{31b2c39b-58f3-41c5-bd0c-a5c8ae1248fe}</Project>
+      <Name>Shared Library PM</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shared Library\Shared Library.csproj">
       <Project>{20ac052e-b503-42a1-a69a-15b5f6caeaab}</Project>
       <Name>Shared Library</Name>

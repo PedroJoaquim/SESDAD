@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Broker
 {
-    class Program
+    class Broker
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(args[1]);
+            Console.ReadLine();
         }
     }
 }

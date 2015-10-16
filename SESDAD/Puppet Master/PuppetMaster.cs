@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Shared_Library;
-
+using Shared_Library_PM;
 namespace PuppetMaster
 {
     class Program
@@ -19,7 +19,7 @@ namespace PuppetMaster
 
     class PuppetMaster
     {
-        private static String CONFIG_FILE_PATH = @"../../config/config.txt";
+        private static String CONFIG_FILE_PATH = @"../../Config/config.txt";
         private static String EXIT_CMD = "exit";
 
         private SystemNetwork network = new SystemNetwork();
@@ -235,29 +235,30 @@ namespace PuppetMaster
             {
                 if (IsRemoteEntity(entry.Value))
                 {
-                    launchProcess(entry.Value);
+                    LaunchRemoteProcess(entry.Value);
                 }
                 else
                 {
-                    launchRemoteProcess(entry.Value);
+                    LaunchProcess(entry.Value);
                 }   
             }
         }
 
-        private void launchRemoteProcess(Entity value)
+        private void LaunchRemoteProcess(Entity value)
         {
             throw new NotImplementedException();
         }
 
         private bool IsRemoteEntity(Entity value)
         {
-            return value.Url.ToLower().Contains("localhost");
+            return !value.Url.ToLower().Contains("localhost") && !value.Url.ToLower().Contains("127.0.0.1");
         }
 
-        private void launchProcess(Entity ent)
+        private void LaunchProcess(Entity ent)
         {
             List<Tuple<String, String>> connections = ent.GetConnectionsUrl();
 
+            ProcessManager.LaunchProcess(ent.Type, connections);
 
             return;
         }
