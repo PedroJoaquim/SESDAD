@@ -6,9 +6,24 @@ using System.Threading.Tasks;
 
 namespace Shared_Library
 {
-    public interface RemoteEntity
+    public interface IRemoteBroker
     {
-        void sendMenssage(String message);
+        //TODO
+    }
+
+    public interface IRemotePublisher
+    {
+        //TODO
+    }
+
+    public interface IRemoteSubscriber
+    {
+        //TODO
+    }
+
+    public interface IRemotePuppetMaster
+    {
+        //TODO
     }
 
     public class SysConfig

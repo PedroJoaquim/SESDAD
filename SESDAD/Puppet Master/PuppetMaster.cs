@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Shared_Library;
 using Shared_Library_PM;
+
 namespace PuppetMaster
 {
     class Program
@@ -17,16 +18,18 @@ namespace PuppetMaster
         }
     }
 
-    class PuppetMaster
+    class PuppetMaster : IRemotePuppetMaster
     {
         private static String CONFIG_FILE_PATH = @"../../Config/config.txt";
         private static String EXIT_CMD = "exit";
 
         private SystemNetwork network = new SystemNetwork();
 
-
+        #region "Main Functions"
         public void Start()
         {
+            Console.WriteLine("[INFO] Wainting Slaves to join the network...");
+            WaitSlaves();
             Console.WriteLine("[INFO] Start reading configuration file...");
             ReadConfigFile();
             Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
@@ -38,13 +41,25 @@ namespace PuppetMaster
             Console.WriteLine("[INFO] All processes have been terminated, bye...");
         }
 
+        private void WaitSlaves()
+        {
+            return; // TODO 
+        }
+
         private void CreateNetwork()
         {
             try
             {
-                foreach (KeyValuePair<string, Site> entry in network.SiteMap)
+                foreach (KeyValuePair<string, Entity> entry in network.Entities)
                 {
-                    DeploySite(entry.Value);
+                    if(entry.Value.IsLocal())
+                    {
+                        LaunchProcess(entry.Value);
+                    }
+                    else
+                    {
+                        LaunchRemoteProcess(entry.Value);
+                    }
                 }
             }
             catch(Exception)
@@ -70,7 +85,7 @@ namespace PuppetMaster
         {
             throw new NotImplementedException();
         }
-
+        #endregion
 
         #region "ConfigFileProcess"
         public void ReadConfigFile()
@@ -161,7 +176,6 @@ namespace PuppetMaster
         private void ProcessProcess(string[] splitedLine, int lineNr)
         {
             String targetEntityName, entityType, siteName, url;
-            Entity targetEntity;
             Site parentSite;
 
             if (splitedLine.Length != 8)
@@ -174,16 +188,35 @@ namespace PuppetMaster
             siteName = splitedLine[5].ToLower();
             url = splitedLine[7].ToLower();
 
-            targetEntity = new Entity(targetEntityName, url, entityType);
-
             if(!network.SiteMap.TryGetValue(siteName, out parentSite))
             {
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Process] site: " + siteName + " does not exist");
             }
 
-            targetEntity.Site = parentSite;
-            parentSite.Entities.Add(targetEntityName, targetEntity);
-            network.AddEntity(targetEntity);
+            switch (entityType)
+            {
+                case Entity.BROKER:
+                    BrokerEntity bEntity = new BrokerEntity(targetEntityName, url);
+                    bEntity.Site = parentSite;
+                    parentSite.BrokerEntities.Add(targetEntityName, bEntity);
+                    network.AddEntity(bEntity);
+                    break;
+                case Entity.PUBLISHER:
+                    PublisherEntity pEntity = new PublisherEntity(targetEntityName, url);
+                    pEntity.Site = parentSite;
+                    parentSite.PublisherEntities.Add(targetEntityName, pEntity);
+                    network.AddEntity(pEntity);
+                    break;
+                case Entity.SUBSCRIBER:
+                    SubscriberEntity sEntity = new SubscriberEntity(targetEntityName, url);
+                    sEntity.Site = parentSite;
+                    parentSite.SubscriberEntities.Add(targetEntityName, sEntity);
+                    network.AddEntity(sEntity);
+                    break;
+                default:
+                    break;
+            }
+    
         }
 
         private void ProcessSite(string[] splitedLine, int lineNr)
@@ -228,21 +261,7 @@ namespace PuppetMaster
         #endregion
 
         #region "NetworkCreation"
-        private void DeploySite(Site site)
-        {
 
-            foreach (KeyValuePair<string, Entity> entry in site.Entities)
-            {
-                if (IsRemoteEntity(entry.Value))
-                {
-                    LaunchRemoteProcess(entry.Value);
-                }
-                else
-                {
-                    LaunchProcess(entry.Value);
-                }   
-            }
-        }
 
         private void LaunchRemoteProcess(Entity value)
         {
@@ -258,7 +277,7 @@ namespace PuppetMaster
         {
             List<Tuple<String, String>> connections = ent.GetConnectionsUrl();
 
-            ProcessManager.LaunchProcess(ent.Type, connections);
+            ProcessManager.LaunchProcess(ent.EntityType(), "TODO");
 
             return;
         }
@@ -273,104 +292,6 @@ namespace PuppetMaster
     }
 
 
-    class SystemNetwork
-    {
-        #region "Attributes"
-        private String logLevel = "light";
-        private String routingPolicy = "flooding";
-        private String ordering = "fifo";
-        private Dictionary<String, Entity> entities = new Dictionary<string, Entity>();
-        private Dictionary<String, Site> siteMap = new Dictionary<string, Site>();
-        #endregion
-
-        #region "Properties"
-        public string LogLevel
-        {
-            get
-            {
-                return logLevel;
-            }
-
-            set
-            {
-                logLevel = value;
-            }
-        }
-
-        public string RoutingPolicy
-        {
-            get
-            {
-                return routingPolicy;
-            }
-
-            set
-            {
-                routingPolicy = value;
-            }
-        }
-
-        public string Ordering
-        {
-            get
-            {
-                return ordering;
-            }
-
-            set
-            {
-                ordering = value;
-            }
-        }
-
-        public Dictionary<string, Entity> Entities
-        {
-            get
-            {
-                return entities;
-            }
-
-            set
-            {
-                entities = value;
-            }
-        }
-
-        public Dictionary<string, Site> SiteMap
-        {
-            get
-            {
-                return siteMap;
-            }
-
-            set
-            {
-                siteMap = value;
-            }
-        }
-        #endregion
-
-        public Site GetSite(String name)
-        {
-            Site target;
-            return SiteMap.TryGetValue(name, out target) ? target : null;
-        }
-
-        public void AddSite(Site newSite)
-        {
-            SiteMap.Add(newSite.Name, newSite);
-        }
-
-        public Entity GetEntity(String name)
-        {
-            Entity target;
-            return Entities.TryGetValue(name, out target) ? target : null;
-        }
-
-        public void AddEntity(Entity newEntity)
-        {
-            Entities.Add(newEntity.Name, newEntity);
-        }
-    }
+    
 
 }

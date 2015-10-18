@@ -17,11 +17,14 @@ namespace Shared_Library_PM
         {
             Process process = new Process();
             process.StartInfo.FileName = BROKER_PROCESS;
-            process.StartInfo.Arguments = "-urls " + args;
+            process.StartInfo.Arguments = args;
             process.Start();
 
         }
 
-
+        private String getProcessPath(String type)
+        {
+            return "TODO";
+        }
     }
 }
