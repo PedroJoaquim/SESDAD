@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting;
+using System.Threading;
 
 namespace PuppetMaster
 {
@@ -31,6 +32,11 @@ namespace PuppetMaster
                
         private ConcurrentDictionary<String, IRemotePuppetMasterSlave> pmSlaves = new ConcurrentDictionary<string, IRemotePuppetMasterSlave>();
 
+        private static Semaphore sem = new Semaphore(0, 1);
+        private int maxNumberEntities;
+        private static object lockObject = new object();
+        private int entitiesProcessed = 0;
+
         #region "Main Functions"
         public void Start()
         {
@@ -43,21 +49,10 @@ namespace PuppetMaster
             Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
             CreateNetwork();
             Console.WriteLine("[INFO] Successfully generated the network, waiting input...");
-            DoCenas();
             RunMode();
             Console.WriteLine("[INFO] Shutingdown the network...");
             ShutDownNetwork();
             Console.WriteLine("[INFO] All processes have been terminated, bye...");
-        }
-
-        private void DoCenas()
-        {
-            Console.ReadLine();
-            foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
-            {
-                entry.Value.GetRemoteEntity().EstablishConnections();
-            }
-
         }
 
         private void RegisterPM()
@@ -74,6 +69,7 @@ namespace PuppetMaster
 
         private void CreateNetwork()
         {
+
             try
             {
                 foreach (KeyValuePair<string, Entity> entry in network.Entities)
@@ -92,8 +88,16 @@ namespace PuppetMaster
             {
                 //TODO 
             }
+            
+            this.maxNumberEntities = this.network.Entities.Count;
 
 
+            SemaphoreWait(); //wait all processes up and running
+
+            foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
+            {
+                entry.Value.GetRemoteEntity().EstablishConnections();
+            }
         }
 
 
@@ -103,6 +107,7 @@ namespace PuppetMaster
 
             while(!cmd.Equals(EXIT_CMD))
             {
+                Console.Write("[CMD] - ");
                 cmd = Console.ReadLine();
                 processCommand(cmd);
             }
@@ -337,6 +342,7 @@ namespace PuppetMaster
             bEntity.RemoteEntity = newBroker;
             this.network.SystemConfig.Connections = bEntity.GetConnectionsUrl();
             newBroker.RegisterInitializationInfo(this.network.SystemConfig);
+            IncrementEntitiesProcessed();
 
             Console.WriteLine(String.Format("[INFO] Broker: {0} connected on url: {1}", name, url));
         }
@@ -348,6 +354,7 @@ namespace PuppetMaster
             pEntity.RemoteEntity = newPublisher;
             this.network.SystemConfig.Connections = pEntity.GetConnectionsUrl();
             newPublisher.RegisterInitializationInfo(this.network.SystemConfig);
+            IncrementEntitiesProcessed();
 
             Console.WriteLine(String.Format("[INFO] Publisher: {0} connected on url: {1}", name, url));
         }
@@ -359,13 +366,43 @@ namespace PuppetMaster
             sEntity.RemoteEntity = newSubscriber;
             this.network.SystemConfig.Connections = sEntity.GetConnectionsUrl();
             newSubscriber.RegisterInitializationInfo(this.network.SystemConfig);
+            IncrementEntitiesProcessed();
 
             Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));
         }
         #endregion
+
+
+        #region "semaphores"
+        public void SemaphoreWait()
+        {
+            PuppetMaster.sem.WaitOne();
+        }
+
+        public void SemaphoreRelease()
+        {
+            PuppetMaster.sem.Release();
+        }
+
+        public void IncrementEntitiesProcessed()
+        {
+
+            Monitor.Enter(lockObject);
+            try
+            {
+
+                if (++this.entitiesProcessed == this.maxNumberEntities)
+                    SemaphoreRelease();
+
+            }
+            finally
+            {
+                Monitor.Exit(lockObject);
+                    
+            }
+
+        }
+        #endregion
     }
-
-
-
 
 }
