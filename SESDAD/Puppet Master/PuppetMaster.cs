@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting;
+using System.Threading;
 
 namespace PuppetMaster
 {
@@ -30,6 +31,11 @@ namespace PuppetMaster
         private SystemNetwork network = new SystemNetwork();
                
         private ConcurrentDictionary<String, IRemotePuppetMasterSlave> pmSlaves = new ConcurrentDictionary<string, IRemotePuppetMasterSlave>();
+
+        private static Semaphore sem = new Semaphore(0, 1);
+        private int maxNumberEntities;
+        private static object lockObject = new object();
+        private int entitiesProcessed = 0;
 
         #region "Main Functions"
         public void Start()
@@ -63,6 +69,7 @@ namespace PuppetMaster
 
         private void CreateNetwork()
         {
+
             try
             {
                 foreach (KeyValuePair<string, Entity> entry in network.Entities)
@@ -81,6 +88,10 @@ namespace PuppetMaster
             {
                 //TODO 
             }
+
+            this.maxNumberEntities = this.network.Entities.Count;
+
+            SemaphoreWait();
 
         }
 
@@ -323,6 +334,7 @@ namespace PuppetMaster
             BrokerEntity bEntity = (BrokerEntity) this.network.GetEntity(name);
             IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), url);
             bEntity.RemoteEntity = newBroker;
+            IncrementEntitiesProcessed();
 
             Console.WriteLine(String.Format("[INFO] Broker: {0} connected on url: {1}", name, url));
         }
@@ -332,6 +344,7 @@ namespace PuppetMaster
             PublisherEntity pEntity = (PublisherEntity) this.network.GetEntity(name);
             IRemotePublisher newPublisher = (IRemotePublisher)Activator.GetObject(typeof(IRemotePublisher), url);
             pEntity.RemoteEntity = newPublisher;
+            IncrementEntitiesProcessed();
 
             Console.WriteLine(String.Format("[INFO] Publisher: {0} connected on url: {1}", name, url));
         }
@@ -341,13 +354,47 @@ namespace PuppetMaster
             SubscriberEntity sEntity = (SubscriberEntity)this.network.GetEntity(name);
             IRemoteSubscriber newSubscriber = (IRemoteSubscriber)Activator.GetObject(typeof(IRemoteSubscriber), url);
             sEntity.RemoteEntity = newSubscriber;
+            IncrementEntitiesProcessed();
 
             Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));
         }
         #endregion
+
+
+        #region "semaphores"
+        public void SemaphoreWait()
+        {
+            PuppetMaster.sem.WaitOne();
+        }
+
+        public void SemaphoreRelease()
+        {
+            PuppetMaster.sem.Release();
+        }
+
+        public void IncrementEntitiesProcessed()
+        {
+          
+    
+           
+
+            Monitor.Enter(lockObject);
+            try
+            {
+
+                if (++this.entitiesProcessed == this.maxNumberEntities)
+                    SemaphoreRelease();
+
+            }
+            finally
+            {
+                Monitor.Exit(lockObject);
+                    
+            }
+          
+    
+        }
+        #endregion
     }
-
-
-
 
 }
