@@ -10,67 +10,22 @@ using System.Runtime.Remoting;
 
 namespace Subscriber
 {
-    class Subscriber : MarshalByRefObject, IRemoteSubscriber
+    class Subscriber : RemoteEntity, IRemoteSubscriber
     {
-        private String name;
-        private String url;
-        private String pmURL;
 
-        #region "Properties"
-        public string Name
+        static void Main(string[] args)
         {
-            get
-            {
-                return name;
-            }
+            if (args.Length < 3) return;
 
-            set
-            {
-                name = value;
-            }
+            Subscriber s = new Subscriber(args[0], args[1], args[2]);
+            s.Start();
         }
 
-        public string Url
-        {
-            get
-            {
-                return url;
-            }
 
-            set
-            {
-                url = value;
-            }
-        }
+        public Subscriber(String name, String url, String pmUrl) : base(name, url, pmUrl) { }
 
-        public string PmURL
-        {
-            get
-            {
-                return pmURL;
-            }
 
-            set
-            {
-                pmURL = value;
-            }
-        }
-        #endregion
-
-        public Subscriber(String name, String url, String pmUrl)
-        {
-            this.Name = name;
-            this.Url = url;
-            this.PmURL = pmUrl;
-        }
-
-        public void Start()
-        {
-            Register();
-            Console.ReadLine();
-        }
-
-        private void Register()
+        public override void Register()
         {
             int port = Int32.Parse(Utils.GetIPPort(this.Url));
             string objName = Utils.GetObjName(this.Url);
@@ -80,16 +35,17 @@ namespace Subscriber
             RemotingServices.Marshal(this, objName, typeof(IRemoteSubscriber));
 
             IRemotePuppetMaster pm = (IRemotePuppetMaster)Activator.GetObject(typeof(IRemotePuppetMaster), this.PmURL);
-            pm.RegisterPublisher(this.Url, this.Name);
+            pm.RegisterSubscriber(this.Url, this.Name);
         }
 
 
-        static void Main(string[] args)
+        public override void Run()
         {
-            if (args.Length < 3) return;
-
-            Subscriber s = new Subscriber(args[0], args[1], args[2]);
-            s.Start();
+            //TODO
         }
+
+        #region "interface methods"
+
+        #endregion
     }
 }

@@ -20,9 +20,9 @@ namespace PuppetMaster
         public SystemNetwork()
         {
             //setting system default values
-            this.systemConfig.LogLevel = "light";
-            this.systemConfig.RoutingPolicy = "flooding";
-            this.systemConfig.Ordering = "fifo";
+            this.SystemConfig.LogLevel = "light";
+            this.SystemConfig.RoutingPolicy = "flooding";
+            this.SystemConfig.Ordering = "fifo";
         }
 
 
@@ -31,12 +31,12 @@ namespace PuppetMaster
         {
             get
             {
-                return this.systemConfig.LogLevel;
+                return this.SystemConfig.LogLevel;
             }
 
             set
             {
-                this.systemConfig.LogLevel = value;
+                this.SystemConfig.LogLevel = value;
             }
         }
 
@@ -44,12 +44,12 @@ namespace PuppetMaster
         {
             get
             {
-                return this.systemConfig.RoutingPolicy;
+                return this.SystemConfig.RoutingPolicy;
             }
 
             set
             {
-                this.systemConfig.RoutingPolicy = value;
+                this.SystemConfig.RoutingPolicy = value;
             }
         }
 
@@ -57,12 +57,12 @@ namespace PuppetMaster
         {
             get
             {
-                return this.systemConfig.Ordering;
+                return this.SystemConfig.Ordering;
             }
 
             set
             {
-                this.systemConfig.Ordering = value;
+                this.SystemConfig.Ordering = value;
             }
         }
 
@@ -89,6 +89,19 @@ namespace PuppetMaster
             set
             {
                 siteMap = value;
+            }
+        }
+
+        public SysConfig SystemConfig
+        {
+            get
+            {
+                return systemConfig;
+            }
+
+            set
+            {
+                systemConfig = value;
             }
         }
         #endregion
@@ -343,6 +356,7 @@ namespace PuppetMaster
 
         public abstract List<Tuple<String, String>> GetConnectionsUrl();
         public abstract String EntityType();
+        public abstract IRemoteEntity GetRemoteEntity();
     }
 
     public class BrokerEntity : Entity
@@ -366,8 +380,8 @@ namespace PuppetMaster
         }
         #endregion
 
-        override
-        public List<Tuple<String, String>> GetConnectionsUrl()
+
+        public override List<Tuple<String, String>> GetConnectionsUrl()
         {
             List<Tuple<String, String>> connectionURLS = new List<Tuple<string, string>>();
 
@@ -380,10 +394,15 @@ namespace PuppetMaster
             return connectionURLS;
         }
 
-        override
-        public String EntityType()
+        
+        public override String EntityType()
         {
             return SysConfig.BROKER;
+        }
+
+        public override IRemoteEntity GetRemoteEntity()
+        {
+            return this.RemoteEntity;
         }
     }
 
@@ -409,8 +428,7 @@ namespace PuppetMaster
         }
         #endregion
 
-        override
-        public List<Tuple<String, String>> GetConnectionsUrl()
+        public override List<Tuple<String, String>> GetConnectionsUrl()
         {
             List<Tuple<String, String>> connectionURLS = new List<Tuple<string, string>>();
 
@@ -419,10 +437,15 @@ namespace PuppetMaster
             return connectionURLS;
         }
 
-        override
-        public String EntityType()
+
+        public override String EntityType()
         {
             return SysConfig.PUBLISHER;
+        }
+
+        public override IRemoteEntity GetRemoteEntity()
+        {
+            return this.RemoteEntity;
         }
     }
 
@@ -447,8 +470,8 @@ namespace PuppetMaster
         }
         #endregion
 
-        override
-        public List<Tuple<String, String>> GetConnectionsUrl()
+   
+        public override List<Tuple<String, String>> GetConnectionsUrl()
         {
             List<Tuple<String, String>> connectionURLS = new List<Tuple<string, string>>();
 
@@ -457,10 +480,15 @@ namespace PuppetMaster
             return connectionURLS;
         }
 
-        override
-        public String EntityType()
+        
+        public override String EntityType()
         {
             return SysConfig.SUBSCRIBER;
+        }
+
+        public override IRemoteEntity GetRemoteEntity()
+        {
+            return this.RemoteEntity;
         }
     }
 }

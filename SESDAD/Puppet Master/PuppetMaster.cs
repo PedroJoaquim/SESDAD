@@ -43,10 +43,21 @@ namespace PuppetMaster
             Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
             CreateNetwork();
             Console.WriteLine("[INFO] Successfully generated the network, waiting input...");
+            DoCenas();
             RunMode();
             Console.WriteLine("[INFO] Shutingdown the network...");
             ShutDownNetwork();
             Console.WriteLine("[INFO] All processes have been terminated, bye...");
+        }
+
+        private void DoCenas()
+        {
+            Console.ReadLine();
+            foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
+            {
+                entry.Value.GetRemoteEntity().EstablishConnections();
+            }
+
         }
 
         private void RegisterPM()
@@ -81,6 +92,7 @@ namespace PuppetMaster
             {
                 //TODO 
             }
+
 
         }
 
@@ -323,6 +335,8 @@ namespace PuppetMaster
             BrokerEntity bEntity = (BrokerEntity) this.network.GetEntity(name);
             IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), url);
             bEntity.RemoteEntity = newBroker;
+            this.network.SystemConfig.Connections = bEntity.GetConnectionsUrl();
+            newBroker.RegisterInitializationInfo(this.network.SystemConfig);
 
             Console.WriteLine(String.Format("[INFO] Broker: {0} connected on url: {1}", name, url));
         }
@@ -332,6 +346,8 @@ namespace PuppetMaster
             PublisherEntity pEntity = (PublisherEntity) this.network.GetEntity(name);
             IRemotePublisher newPublisher = (IRemotePublisher)Activator.GetObject(typeof(IRemotePublisher), url);
             pEntity.RemoteEntity = newPublisher;
+            this.network.SystemConfig.Connections = pEntity.GetConnectionsUrl();
+            newPublisher.RegisterInitializationInfo(this.network.SystemConfig);
 
             Console.WriteLine(String.Format("[INFO] Publisher: {0} connected on url: {1}", name, url));
         }
@@ -341,6 +357,8 @@ namespace PuppetMaster
             SubscriberEntity sEntity = (SubscriberEntity)this.network.GetEntity(name);
             IRemoteSubscriber newSubscriber = (IRemoteSubscriber)Activator.GetObject(typeof(IRemoteSubscriber), url);
             sEntity.RemoteEntity = newSubscriber;
+            this.network.SystemConfig.Connections = sEntity.GetConnectionsUrl();
+            newSubscriber.RegisterInitializationInfo(this.network.SystemConfig);
 
             Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));
         }
