@@ -36,10 +36,16 @@ namespace Publisher
             pm.RegisterPublisher(this.Url, this.Name);
         }
 
-        public override void Run()
+        public override void Status()
         {
-            //TODO
+            throw new NotImplementedException();
         }
+
+        public void Publish(string topic, int nrEvents, int ms)
+        {
+            throw new NotImplementedException();
+        }
+
 
         #region "interface methods"
 

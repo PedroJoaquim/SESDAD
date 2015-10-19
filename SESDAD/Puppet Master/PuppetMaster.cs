@@ -92,7 +92,7 @@ namespace PuppetMaster
             this.maxNumberEntities = this.network.Entities.Count;
 
 
-            SemaphoreWait(); //wait all processes up and running
+            SemaphoreWait(); //wait all processes to be up and running
 
             foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
             {
@@ -107,7 +107,7 @@ namespace PuppetMaster
 
             while(!cmd.Equals(EXIT_CMD))
             {
-                Console.Write("[CMD] - ");
+                Console.Write("[CMD] > ");
                 cmd = Console.ReadLine();
                 processCommand(cmd);
             }
@@ -401,6 +401,16 @@ namespace PuppetMaster
                     
             }
 
+        }
+
+        public void Wait(int x_ms)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Notify(string msg)
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

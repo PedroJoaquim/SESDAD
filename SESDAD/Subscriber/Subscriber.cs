@@ -38,14 +38,24 @@ namespace Subscriber
             pm.RegisterSubscriber(this.Url, this.Name);
         }
 
-
-        public override void Run()
+        public override void Status()
         {
-            //TODO
+            throw new NotImplementedException();
         }
 
-        #region "interface methods"
 
+
+
+        #region "interface methods"
+        public void Subscribe(string topic)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Unsubscribe(string topic)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

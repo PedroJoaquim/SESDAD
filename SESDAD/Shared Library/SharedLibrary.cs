@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shared_Library
@@ -12,21 +13,30 @@ namespace Shared_Library
         void RegisterInitializationInfo(SysConfig sysConfig);
         void EstablishConnections();
         string GetEntityName();
+
+        void Status();
+        void Crash();
+        void Freeze();
+        void Unfreeze();
     }
 
     public interface IRemoteBroker : IRemoteEntity
     {
-        //TODO
+        void DifundPublishEvent(String topic);
+        void DifundSubscribeEvent(String topic);
+        void DifundUnSubscribeEvent(String topic);
     }
 
     public interface IRemotePublisher : IRemoteEntity
     {
-        //TODO
+        void Publish(String topic, int nrEvents, int ms);
+
     }
 
     public interface IRemoteSubscriber : IRemoteEntity
     {
-        //TODO
+        void Subscribe(String topic);
+        void Unsubscribe(String topic);
     }
 
     public interface IRemotePuppetMaster
@@ -35,6 +45,8 @@ namespace Shared_Library
         void RegisterBroker(String url, String name);
         void RegisterPublisher(String url, String name);
         void RegisterSubscriber(String url, String name);
+        void Wait(int x_ms);
+        void Notify(String msg);
     }
 
     public interface IRemotePuppetMasterSlave
@@ -44,6 +56,7 @@ namespace Shared_Library
 
     public abstract class RemoteEntity : MarshalByRefObject, IRemoteEntity
     {
+        #region "Attributes"
         private String name;
         private String url;
         private String pmURL;
@@ -52,6 +65,11 @@ namespace Shared_Library
         private Dictionary<String, IRemoteBroker> brokers = new Dictionary<string, IRemoteBroker>();
         private Dictionary<String, IRemotePublisher> publishers = new Dictionary<string, IRemotePublisher>();
         private Dictionary<String, IRemoteSubscriber> subscribers = new Dictionary<string, IRemoteSubscriber>();
+
+        private Queue<Command> commands = new Queue<Command>();
+        private static Semaphore freezeSemaphore = new Semaphore(1, 1);
+        private static Semaphore queueSemaphore = new Semaphore(0, 1);
+        #endregion
 
         #region Properties
         public string Name
@@ -155,18 +173,13 @@ namespace Shared_Library
 
         public void Start()
         {
-            Register();
-            Run();
-            Console.ReadLine();
+           Register();
+           Thread t = new Thread(ProcessQueue);
+           t.Start();
         }
 
-        public abstract void Register();
-        public abstract void Run();
 
-        /*
-         * General remote entity interface methods
-         */
-
+        #region "Initialization"
         public void RegisterInitializationInfo(SysConfig sysConfig)
         {
             this.SysConfig = sysConfig;
@@ -194,13 +207,39 @@ namespace Shared_Library
                         break;
                 }
 
-                Console.WriteLine(String.Format("{0} added on: {1}", conn.Item2, conn.Item1));
+                Console.WriteLine(String.Format("[INFO] {0} added on: {1}", conn.Item2, conn.Item1));
             }
+          
         }
+        #endregion
+
+        public abstract void Register();
+        public abstract void Status();
 
         public string GetEntityName()
         {
             return this.Name;
+        }
+
+        public void Crash()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Freeze()
+        {
+            freezeSemaphore.WaitOne();
+        }
+
+        public void Unfreeze()
+        {
+            freezeSemaphore.Release();
+        }
+
+        private void ProcessQueue()
+        {
+            freezeSemaphore.WaitOne();
+
         }
     }
 
@@ -288,7 +327,7 @@ namespace Shared_Library
             logLevel = (String) info.GetValue("logLevel", typeof(String));
             routingPolicy = (String)info.GetValue("routingPolicy", typeof(String));
             ordering = (String)info.GetValue("ordering", typeof(String));
-            Connections = deserializeConnections((String) info.GetValue("connections", typeof(String)));
+            connections = DeserializeConnections((String) info.GetValue("connections", typeof(String)));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -314,7 +353,7 @@ namespace Shared_Library
             return result.Remove(result.Length - 1);
          } 
 
-        private List<Tuple<String, String>> deserializeConnections(String connStr)
+        private List<Tuple<String, String>> DeserializeConnections(String connStr)
         {
             List<Tuple<String, String>> result = new List<Tuple<string, string>>();
 
@@ -351,5 +390,10 @@ namespace Shared_Library
             return myUrl.Substring(myUrl.LastIndexOf("/") + 1);
         }
 
+    }
+
+    public abstract class Command
+    {
+        public abstract void Execute(IRemoteEntity entity);
     }
 }

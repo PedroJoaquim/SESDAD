@@ -36,11 +36,25 @@ namespace Broker
             pm.RegisterBroker(this.Url, this.Name);
         }
 
-        public override void Run()
+        public override void Status()
         {
-            //TODO
+            throw new NotImplementedException();
         }
 
+        public void DifundPublishEvent(string topic)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DifundSubscribeEvent(string topic)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DifundUnSubscribeEvent(string topic)
+        {
+            throw new NotImplementedException();
+        }
 
 
         #region "interface methods"
