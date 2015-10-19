@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using System.IO;
 using Shared_Library;
 using Shared_Library_PM;
+using System.Collections.Concurrent;
+using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting;
 
 namespace PuppetMaster
 {
@@ -18,16 +22,20 @@ namespace PuppetMaster
         }
     }
 
-    class PuppetMaster : IRemotePuppetMaster
+    class PuppetMaster : MarshalByRefObject, IRemotePuppetMaster
     {
         private static String CONFIG_FILE_PATH = @"../../Config/config.txt";
         private static String EXIT_CMD = "exit";
-
+        private static String PM_URL = @"tcp://localhost:56000/PuppetMaster";
         private SystemNetwork network = new SystemNetwork();
+               
+        private ConcurrentDictionary<String, IRemotePuppetMasterSlave> pmSlaves = new ConcurrentDictionary<string, IRemotePuppetMasterSlave>();
 
         #region "Main Functions"
         public void Start()
         {
+            Console.WriteLine("[INFO] Registering PuppetMaster Remote Object...");
+            RegisterPM();
             Console.WriteLine("[INFO] Wainting Slaves to join the network...");
             WaitSlaves();
             Console.WriteLine("[INFO] Start reading configuration file...");
@@ -41,9 +49,16 @@ namespace PuppetMaster
             Console.WriteLine("[INFO] All processes have been terminated, bye...");
         }
 
+        private void RegisterPM()
+        {
+            TcpChannel channel = new TcpChannel(SysConfig.PM_PORT);
+            ChannelServices.RegisterChannel(channel, false);
+            RemotingServices.Marshal(this, SysConfig.PM_NAME, typeof(IRemotePuppetMaster));
+        }
+
         private void WaitSlaves()
         {
-            return; // TODO 
+            Console.ReadLine();
         }
 
         private void CreateNetwork()
@@ -92,10 +107,10 @@ namespace PuppetMaster
         {
             String line = null;
             int lineNr = 0;
-
+            StreamReader file = null;
             try
             {
-                StreamReader file = new StreamReader(CONFIG_FILE_PATH);
+                file = new StreamReader(CONFIG_FILE_PATH);
 
                 while ((line = file.ReadLine()) != null)
                 {
@@ -104,6 +119,10 @@ namespace PuppetMaster
             } catch (Exception e)
             {
                 Console.WriteLine("[INIT] Failed to parse config file, exception: {0}", e.Message);
+            }
+            finally
+            {
+                if (file != null) file.Close();
             }
         }
         
@@ -195,19 +214,19 @@ namespace PuppetMaster
 
             switch (entityType)
             {
-                case Entity.BROKER:
+                case SysConfig.BROKER:
                     BrokerEntity bEntity = new BrokerEntity(targetEntityName, url);
                     bEntity.Site = parentSite;
                     parentSite.BrokerEntities.Add(targetEntityName, bEntity);
                     network.AddEntity(bEntity);
                     break;
-                case Entity.PUBLISHER:
+                case SysConfig.PUBLISHER:
                     PublisherEntity pEntity = new PublisherEntity(targetEntityName, url);
                     pEntity.Site = parentSite;
                     parentSite.PublisherEntities.Add(targetEntityName, pEntity);
                     network.AddEntity(pEntity);
                     break;
-                case Entity.SUBSCRIBER:
+                case SysConfig.SUBSCRIBER:
                     SubscriberEntity sEntity = new SubscriberEntity(targetEntityName, url);
                     sEntity.Site = parentSite;
                     parentSite.SubscriberEntities.Add(targetEntityName, sEntity);
@@ -268,17 +287,10 @@ namespace PuppetMaster
             throw new NotImplementedException();
         }
 
-        private bool IsRemoteEntity(Entity value)
-        {
-            return !value.Url.ToLower().Contains("localhost") && !value.Url.ToLower().Contains("127.0.0.1");
-        }
-
         private void LaunchProcess(Entity ent)
         {
-            List<Tuple<String, String>> connections = ent.GetConnectionsUrl();
-
-            ProcessManager.LaunchProcess(ent.EntityType(), "TODO");
-
+            String args = String.Format("{0} {1} {2}", ent.Name, ent.Url, PM_URL);
+            ProcessManager.LaunchProcess(ent.EntityType(), args);
             return;
         }
         #endregion
@@ -289,9 +301,53 @@ namespace PuppetMaster
             throw new NotImplementedException();
         }
         #endregion
+
+        #region "interface methods"
+        public void RegisterSlave(String url)
+        {
+            IRemotePuppetMasterSlave newSlave = (IRemotePuppetMasterSlave) Activator.GetObject(typeof(IRemotePuppetMasterSlave), url);
+            String ipDomain = Utils.GetIPDomain(url);
+
+            if (this.pmSlaves.TryAdd(ipDomain, newSlave))
+            {
+                Console.WriteLine("[INFO] Added PM Slave for domain:'" + ipDomain + "'");
+            }
+            else
+            {
+                Console.WriteLine("[INFO] Failed to add PM Slave for domain: " + ipDomain);
+            }
+        }
+
+        public void RegisterBroker(string url, string name)
+        {
+            BrokerEntity bEntity = (BrokerEntity) this.network.GetEntity(name);
+            IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), url);
+            bEntity.RemoteEntity = newBroker;
+
+            Console.WriteLine(String.Format("[INFO] Broker: {0} connected on url: {1}", name, url));
+        }
+
+        public void RegisterPublisher(string url, string name)
+        {
+            PublisherEntity pEntity = (PublisherEntity) this.network.GetEntity(name);
+            IRemotePublisher newPublisher = (IRemotePublisher)Activator.GetObject(typeof(IRemotePublisher), url);
+            pEntity.RemoteEntity = newPublisher;
+
+            Console.WriteLine(String.Format("[INFO] Publisher: {0} connected on url: {1}", name, url));
+        }
+
+        public void RegisterSubscriber(string url, string name)
+        {
+            SubscriberEntity sEntity = (SubscriberEntity)this.network.GetEntity(name);
+            IRemoteSubscriber newSubscriber = (IRemoteSubscriber)Activator.GetObject(typeof(IRemoteSubscriber), url);
+            sEntity.RemoteEntity = newSubscriber;
+
+            Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));
+        }
+        #endregion
     }
 
 
-    
+
 
 }

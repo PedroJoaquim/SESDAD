@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
 using System.Text;
 using System.Threading.Tasks;
 using Shared_Library;
+using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting;
 
-namespace Broker 
+namespace Publisher
 {
-    class Broker : MarshalByRefObject, IRemoteBroker
+    class Publisher : MarshalByRefObject, IRemotePublisher
     {
         private String name;
         private String url;
@@ -57,7 +57,7 @@ namespace Broker
         }
         #endregion
 
-        public Broker(String name, String url, String pmUrl)
+        public Publisher(String name, String url, String pmUrl)
         {
             this.Name = name;
             this.Url = url;
@@ -77,18 +77,19 @@ namespace Broker
 
             TcpChannel chan = new TcpChannel(port);
             ChannelServices.RegisterChannel(chan, false);
-            RemotingServices.Marshal(this, objName, typeof(IRemoteBroker));
+            RemotingServices.Marshal(this, objName, typeof(IRemotePublisher));
 
             IRemotePuppetMaster pm = (IRemotePuppetMaster)Activator.GetObject(typeof(IRemotePuppetMaster), this.PmURL);
-            pm.RegisterBroker(this.Url, this.Name);
+            pm.RegisterPublisher(this.Url, this.Name);
         }
+
 
         static void Main(string[] args)
         {
             if (args.Length < 3) return;
 
-            Broker b = new Broker(args[0], args[1], args[2]);
-            b.Start();
+            Publisher p = new Publisher(args[0], args[1], args[2]);
+            p.Start();
         }
     }
 }

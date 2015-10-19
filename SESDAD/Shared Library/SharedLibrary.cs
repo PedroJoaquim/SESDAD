@@ -23,11 +23,27 @@ namespace Shared_Library
 
     public interface IRemotePuppetMaster
     {
-        //TODO
+        void RegisterSlave(String url);
+        void RegisterBroker(String url, String name);
+        void RegisterPublisher(String url, String name);
+        void RegisterSubscriber(String url, String name);
+    }
+
+    public interface IRemotePuppetMasterSlave
+    {
+        void StartNewProcess(String objName, String objType, String objUrl);
     }
 
     public class SysConfig
     {
+        public const int PM_PORT = 56000;
+        public const int PM_SLAVE_PORT = 55000;
+        public const String PM_NAME = "PuppetMaster";
+        public const String PM_SLAVE_NAME = "PuppetMasterSlave";
+        public const String BROKER = "broker";
+        public const String PUBLISHER = "publisher";
+        public const String SUBSCRIBER = "subscriber";
+
         #region "Attributes"
         private String logLevel = null;
         private String routingPolicy = null;
@@ -88,7 +104,26 @@ namespace Shared_Library
             }
         }
         #endregion
-
     }
 
+    public class Utils
+    {
+        private static int START_INDEX = 6;
+
+        public static string GetIPDomain(String url)
+        {
+            return url.Substring(START_INDEX, url.LastIndexOf(":") - START_INDEX);
+        }
+
+        public static string GetIPPort(String url)
+        {
+            int start = url.LastIndexOf(":") + 1;
+            return url.Substring(start, url.LastIndexOf("/") - start);
+        }
+
+        public static string GetObjName(string myUrl)
+        {
+            return myUrl.Substring(myUrl.LastIndexOf("/") + 1);
+        }
+    }
 }

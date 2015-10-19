@@ -240,7 +240,7 @@ namespace PuppetMaster
             {
                 if (!entry.Value.Url.Equals(ignoreCase))
                 {
-                    result.Add(Tuple.Create(entry.Value.Url, Entity.PUBLISHER));
+                    result.Add(Tuple.Create(entry.Value.Url, SysConfig.PUBLISHER));
                 }
             }
 
@@ -255,7 +255,7 @@ namespace PuppetMaster
             {
                 if (!entry.Value.Url.Equals(ignoreCase))
                 {
-                    result.Add(Tuple.Create(entry.Value.Url, Entity.SUBSCRIBER));
+                    result.Add(Tuple.Create(entry.Value.Url, SysConfig.SUBSCRIBER));
                 }
             }
 
@@ -270,7 +270,7 @@ namespace PuppetMaster
             {
                 if (!entry.Value.Url.Equals(ignoreCase))
                 {
-                    result.Add(Tuple.Create(entry.Value.Url, Entity.BROKER));
+                    result.Add(Tuple.Create(entry.Value.Url, SysConfig.BROKER));
                 }
             }
 
@@ -288,10 +288,6 @@ namespace PuppetMaster
         private Site site = null;
         private String name = null;
         private String url = null;
-
-        public const String BROKER = "broker";
-        public const String PUBLISHER = "publisher";
-        public const String SUBSCRIBER = "subscriber";
 
         #region "Properties"
         public Site Site
@@ -342,7 +338,7 @@ namespace PuppetMaster
 
         public bool IsLocal()
         {
-            return !this.Url.ToLower().Contains("localhost") && !this.Url.ToLower().Contains("127.0.0.1");
+            return this.Url.ToLower().Contains("localhost") || this.Url.ToLower().Contains("127.0.0.1");
         }
 
         public abstract List<Tuple<String, String>> GetConnectionsUrl();
@@ -387,7 +383,7 @@ namespace PuppetMaster
         override
         public String EntityType()
         {
-            return Entity.BROKER;
+            return SysConfig.BROKER;
         }
     }
 
@@ -426,7 +422,7 @@ namespace PuppetMaster
         override
         public String EntityType()
         {
-            return Entity.PUBLISHER;
+            return SysConfig.PUBLISHER;
         }
     }
 
@@ -464,7 +460,7 @@ namespace PuppetMaster
         override
         public String EntityType()
         {
-            return Entity.SUBSCRIBER;
+            return SysConfig.SUBSCRIBER;
         }
     }
 }
