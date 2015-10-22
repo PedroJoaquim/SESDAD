@@ -22,9 +22,9 @@ namespace Shared_Library
 
     public interface IRemoteBroker : IRemoteEntity
     {
-        void DifundPublishEvent(String topic);
-        void DifundSubscribeEvent(String topic);
-        void DifundUnSubscribeEvent(String topic);
+        void DifundPublishEvent(Event e, bool source);
+        void DifundSubscribeEvent(string topic, bool source);
+        void DifundUnSubscribeEvent(string topic, bool source);
     }
 
     public interface IRemotePublisher : IRemoteEntity
@@ -37,6 +37,7 @@ namespace Shared_Library
     {
         void Subscribe(String topic);
         void Unsubscribe(String topic);
+        void NotifyEvent(Event  e);
     }
 
     public interface IRemotePuppetMaster
@@ -431,6 +432,93 @@ namespace Shared_Library
 
     public abstract class Command
     {
-        public abstract void Execute(IRemoteEntity entity);
+        public abstract void Execute(RemoteEntity entity);
+    }
+
+    [Serializable()]
+    public class Event : ISerializable
+    {
+        private string publisher;
+        private string topic;
+        private long timestamp;
+        private int eventNr;
+
+        #region "Properties"
+        public string Publisher
+        {
+            get
+            {
+                return publisher;
+            }
+
+            set
+            {
+                publisher = value;
+            }
+        }
+
+        public string Topic
+        {
+            get
+            {
+                return topic;
+            }
+
+            set
+            {
+                topic = value;
+            }
+        }
+
+        public long Timestamp
+        {
+            get
+            {
+                return timestamp;
+            }
+
+            set
+            {
+                timestamp = value;
+            }
+        }
+
+        public int EventNr
+        {
+            get
+            {
+                return eventNr;
+            }
+
+            set
+            {
+                eventNr = value;
+            }
+        }
+        #endregion
+
+        public Event(string publisher, string topic, long timestamp, int eventNr)
+        {
+            this.Publisher = publisher;
+            this.Topic = topic;
+            this.Timestamp = timestamp;
+            this.EventNr = eventNr;
+        }
+
+        public Event(SerializationInfo info, StreamingContext ctxt)
+        {
+            publisher = (String) info.GetValue("publisher", typeof(String));
+            topic = (String) info.GetValue("topic", typeof(String));
+            timestamp = (long) info.GetValue("timestamp", typeof(long));
+            eventNr = (int)info.GetValue("eventNr", typeof(int));
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("publisher", publisher);
+            info.AddValue("topic", topic);
+            info.AddValue("timestamp", timestamp);
+            info.AddValue("eventNr", eventNr);
+        }
     }
 }

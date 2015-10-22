@@ -44,18 +44,20 @@ namespace Subscriber
             throw new NotImplementedException();
         }
 
-
-
-
         #region "interface methods"
         public void Subscribe(string topic)
         {
-            throw new NotImplementedException();
+            this.Events.Produce(new SubscribeCommand(topic));
         }
 
         public void Unsubscribe(string topic)
         {
-            throw new NotImplementedException();
+            this.Events.Produce(new UnsubscribeCommand(topic));
+        }
+
+        public void NotifyEvent(Event e)
+        {
+            this.Events.Produce(new NotifyEvent(e));
         }
         #endregion
     }

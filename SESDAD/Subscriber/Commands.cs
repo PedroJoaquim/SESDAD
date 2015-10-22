@@ -31,9 +31,10 @@ namespace Subscriber
             this.Topic = topic;
         }
 
-        public override void Execute(IRemoteEntity entity)
+        public override void Execute(RemoteEntity entity)
         {
-            throw new NotImplementedException();
+            IRemoteBroker broker = entity.Brokers.ElementAt(0).Value; //first broker
+            broker.DifundSubscribeEvent(topic, true); //remote call
         }
     }
 
@@ -62,7 +63,38 @@ namespace Subscriber
         }
 
 
-        public override void Execute(IRemoteEntity entity)
+        public override void Execute(RemoteEntity entity)
+        {
+            IRemoteBroker broker = entity.Brokers.ElementAt(0).Value; //first broker
+            broker.DifundUnSubscribeEvent(this.topic, true); //remote call
+        }
+    }
+
+    class NotifyEvent : Command
+    {
+        #region "Properties"
+        private Event e;
+
+        public Event E
+        {
+            get
+            {
+                return e;
+            }
+
+            set
+            {
+                e = value;
+            }
+        }
+        #endregion
+
+        public NotifyEvent(Event e)
+        {
+            this.E = e;
+        }
+
+        public override void Execute(RemoteEntity entity)
         {
             throw new NotImplementedException();
         }

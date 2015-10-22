@@ -42,24 +42,21 @@ namespace Broker
             throw new NotImplementedException();
         }
 
-        public void DifundPublishEvent(string topic)
-        {
-            this.Events.Produce(new DifundPublishEventCommand(topic));
-        }
-
-        public void DifundSubscribeEvent(string topic)
-        {
-            this.Events.Produce(new DifundSubscribeEventCommand(topic));
-        }
-
-        public void DifundUnSubscribeEvent(string topic)
-        {
-            throw new NotImplementedException();
-        }
-
-
         #region "interface methods"
+        public void DifundPublishEvent(Event e, bool source)
+        {
+            this.Events.Produce(new DifundPublishEventCommand(e, source));
+        }
 
+        public void DifundSubscribeEvent(string topic, bool source)
+        {
+            this.Events.Produce(new DifundSubscribeEventCommand(topic, source));
+        }
+
+        public void DifundUnSubscribeEvent(string topic, bool source)
+        {
+            this.Events.Produce(new DifundUnSubscribeEventCommand(topic, source));
+        }
         #endregion
     }
 }

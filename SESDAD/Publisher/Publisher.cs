@@ -12,6 +12,22 @@ namespace Publisher
 {
     class Publisher : RemoteEntity, IRemotePublisher
     {
+        #region "Properties"
+        private int currentEventNr;
+
+        public int CurrentEventNr
+        {
+            get
+            {
+                return currentEventNr;
+            }
+
+            set
+            {
+                currentEventNr = value;
+            }
+        }
+        #endregion
 
         static void Main(string[] args)
         {
@@ -21,7 +37,25 @@ namespace Publisher
             p.Start();
         }
 
-        public Publisher(String name, String url, String pmUrl) : base(name, url, pmUrl) { }
+        public Publisher(String name, String url, String pmUrl) : base(name, url, pmUrl)
+        {
+            this.CurrentEventNr = 1;
+        }
+
+
+        private int ConcurrentEventNumberGetter(int nrEvents)
+        {
+            int result;
+
+            lock (this)
+            {
+                result = this.CurrentEventNr;
+                this.CurrentEventNr = result + nrEvents;
+            }
+
+            return result;
+        }
+
 
         public override void Register()
         {
@@ -42,14 +76,12 @@ namespace Publisher
             throw new NotImplementedException();
         }
 
+        #region "interface methods"
         public void Publish(string topic, int nrEvents, int ms)
         {
-            throw new NotImplementedException();
+            int eventNumber = ConcurrentEventNumberGetter(nrEvents);
+            this.Events.Produce(new PublishCommand(topic, nrEvents, ms, eventNumber));
         }
-
-
-        #region "interface methods"
-
         #endregion
     }
 }

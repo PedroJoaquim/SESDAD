@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared_Library;
+using System.Threading;
 
 namespace Publisher
 {
@@ -13,6 +14,7 @@ namespace Publisher
         private String topic;
         private int nrEvents;
         private int ms;
+        private int eventNr;
 
         public string Topic
         {
@@ -52,18 +54,42 @@ namespace Publisher
                 ms = value;
             }
         }
+
+        public int EventNr
+        {
+            get
+            {
+                return eventNr;
+            }
+
+            set
+            {
+                eventNr = value;
+            }
+        }
         #endregion
 
-        public PublishCommand(String topic, int nrEvents, int ms)
+        public PublishCommand(String topic, int nrEvents, int ms, int eventNr)
         {
             this.Topic = topic;
             this.NrEvents = nrEvents;
             this.Ms = ms;
+            this.EventNr = eventNr;
         }
 
-        public override void Execute(IRemoteEntity entity)
+        public override void Execute(RemoteEntity entity)
         {
-            throw new NotImplementedException();
+            IRemoteBroker broker = entity.Brokers.ElementAt(0).Value; //first broker
+            Event newEvent;
+
+            for (int i = 0; i < this.nrEvents; i++)
+            {
+                newEvent = new Event(entity.Name, this.Topic, new DateTime().Ticks, this.EventNr + i);
+                broker.DifundPublishEvent(newEvent, true); // remote call
+                Thread.Sleep(this.Ms);
+            }
+             
+
         }
     }
 }

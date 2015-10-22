@@ -10,28 +10,43 @@ namespace Broker
     class DifundPublishEventCommand : Command
     {
         #region "Properties"
-        private String topic;
+        private Event e;
+        private bool source;
 
-        public string Topic
+        public Event E
         {
             get
             {
-                return topic;
+                return e;
             }
 
             set
             {
-                topic = value;
+                e = value;
+            }
+        }
+
+        public bool Source
+        {
+            get
+            {
+                return source;
+            }
+
+            set
+            {
+                source = value;
             }
         }
         #endregion
 
-        public DifundPublishEventCommand(String topic)
+        public DifundPublishEventCommand(Event e, bool source)
         {
-            this.Topic = topic;
+            this.E = e;
+            this.source = source;
         }
 
-        public override void Execute(IRemoteEntity entity)
+        public override void Execute(RemoteEntity entity)
         {
             throw new NotImplementedException();
         }
@@ -41,6 +56,7 @@ namespace Broker
     {
         #region "Properties"
         private String topic;
+        private bool source;
 
         public string Topic
         {
@@ -54,14 +70,28 @@ namespace Broker
                 topic = value;
             }
         }
+
+        public bool Source
+        {
+            get
+            {
+                return source;
+            }
+
+            set
+            {
+                source = value;
+            }
+        }
         #endregion
 
-        public DifundSubscribeEventCommand(String topic)
+        public DifundSubscribeEventCommand(String topic, bool source)
         {
             this.Topic = topic;
+            this.Source = source;
         }
 
-        public override void Execute(IRemoteEntity entity)
+        public override void Execute(RemoteEntity entity)
         {
             Console.WriteLine(this.topic);
         }
@@ -71,6 +101,7 @@ namespace Broker
     {
         #region "Properties"
         private String topic;
+        private bool source;
 
         public string Topic
         {
@@ -84,14 +115,28 @@ namespace Broker
                 topic = value;
             }
         }
+
+        public bool Source
+        {
+            get
+            {
+                return source;
+            }
+
+            set
+            {
+                source = value;
+            }
+        }
         #endregion
 
-        public DifundUnSubscribeEventCommand(String topic)
+        public DifundUnSubscribeEventCommand(String topic, bool source)
         {
             this.Topic = topic;
+            this.source = source;
         }
 
-        public override void Execute(IRemoteEntity entity)
+        public override void Execute(RemoteEntity entity)
         {
             throw new NotImplementedException();
         }
