@@ -63,7 +63,7 @@ namespace Broker
 
         public override void Execute(IRemoteEntity entity)
         {
-            throw new NotImplementedException();
+            Console.WriteLine(this.topic);
         }
     }
 

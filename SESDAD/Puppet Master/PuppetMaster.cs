@@ -315,11 +315,155 @@ namespace PuppetMaster
         #region "RunMode"
         private void processCommand(string cmd)
         {
-            throw new NotImplementedException();
+            string[] splitedCMD = cmd.ToLower().Split(' ');
+
+            switch (splitedCMD[0])
+            {
+                case "subscriber":
+                    processSubscriberCommand(splitedCMD);
+                    break;
+
+                case "publisher":
+                    processPublisherCommand(splitedCMD);
+                    break;
+
+                case "status":
+                    processStatusCommand();
+                    break;
+
+                case "crash":
+                    processCrashCommand(splitedCMD);
+                    break;
+
+                case "freeze":
+                    processFreezeCommand(splitedCMD);
+                    break;
+
+                case "unfreeze":
+                    processUnfreezeCommand(splitedCMD);
+                    break;
+
+                case "wait":
+                    processWaitCommand(splitedCMD);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private void processWaitCommand(string[] splitedCMD)
+        {
+            try
+            {
+                int ms = Int32.Parse(splitedCMD[1]);
+                Thread.Sleep(ms);
+            }
+            catch(Exception)
+            {
+                Console.WriteLine("[ERROR] Invalid Wait Command");
+            }
+
+        }
+
+        private void processUnfreezeCommand(string[] splitedCMD)
+        {
+            try
+            {
+                string processName = splitedCMD[1];
+                Entity entity = network.GetEntity(processName);
+                entity.GetRemoteEntity().Unfreeze();
+            }
+            catch(Exception)
+            {
+                Console.WriteLine("[ERROR] Invalid Unfreeze Command");
+            }
+        }
+
+        private void processFreezeCommand(string[] splitedCMD)
+        {
+            try
+            {
+                string processName = splitedCMD[1];
+                Entity entity = network.GetEntity(processName);
+                entity.GetRemoteEntity().Freeze();
+            } catch (Exception)
+            {
+                Console.WriteLine("[ERROR] Invalid Freeze Command");
+            }
+        }
+
+        private void processCrashCommand(string[] splitedCMD)
+        {
+            try
+            {
+                string processName = splitedCMD[1];
+                Entity entity = network.GetEntity(processName);
+                entity.GetRemoteEntity().Crash();
+            } catch (Exception)
+            {
+                Console.WriteLine("[ERROR] Invalid Crash Command");
+            }
+        }
+
+        private void processStatusCommand()
+        {
+            try
+            {
+                foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
+                {
+                    entry.Value.GetRemoteEntity().Status();
+                }
+            }
+            catch(Exception)
+            {
+                Console.WriteLine("[ERROR] Invalid Status Command");
+            }
+        }
+
+        private void processPublisherCommand(string[] splitedCMD)
+        {
+            try
+            {
+                string processName = splitedCMD[1];
+                int numberOfEvents = Int32.Parse(splitedCMD[3]);
+                string topicName = splitedCMD[5];
+                int ms = Int32.Parse(splitedCMD[7]);
+
+                PublisherEntity entity = (PublisherEntity)this.network.GetEntity(processName);
+                entity.RemoteEntity.Publish(topicName, numberOfEvents, ms);
+            } catch (Exception)
+            {
+                Console.WriteLine("[ERROR] Invalid Publish Command");
+            }
+        }
+
+        private void processSubscriberCommand(string[] splitedCMD)
+        {
+            try
+            {
+                string processName = splitedCMD[1];
+                string operation = splitedCMD[2];
+                string topicName = splitedCMD[3];
+
+                SubscriberEntity entity = (SubscriberEntity)this.network.GetEntity(processName);
+
+                if(operation.Equals("subscribe"))
+                {
+                    entity.RemoteEntity.Subscribe(topicName);
+                }
+                else
+                {
+                    entity.RemoteEntity.Unsubscribe(topicName);
+                }
+            } catch (Exception)
+            {
+                Console.WriteLine("[ERROR] Invalid Publish Command");
+            }
         }
         #endregion
 
-        #region "interface methods"
+        #region "Interface Methods"
         public void RegisterSlave(String url)
         {
             IRemotePuppetMasterSlave newSlave = (IRemotePuppetMasterSlave) Activator.GetObject(typeof(IRemotePuppetMasterSlave), url);
@@ -370,10 +514,19 @@ namespace PuppetMaster
 
             Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));
         }
+
+        public void Wait(int x_ms)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Notify(string msg)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
-
-        #region "semaphores"
+        #region "Semaphores"
         public void SemaphoreWait()
         {
             PuppetMaster.sem.WaitOne();
@@ -390,27 +543,14 @@ namespace PuppetMaster
             Monitor.Enter(lockObject);
             try
             {
-
                 if (++this.entitiesProcessed == this.maxNumberEntities)
                     SemaphoreRelease();
-
             }
             finally
             {
                 Monitor.Exit(lockObject);
-                    
             }
 
-        }
-
-        public void Wait(int x_ms)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Notify(string msg)
-        {
-            throw new NotImplementedException();
         }
         #endregion
     }

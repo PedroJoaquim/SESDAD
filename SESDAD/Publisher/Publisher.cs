@@ -34,6 +34,7 @@ namespace Publisher
 
             IRemotePuppetMaster pm = (IRemotePuppetMaster)Activator.GetObject(typeof(IRemotePuppetMaster), this.PmURL);
             pm.RegisterPublisher(this.Url, this.Name);
+            this.PuppetMaster = pm;
         }
 
         public override void Status()

@@ -6,3 +6,4 @@ depois de freeze os processos continuam a responder a comandos status do PM?
 mais do que 1 broker por site na primeira entrega?
 
 podemos usar semaforos?
+

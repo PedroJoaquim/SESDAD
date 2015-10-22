@@ -36,6 +36,7 @@ namespace Subscriber
 
             IRemotePuppetMaster pm = (IRemotePuppetMaster)Activator.GetObject(typeof(IRemotePuppetMaster), this.PmURL);
             pm.RegisterSubscriber(this.Url, this.Name);
+            this.PuppetMaster = pm;
         }
 
         public override void Status()

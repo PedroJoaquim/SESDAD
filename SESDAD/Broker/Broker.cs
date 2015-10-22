@@ -34,6 +34,7 @@ namespace Broker
 
             IRemotePuppetMaster pm = (IRemotePuppetMaster)Activator.GetObject(typeof(IRemotePuppetMaster), this.PmURL);
             pm.RegisterBroker(this.Url, this.Name);
+            this.PuppetMaster = pm;
         }
 
         public override void Status()
@@ -43,12 +44,12 @@ namespace Broker
 
         public void DifundPublishEvent(string topic)
         {
-            throw new NotImplementedException();
+            this.Events.Produce(new DifundPublishEventCommand(topic));
         }
 
         public void DifundSubscribeEvent(string topic)
         {
-            throw new NotImplementedException();
+            this.Events.Produce(new DifundSubscribeEventCommand(topic));
         }
 
         public void DifundUnSubscribeEvent(string topic)

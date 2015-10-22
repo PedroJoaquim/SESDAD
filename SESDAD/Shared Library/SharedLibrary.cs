@@ -61,14 +61,15 @@ namespace Shared_Library
         private String url;
         private String pmURL;
 
+        private IRemotePuppetMaster puppetMaster;
         private SysConfig sysConfig;
         private Dictionary<String, IRemoteBroker> brokers = new Dictionary<string, IRemoteBroker>();
         private Dictionary<String, IRemotePublisher> publishers = new Dictionary<string, IRemotePublisher>();
         private Dictionary<String, IRemoteSubscriber> subscribers = new Dictionary<string, IRemoteSubscriber>();
 
-        private Queue<Command> commands = new Queue<Command>();
-        private static Semaphore freezeSemaphore = new Semaphore(1, 1);
-        private static Semaphore queueSemaphore = new Semaphore(0, 1);
+        private EventQueue events = new EventQueue(50);
+        private static Semaphore freezeSemaphore = new Semaphore(1, 1); //semaphore for freeze command
+
         #endregion
 
         #region Properties
@@ -162,6 +163,32 @@ namespace Shared_Library
                 subscribers = value;
             }
         }
+
+        public IRemotePuppetMaster PuppetMaster
+        {
+            get
+            {
+                return puppetMaster;
+            }
+
+            set
+            {
+                puppetMaster = value;
+            }
+        }
+
+        public EventQueue Events
+        {
+            get
+            {
+                return events;
+            }
+
+            set
+            {
+                events = value;
+            }
+        }
         #endregion
 
         public RemoteEntity(String name, String url, String pmUrl)
@@ -176,6 +203,7 @@ namespace Shared_Library
            Register();
            Thread t = new Thread(ProcessQueue);
            t.Start();
+           Console.ReadLine();
         }
 
 
@@ -238,7 +266,15 @@ namespace Shared_Library
 
         private void ProcessQueue()
         {
-            freezeSemaphore.WaitOne();
+            Command command;
+        
+            while (true)
+            {  
+                command = events.Consume();
+                freezeSemaphore.WaitOne();       //see if the process is freeze
+                command.Execute(this);
+                freezeSemaphore.Release();
+            }
 
         }
     }
@@ -350,21 +386,22 @@ namespace Shared_Library
                 }
             }
 
-            return result.Remove(result.Length - 1);
+            return result.Equals("") ? result : result.Remove(result.Length - 1);
          } 
 
         private List<Tuple<String, String>> DeserializeConnections(String connStr)
         {
             List<Tuple<String, String>> result = new List<Tuple<string, string>>();
 
-            string[] splitedConns = connStr.Split('#');
-
-            for (int i = 0; i < splitedConns.Length - 1; i = i +2)
+            if(!connStr.Equals(""))
             {
-                result.Add(new Tuple<string, string>(splitedConns[i], splitedConns[i + 1]));
+                string[] splitedConns = connStr.Split('#');
+                for (int i = 0; i < splitedConns.Length - 1; i = i + 2)
+                {
+                    result.Add(new Tuple<string, string>(splitedConns[i], splitedConns[i + 1]));
+                }
             }
-
-
+ 
             return result;
         }
         #endregion
