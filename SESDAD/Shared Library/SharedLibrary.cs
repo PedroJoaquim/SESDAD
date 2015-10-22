@@ -295,6 +295,7 @@ namespace Shared_Library
         private String logLevel = null;
         private String routingPolicy = null;
         private String ordering = null;
+        private String distributed = null;
         private List<Tuple<String, String>> connections = null;
         #endregion
 
@@ -350,6 +351,20 @@ namespace Shared_Library
                 connections = value;
             }
         }
+
+        public string Distributed
+        {
+            get
+            {
+                return distributed;
+            }
+
+            set
+            {
+                distributed = value;
+            }
+        }
+
         #endregion
 
         public SysConfig()

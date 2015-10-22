@@ -32,7 +32,7 @@ namespace PuppetMaster
         private SystemNetwork network = new SystemNetwork();
         private Logger log = new Logger();
                
-        private ConcurrentDictionary<String, IRemotePuppetMasterSlave> pmSlaves = new ConcurrentDictionary<string, IRemotePuppetMasterSlave>();
+        private Dictionary<String, IRemotePuppetMasterSlave> pmSlaves = new Dictionary<string, IRemotePuppetMasterSlave>();
 
         private static Semaphore sem = new Semaphore(0, 1);
         private int maxNumberEntities;
@@ -44,8 +44,6 @@ namespace PuppetMaster
         {
             Console.WriteLine("[INFO] Registering PuppetMaster Remote Object...");
             RegisterPM();
-            Console.WriteLine("[INFO] Wainting Slaves to join the network...");
-            WaitSlaves();
             Console.WriteLine("[INFO] Start reading configuration file...");
             ReadFile("config");
             Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
@@ -72,11 +70,17 @@ namespace PuppetMaster
         private void CreateNetwork()
         {
 
+            if(!this.network.Distributed.Equals("localhost"))
+            {
+                Console.WriteLine("[INFO] Wainting Slaves to join the network...");
+                WaitSlaves();
+            }
+
             try
             {
                 foreach (KeyValuePair<string, Entity> entry in network.Entities)
                 {
-                    if(entry.Value.IsLocal())
+                    if(Utils.GetIPDomain(entry.Value.Url).Equals(this.network.Distributed)) //check if the process is local to the pm machine
                     {
                         LaunchProcess(entry.Value);
                     }
@@ -185,6 +189,9 @@ namespace PuppetMaster
                 case "logginglevel":
                     ProcessLoggingLevel(splitedLine, lineNr);
                     break;
+                case "distributed":
+                    ProcessDistributed(splitedLine, lineNr);
+                    break;
                 default:
                     break;
             }
@@ -192,9 +199,20 @@ namespace PuppetMaster
         }
 
 
+
+
         /*
          *  Functions to process a config file line
          */
+        private void ProcessDistributed(string[] splitedLine, int lineNr)
+        {
+            if (splitedLine.Length != 2)
+            {
+                throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Distributed]");
+            }
+
+            this.network.Distributed = splitedLine[1];
+        }
 
         private void ProcessOrdering(string[] splitedLine, int lineNr)
         {
@@ -316,17 +334,24 @@ namespace PuppetMaster
         #region "NetworkCreation"
 
 
-        private void LaunchRemoteProcess(Entity value)
+        private void LaunchRemoteProcess(Entity ent)
         {
-            throw new NotImplementedException();
+            IRemotePuppetMasterSlave slave;
+            string ipDomain = Utils.GetIPDomain(ent.Url);
+            if(!this.pmSlaves.TryGetValue(ipDomain, out slave))
+            {
+                Console.WriteLine("[ERROR] Slave for ipdomain: " + ipDomain + "not found and process not launched");
+            }
+
+            slave.StartNewProcess(ent.Name, ent.EntityType(), ent.Url);
         }
 
         private void LaunchProcess(Entity ent)
         {
             String args = String.Format("{0} {1} {2}", ent.Name, ent.Url, PM_URL);
             ProcessManager.LaunchProcess(ent.EntityType(), args);
-            return;
         }
+
         #endregion
 
         #region "RunMode"
@@ -483,17 +508,24 @@ namespace PuppetMaster
         #region "Interface Methods"
         public void RegisterSlave(String url)
         {
-            IRemotePuppetMasterSlave newSlave = (IRemotePuppetMasterSlave) Activator.GetObject(typeof(IRemotePuppetMasterSlave), url);
-            String ipDomain = Utils.GetIPDomain(url);
+            
+            try
+            {
+                IRemotePuppetMasterSlave newSlave = (IRemotePuppetMasterSlave)Activator.GetObject(typeof(IRemotePuppetMasterSlave), url);
+                String ipDomain = Utils.GetIPDomain(url);
 
-            if (this.pmSlaves.TryAdd(ipDomain, newSlave))
-            {
+                lock (this)
+                {
+                    this.pmSlaves.Add(ipDomain, newSlave);
+                }
+                
                 Console.WriteLine("[INFO] Added PM Slave for domain:'" + ipDomain + "'");
-            }
-            else
+            } 
+            catch (Exception)
             {
-                Console.WriteLine("[INFO] Failed to add PM Slave for domain: " + ipDomain);
+                Console.WriteLine("[ERROR] Failed to add PM Slave");
             }
+    
         }
 
         public void RegisterBroker(string url, string name)

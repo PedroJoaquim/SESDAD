@@ -23,6 +23,7 @@ namespace PuppetMaster
             this.SystemConfig.LogLevel = "light";
             this.SystemConfig.RoutingPolicy = "flooding";
             this.SystemConfig.Ordering = "fifo";
+            this.SystemConfig.Distributed = "localhost";
         }
 
 
@@ -63,6 +64,19 @@ namespace PuppetMaster
             set
             {
                 this.SystemConfig.Ordering = value;
+            }
+        }
+
+        public string Distributed
+        {
+            get
+            {
+                return this.SystemConfig.Distributed;
+            }
+
+            set
+            {
+                this.SystemConfig.Distributed = value;
             }
         }
 
@@ -347,11 +361,6 @@ namespace PuppetMaster
         {
             this.name = name;
             this.url = url;
-        }
-
-        public bool IsLocal()
-        {
-            return this.Url.ToLower().Contains("localhost") || this.Url.ToLower().Contains("127.0.0.1");
         }
 
         public abstract List<Tuple<String, String>> GetConnectionsUrl();

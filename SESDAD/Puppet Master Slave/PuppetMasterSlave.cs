@@ -31,6 +31,9 @@ namespace Puppet_Master_Slave
             string[] urls = GetConfigFileInfo();
             String myUrl = urls[MY_URL_INDEX];
             String pmUrl = urls[PM_URL_INDEX];
+            int myPort;
+
+            if (!Int32.TryParse(Utils.GetIPPort(myUrl), out myPort)) myPort = SysConfig.PM_SLAVE_PORT;
 
             TcpChannel chan = new TcpChannel(SysConfig.PM_SLAVE_PORT);
             ChannelServices.RegisterChannel(chan, false);
@@ -42,8 +45,6 @@ namespace Puppet_Master_Slave
             this.pmURL = pmUrl;
         }
 
-
-  
 
         private string[] GetConfigFileInfo()
         {
