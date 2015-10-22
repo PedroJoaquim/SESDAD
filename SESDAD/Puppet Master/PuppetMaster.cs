@@ -26,9 +26,11 @@ namespace PuppetMaster
     class PuppetMaster : MarshalByRefObject, IRemotePuppetMaster
     {
         private static String CONFIG_FILE_PATH = @"../../Config/config.txt";
+        private static String SCRIPT_FILE_PATH = @"../../Config/script.txt";
         private static String EXIT_CMD = "exit";
         private static String PM_URL = @"tcp://localhost:56000/PuppetMaster";
         private SystemNetwork network = new SystemNetwork();
+        private Logger log = new Logger();
                
         private ConcurrentDictionary<String, IRemotePuppetMasterSlave> pmSlaves = new ConcurrentDictionary<string, IRemotePuppetMasterSlave>();
 
@@ -45,7 +47,7 @@ namespace PuppetMaster
             Console.WriteLine("[INFO] Wainting Slaves to join the network...");
             WaitSlaves();
             Console.WriteLine("[INFO] Start reading configuration file...");
-            ReadConfigFile();
+            ReadFile("config");
             Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
             CreateNetwork();
             Console.WriteLine("[INFO] Successfully generated the network, waiting input...");
@@ -120,7 +122,7 @@ namespace PuppetMaster
         #endregion
 
         #region "ConfigFileProcess"
-        public void ReadConfigFile()
+        public void ReadFile(string fileName)
         {
             String line = null;
             int lineNr = 0;
@@ -131,23 +133,38 @@ namespace PuppetMaster
 
                 while ((line = file.ReadLine()) != null)
                 {
-                    ProcessLine(line, lineNr++);
+                    if (fileName.Equals("config"))
+                        ProcessConfigLine(line, lineNr++);
+                    else
+                        ProcessScriptLine(line, lineNr++);
                 }
             } catch (Exception e)
             {
-                Console.WriteLine("[INIT] Failed to parse config file, exception: {0}", e.Message);
+                Console.WriteLine("[INIT] Failed to parse {0} file, exception: {1}", fileName, e.Message);
             }
             finally
             {
                 if (file != null) file.Close();
             }
         }
-        
-        
+
+        private void ProcessScriptLine(string line, int lineNr)
+        {
+
+            String[] splitedLine = line.Split(' ');
+
+            switch (splitedLine[0].ToLower())
+            {
+
+            }
+        }
+
+
+
         /*
          *  Function that parses one line from the config file
          */
-        private void ProcessLine(string line, int lineNr)
+        private void ProcessConfigLine(string line, int lineNr)
         {
             String[] splitedLine = line.Split(' ');
 
