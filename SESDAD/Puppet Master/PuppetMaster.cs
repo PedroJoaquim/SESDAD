@@ -30,7 +30,7 @@ namespace PuppetMaster
         private static String EXIT_CMD = "exit";
         private static String PM_URL = @"tcp://localhost:56000/PuppetMaster";
         private SystemNetwork network = new SystemNetwork();
-        private Logger log = new Logger();
+        public Logger log = new Logger();
                
         private Dictionary<String, IRemotePuppetMasterSlave> pmSlaves = new Dictionary<string, IRemotePuppetMasterSlave>();
 
@@ -115,7 +115,7 @@ namespace PuppetMaster
             {
                 Console.Write("[CMD] > ");
                 cmd = Console.ReadLine();
-                processCommand(cmd);
+                ProcessCommand(cmd);
             }
         }
 
@@ -140,7 +140,7 @@ namespace PuppetMaster
                     if (fileName.Equals("config"))
                         ProcessConfigLine(line, lineNr++);
                     else
-                        ProcessScriptLine(line, lineNr++);
+                        ProcessCommand(line, lineNr++);
                 }
             } catch (Exception e)
             {
@@ -149,17 +149,6 @@ namespace PuppetMaster
             finally
             {
                 if (file != null) file.Close();
-            }
-        }
-
-        private void ProcessScriptLine(string line, int lineNr)
-        {
-
-            String[] splitedLine = line.Split(' ');
-
-            switch (splitedLine[0].ToLower())
-            {
-
             }
         }
 
@@ -355,42 +344,47 @@ namespace PuppetMaster
         #endregion
 
         #region "RunMode"
-        private void processCommand(string cmd)
+        private void ProcessCommand(string cmd, int lineNr = -1)
         {
-            string[] splitedCMD = cmd.ToLower().Split(' ');
+            string[] splitedCMD = cmd.Split(' ');
 
             switch (splitedCMD[0])
             {
-                case "subscriber":
+                case "Subscriber":
                     processSubscriberCommand(splitedCMD);
                     break;
 
-                case "publisher":
+                case "Publisher":
                     processPublisherCommand(splitedCMD);
                     break;
 
-                case "status":
+                case "Status":
                     processStatusCommand();
                     break;
 
-                case "crash":
+                case "Crash":
                     processCrashCommand(splitedCMD);
                     break;
 
-                case "freeze":
+                case "Freeze":
                     processFreezeCommand(splitedCMD);
                     break;
 
-                case "unfreeze":
+                case "Unfreeze":
                     processUnfreezeCommand(splitedCMD);
                     break;
 
-                case "wait":
+                case "Wait":
                     processWaitCommand(splitedCMD);
                     break;
 
                 default:
-                    break;
+                    if (lineNr != -1)
+                        Console.WriteLine("[ERROR] Unknown command at line: {0}", lineNr);
+                    else
+                        Console.WriteLine("[ERROR] Unknown command");
+
+                        break;
             }
         }
 
@@ -400,6 +394,8 @@ namespace PuppetMaster
             {
                 int ms = Int32.Parse(splitedCMD[1]);
                 Thread.Sleep(ms);
+
+                log.logCMD(splitedCMD);
             }
             catch(Exception)
             {
@@ -415,6 +411,8 @@ namespace PuppetMaster
                 string processName = splitedCMD[1];
                 Entity entity = network.GetEntity(processName);
                 entity.GetRemoteEntity().Unfreeze();
+
+                log.logCMD(splitedCMD);
             }
             catch(Exception)
             {
@@ -429,6 +427,8 @@ namespace PuppetMaster
                 string processName = splitedCMD[1];
                 Entity entity = network.GetEntity(processName);
                 entity.GetRemoteEntity().Freeze();
+
+                log.logCMD(splitedCMD);
             } catch (Exception)
             {
                 Console.WriteLine("[ERROR] Invalid Freeze Command");
@@ -442,6 +442,8 @@ namespace PuppetMaster
                 string processName = splitedCMD[1];
                 Entity entity = network.GetEntity(processName);
                 entity.GetRemoteEntity().Crash();
+
+                log.logCMD(splitedCMD);
             } catch (Exception)
             {
                 Console.WriteLine("[ERROR] Invalid Crash Command");
@@ -456,6 +458,7 @@ namespace PuppetMaster
                 {
                     entry.Value.GetRemoteEntity().Status();
                 }
+
             }
             catch(Exception)
             {
@@ -472,8 +475,10 @@ namespace PuppetMaster
                 string topicName = splitedCMD[5];
                 int ms = Int32.Parse(splitedCMD[7]);
 
-                PublisherEntity entity = (PublisherEntity)this.network.GetEntity(processName);
+                PublisherEntity entity = (PublisherEntity) this.network.GetEntity(processName);
                 entity.RemoteEntity.Publish(topicName, numberOfEvents, ms);
+
+                log.logCMD(splitedCMD);
             } catch (Exception)
             {
                 Console.WriteLine("[ERROR] Invalid Publish Command");
@@ -498,6 +503,8 @@ namespace PuppetMaster
                 {
                     entity.RemoteEntity.Unsubscribe(topicName);
                 }
+
+                log.logCMD(splitedCMD);
             } catch (Exception)
             {
                 Console.WriteLine("[ERROR] Invalid Publish Command");
@@ -602,6 +609,23 @@ namespace PuppetMaster
 
         }
         #endregion
+
+        #region "Log methods"
+        public void LogEventPublication(string publisher, string topicname, int eventNumber)
+        {
+            log.LogEventPublication(publisher, topicname, eventNumber);
+        }
+
+        public void LogEventForwarding(string broker, string publisher, string topicname, int eventNumber)
+        {
+            log.LogEventForwarding(broker, publisher, topicname, eventNumber);
+        }
+
+        public void LogEventDelivery(string subscriber, string publisher, string topicname, int eventNumber)
+        {
+            log.LogEventDelivery(subscriber, publisher, topicname, eventNumber);
+        }
+
     }
 
 }

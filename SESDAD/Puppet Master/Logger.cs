@@ -43,7 +43,7 @@ namespace PuppetMaster
 
         }
 
-        public void LogEventPublication(string publisher, string topicname, string eventNumber)
+        public void LogEventPublication(string publisher, string topicname, int eventNumber)
         {
             string output = string.Format("{0} - PubEvent {1}, {2}, {3}", GetCurrentTime(), publisher, topicname, eventNumber);
 
@@ -51,14 +51,14 @@ namespace PuppetMaster
 
         }
 
-        public void LogEventForwarding(string broker, string publisher, string topicname, string eventNumber)
+        public void LogEventForwarding(string broker, string publisher, string topicname, int eventNumber)
         {
             string output = string.Format("{0} - BroEvent {1}, {2}, {3}, {4}", GetCurrentTime(), broker, publisher, topicname, eventNumber);
 
             Console.WriteLine(output);
         }
 
-        public void LogEventDelivery(string subscriber, string publisher, string topicname, string eventNumber)
+        public void LogEventDelivery(string subscriber, string publisher, string topicname, int eventNumber)
         {
             string output = string.Format("{0} - SubEvent {1}, {2}, {3}, {4}", GetCurrentTime(), subscriber, publisher, topicname, eventNumber);
 

@@ -48,6 +48,9 @@ namespace Shared_Library
         void RegisterSubscriber(String url, String name);
         void Wait(int x_ms);
         void Notify(String msg);
+        void LogEventPublication(string publisher, string topicname, int eventNumber);
+        void LogEventForwarding(string broker, string publisher, string topicname, int eventNumber);
+        void LogEventDelivery(string subscriber, string publisher, string topicname, int eventNumber);
     }
 
     public interface IRemotePuppetMasterSlave

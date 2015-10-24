@@ -86,6 +86,9 @@ namespace Publisher
             {
                 newEvent = new Event(entity.Name, this.Topic, new DateTime().Ticks, this.EventNr + i);
                 broker.DifundPublishEvent(newEvent, true); // remote call
+
+                entity.PuppetMaster.LogEventPublication(entity.Name, newEvent.Topic, newEvent.EventNr);
+
                 Thread.Sleep(this.Ms);
             }
              
