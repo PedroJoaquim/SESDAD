@@ -60,6 +60,7 @@ namespace PuppetMaster
             RegisterPM();
             Console.WriteLine("[INFO] Start reading configuration file...");
             ReadFile("config");
+            log.newConnection();
             Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
             CreateNetwork();
             Console.WriteLine("[INFO] Successfully generated the network, waiting input...");
