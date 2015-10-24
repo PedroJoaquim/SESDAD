@@ -31,6 +31,7 @@ namespace PuppetMaster
         private static String PM_URL = @"tcp://localhost:56000/PuppetMaster";
         private SystemNetwork network = new SystemNetwork();
         public Logger log = new Logger();
+        public Shell shell;
                
         private Dictionary<String, IRemotePuppetMasterSlave> pmSlaves = new Dictionary<string, IRemotePuppetMasterSlave>();
 
@@ -38,6 +39,19 @@ namespace PuppetMaster
         private int maxNumberEntities;
         private static object lockObject = new object();
         private int entitiesProcessed = 0;
+
+        public SystemNetwork Network
+        {
+            get
+            {
+                return network;
+            }
+
+            set
+            {
+                network = value;
+            }
+        }
 
         #region "Main Functions"
         public void Start()
@@ -110,12 +124,14 @@ namespace PuppetMaster
         private void RunMode()
         {
             String cmd = "";
+            this.shell = new Shell(this.Network, this.log);
 
             while(!cmd.Equals(EXIT_CMD))
             {
                 Console.Write("[CMD] > ");
                 cmd = Console.ReadLine();
-                ProcessCommand(cmd);
+
+                shell.ProcessCommand(cmd);
             }
         }
 
@@ -140,7 +156,7 @@ namespace PuppetMaster
                     if (fileName.Equals("config"))
                         ProcessConfigLine(line, lineNr++);
                     else
-                        ProcessCommand(line, lineNr++);
+                        shell.ProcessCommand(line, lineNr++);
                 }
             } catch (Exception e)
             {
@@ -343,175 +359,6 @@ namespace PuppetMaster
 
         #endregion
 
-        #region "RunMode"
-        private void ProcessCommand(string cmd, int lineNr = -1)
-        {
-            string[] splitedCMD = cmd.Split(' ');
-
-            switch (splitedCMD[0])
-            {
-                case "Subscriber":
-                    processSubscriberCommand(splitedCMD);
-                    break;
-
-                case "Publisher":
-                    processPublisherCommand(splitedCMD);
-                    break;
-
-                case "Status":
-                    processStatusCommand();
-                    break;
-
-                case "Crash":
-                    processCrashCommand(splitedCMD);
-                    break;
-
-                case "Freeze":
-                    processFreezeCommand(splitedCMD);
-                    break;
-
-                case "Unfreeze":
-                    processUnfreezeCommand(splitedCMD);
-                    break;
-
-                case "Wait":
-                    processWaitCommand(splitedCMD);
-                    break;
-
-                default:
-                    if (lineNr != -1)
-                        Console.WriteLine("[ERROR] Unknown command at line: {0}", lineNr);
-                    else
-                        Console.WriteLine("[ERROR] Unknown command");
-
-                        break;
-            }
-        }
-
-        private void processWaitCommand(string[] splitedCMD)
-        {
-            try
-            {
-                int ms = Int32.Parse(splitedCMD[1]);
-                Thread.Sleep(ms);
-
-                log.logCMD(splitedCMD);
-            }
-            catch(Exception)
-            {
-                Console.WriteLine("[ERROR] Invalid Wait Command");
-            }
-
-        }
-
-        private void processUnfreezeCommand(string[] splitedCMD)
-        {
-            try
-            {
-                string processName = splitedCMD[1];
-                Entity entity = network.GetEntity(processName);
-                entity.GetRemoteEntity().Unfreeze();
-
-                log.logCMD(splitedCMD);
-            }
-            catch(Exception)
-            {
-                Console.WriteLine("[ERROR] Invalid Unfreeze Command");
-            }
-        }
-
-        private void processFreezeCommand(string[] splitedCMD)
-        {
-            try
-            {
-                string processName = splitedCMD[1];
-                Entity entity = network.GetEntity(processName);
-                entity.GetRemoteEntity().Freeze();
-
-                log.logCMD(splitedCMD);
-            } catch (Exception)
-            {
-                Console.WriteLine("[ERROR] Invalid Freeze Command");
-            }
-        }
-
-        private void processCrashCommand(string[] splitedCMD)
-        {
-            try
-            {
-                string processName = splitedCMD[1];
-                Entity entity = network.GetEntity(processName);
-                entity.GetRemoteEntity().Crash();
-
-                log.logCMD(splitedCMD);
-            } catch (Exception)
-            {
-                Console.WriteLine("[ERROR] Invalid Crash Command");
-            }
-        }
-
-        private void processStatusCommand()
-        {
-            try
-            {
-                foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
-                {
-                    entry.Value.GetRemoteEntity().Status();
-                }
-
-            }
-            catch(Exception)
-            {
-                Console.WriteLine("[ERROR] Invalid Status Command");
-            }
-        }
-
-        private void processPublisherCommand(string[] splitedCMD)
-        {
-            try
-            {
-                string processName = splitedCMD[1];
-                int numberOfEvents = Int32.Parse(splitedCMD[3]);
-                string topicName = splitedCMD[5];
-                int ms = Int32.Parse(splitedCMD[7]);
-
-                PublisherEntity entity = (PublisherEntity) this.network.GetEntity(processName);
-                entity.RemoteEntity.Publish(topicName, numberOfEvents, ms);
-
-                log.logCMD(splitedCMD);
-            } catch (Exception)
-            {
-                Console.WriteLine("[ERROR] Invalid Publish Command");
-            }
-        }
-
-        private void processSubscriberCommand(string[] splitedCMD)
-        {
-            try
-            {
-                string processName = splitedCMD[1];
-                string operation = splitedCMD[2];
-                string topicName = splitedCMD[3];
-
-                SubscriberEntity entity = (SubscriberEntity)this.network.GetEntity(processName);
-
-                if(operation.Equals("subscribe"))
-                {
-                    entity.RemoteEntity.Subscribe(topicName);
-                }
-                else
-                {
-                    entity.RemoteEntity.Unsubscribe(topicName);
-                }
-
-                log.logCMD(splitedCMD);
-            } catch (Exception)
-            {
-                Console.WriteLine("[ERROR] Invalid Publish Command");
-            }
-        }
-        #endregion
-
         #region "Interface Methods"
         public void RegisterSlave(String url)
         {
@@ -580,6 +427,21 @@ namespace PuppetMaster
         {
             throw new NotImplementedException();
         }
+
+        public void LogEventPublication(string publisher, string topicname, int eventNumber)
+        {
+            log.LogEventPublication(publisher, topicname, eventNumber);
+        }
+
+        public void LogEventForwarding(string broker, string publisher, string topicname, int eventNumber)
+        {
+            log.LogEventForwarding(broker, publisher, topicname, eventNumber);
+        }
+
+        public void LogEventDelivery(string subscriber, string publisher, string topicname, int eventNumber)
+        {
+            log.LogEventDelivery(subscriber, publisher, topicname, eventNumber);
+        }
         #endregion
 
         #region "Semaphores"
@@ -610,22 +472,5 @@ namespace PuppetMaster
         }
         #endregion
 
-        #region "Log methods"
-        public void LogEventPublication(string publisher, string topicname, int eventNumber)
-        {
-            log.LogEventPublication(publisher, topicname, eventNumber);
-        }
-
-        public void LogEventForwarding(string broker, string publisher, string topicname, int eventNumber)
-        {
-            log.LogEventForwarding(broker, publisher, topicname, eventNumber);
-        }
-
-        public void LogEventDelivery(string subscriber, string publisher, string topicname, int eventNumber)
-        {
-            log.LogEventDelivery(subscriber, publisher, topicname, eventNumber);
-        }
-
     }
-
 }

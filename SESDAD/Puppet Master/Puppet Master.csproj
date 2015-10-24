@@ -49,6 +49,7 @@
     <Compile Include="Network.cs" />
     <Compile Include="PuppetMaster.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shell.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
