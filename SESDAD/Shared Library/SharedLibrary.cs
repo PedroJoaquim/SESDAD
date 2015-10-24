@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
@@ -18,6 +21,7 @@ namespace Shared_Library
         void Crash();
         void Freeze();
         void Unfreeze();
+        void Disconnect();
     }
 
     public interface IRemoteBroker : IRemoteEntity
@@ -46,7 +50,6 @@ namespace Shared_Library
         void RegisterBroker(String url, String name);
         void RegisterPublisher(String url, String name);
         void RegisterSubscriber(String url, String name);
-        void Wait(int x_ms);
         void Notify(String msg);
         void LogEventPublication(string publisher, string topicname, int eventNumber);
         void LogEventForwarding(string broker, string publisher, string topicname, int eventNumber);
@@ -65,6 +68,8 @@ namespace Shared_Library
         private String url;
         private String pmURL;
 
+        private TcpChannel channel;
+
         private IRemotePuppetMaster puppetMaster;
         private SysConfig sysConfig;
         private Dictionary<String, IRemoteBroker> brokers = new Dictionary<string, IRemoteBroker>();
@@ -73,7 +78,6 @@ namespace Shared_Library
 
         private EventQueue events = new EventQueue(50);
         private static Semaphore freezeSemaphore = new Semaphore(1, 1); //semaphore for freeze command
-
         #endregion
 
         #region Properties
@@ -193,6 +197,19 @@ namespace Shared_Library
                 events = value;
             }
         }
+
+        public TcpChannel Channel
+        {
+            get
+            {
+                return channel;
+            }
+
+            set
+            {
+                channel = value;
+            }
+        }
         #endregion
 
         public RemoteEntity(String name, String url, String pmUrl)
@@ -211,7 +228,13 @@ namespace Shared_Library
         }
 
 
-        #region "Initialization"
+        #region "Interface methods"
+
+        //not yet implemented
+        public abstract void Register();
+        public abstract void Status();
+
+
         public void RegisterInitializationInfo(SysConfig sysConfig)
         {
             this.SysConfig = sysConfig;
@@ -244,9 +267,6 @@ namespace Shared_Library
           
         }
         #endregion
-
-        public abstract void Register();
-        public abstract void Status();
 
         public string GetEntityName()
         {
@@ -281,6 +301,18 @@ namespace Shared_Library
             }
 
         }
+
+        public void Disconnect()
+        {
+
+            //Channel.StopListening(null);
+            //ChannelServices.UnregisterChannel(Channel);
+
+            //RemotingServices.Disconnect(this);
+
+            Environment.Exit(0);
+        }
+        
     }
 
     [Serializable()]

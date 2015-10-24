@@ -32,7 +32,9 @@ namespace PuppetMaster
         private SystemNetwork network = new SystemNetwork();
         public Logger log = new Logger();
         public Shell shell;
-               
+
+        private TcpChannel channel;
+
         private Dictionary<String, IRemotePuppetMasterSlave> pmSlaves = new Dictionary<string, IRemotePuppetMasterSlave>();
 
         private static Semaphore sem = new Semaphore(0, 1);
@@ -64,6 +66,7 @@ namespace PuppetMaster
             Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
             CreateNetwork();
             Console.WriteLine("[INFO] Successfully generated the network, waiting input...");
+            ReadFile("script");
             RunMode();
             Console.WriteLine("[INFO] Shutingdown the network...");
             ShutDownNetwork();
@@ -72,7 +75,7 @@ namespace PuppetMaster
 
         private void RegisterPM()
         {
-            TcpChannel channel = new TcpChannel(SysConfig.PM_PORT);
+            channel = new TcpChannel(SysConfig.PM_PORT);
             ChannelServices.RegisterChannel(channel, false);
             RemotingServices.Marshal(this, SysConfig.PM_NAME, typeof(IRemotePuppetMaster));
         }
@@ -119,13 +122,14 @@ namespace PuppetMaster
             {
                 entry.Value.GetRemoteEntity().EstablishConnections();
             }
+
+            this.shell = new Shell(this.Network, this.log);
         }
 
 
         private void RunMode()
         {
             String cmd = "";
-            this.shell = new Shell(this.Network, this.log);
 
             while(!cmd.Equals(EXIT_CMD))
             {
@@ -138,7 +142,17 @@ namespace PuppetMaster
 
         private void ShutDownNetwork()
         {
-            throw new NotImplementedException();
+
+            foreach (KeyValuePair<string, Entity> entry in network.Entities)
+            {
+                //TODO
+                try {
+                    entry.Value.GetRemoteEntity().Disconnect();
+                }
+                catch (Exception) {
+
+                }
+            }
         }
         #endregion
 
@@ -148,9 +162,16 @@ namespace PuppetMaster
             String line = null;
             int lineNr = 0;
             StreamReader file = null;
+            String path;
+
             try
             {
-                file = new StreamReader(CONFIG_FILE_PATH);
+                if (fileName.Equals("config"))
+                    path = CONFIG_FILE_PATH;
+                else
+                    path = SCRIPT_FILE_PATH;
+
+                file = new StreamReader(path);
 
                 while ((line = file.ReadLine()) != null)
                 {
@@ -419,14 +440,10 @@ namespace PuppetMaster
             Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));
         }
 
-        public void Wait(int x_ms)
-        {
-            throw new NotImplementedException();
-        }
 
         public void Notify(string msg)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("[Notify] " + msg);
         }
 
         public void LogEventPublication(string publisher, string topicname, int eventNumber)
