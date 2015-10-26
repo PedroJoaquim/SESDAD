@@ -55,6 +55,7 @@ namespace PuppetMaster
         private const string FREEZE = "freeze";
         private const string UNFREEZE = "unfreeze";
         private const string WAIT = "wait";
+        private const string EXIT = "exit";
 
         private const string SPACE = @"[ /t]";
         private const string NAME = @"[a-zA-Z0-9]+";
@@ -81,8 +82,10 @@ namespace PuppetMaster
 
         public void ProcessCommand(String cmd, int lineNr = -1)
         {
+
             string[] splitedCMD = cmd.ToLower().Split(' ');
 
+            if (cmd.Trim().Length == 0) return;
 
             switch (splitedCMD[0])
             {
@@ -114,6 +117,8 @@ namespace PuppetMaster
                     processWaitCommand(splitedCMD, cmd);
                     break;
 
+                case EXIT:
+                    break;
                 default:
                     if (lineNr != -1)
                         Console.WriteLine("[ERROR] Unknown command at line: {0}", lineNr);
@@ -127,7 +132,7 @@ namespace PuppetMaster
         {
             Regex rgx = new Regex(regex, RegexOptions.IgnoreCase);
 
-            if(cmd == null || !rgx.IsMatch(cmd))
+            if (cmd == null || !rgx.IsMatch(cmd))
             {
                 throw new Exception("Invalid syntax for command [" + cmdType + "]");
             }
@@ -173,8 +178,15 @@ namespace PuppetMaster
 
             string processName = splitedCMD[1];
             Entity entity = Network.GetEntity(processName);
-            entity.GetRemoteEntity().Crash();
 
+            try
+            {
+                entity.GetRemoteEntity().Crash();
+            }
+            catch (Exception)
+            {
+            }
+            
             Log.logCMD(cmd);
         }
 
@@ -195,7 +207,7 @@ namespace PuppetMaster
             string topicName = splitedCMD[5];
             int ms = Int32.Parse(splitedCMD[7]);
 
-            PublisherEntity entity = (PublisherEntity) Network.GetEntity(processName);
+            PublisherEntity entity = (PublisherEntity)Network.GetEntity(processName);
             entity.RemoteEntity.Publish(topicName, numberOfEvents, ms);
 
             Log.logCMD(cmd);
@@ -209,7 +221,7 @@ namespace PuppetMaster
             string operation = splitedCMD[2];
             string topicName = splitedCMD[3];
 
-            SubscriberEntity entity = (SubscriberEntity) Network.GetEntity(processName);
+            SubscriberEntity entity = (SubscriberEntity)Network.GetEntity(processName);
 
             if (operation.Equals(SUBSCRIBE))
             {

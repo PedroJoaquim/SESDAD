@@ -88,7 +88,7 @@ namespace PuppetMaster
         private void CreateNetwork()
         {
 
-            if(!this.network.Distributed.Equals("localhost"))
+            if (!this.network.Distributed.Equals("localhost"))
             {
                 Console.WriteLine("[INFO] Wainting Slaves to join the network...");
                 WaitSlaves();
@@ -98,7 +98,7 @@ namespace PuppetMaster
             {
                 foreach (KeyValuePair<string, Entity> entry in network.Entities)
                 {
-                    if(Utils.GetIPDomain(entry.Value.Url).Equals(this.network.Distributed)) //check if the process is local to the pm machine
+                    if (Utils.GetIPDomain(entry.Value.Url).Equals(this.network.Distributed)) //check if the process is local to the pm machine
                     {
                         LaunchProcess(entry.Value);
                     }
@@ -108,20 +108,24 @@ namespace PuppetMaster
                     }
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 //TODO 
             }
-            
+
             this.maxNumberEntities = this.network.Entities.Count;
-
-
             SemaphoreWait(); //wait all processes to be up and running
+
+            Thread t;
+            this.entitiesProcessed = 0;
 
             foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
             {
-                entry.Value.GetRemoteEntity().EstablishConnections();
+                t = new Thread(entry.Value.GetRemoteEntity().EstablishConnections);
+                t.Start();
             }
+
+            SemaphoreWait(); //wait all processes to be up and running
 
             this.shell = new Shell(this.Network, this.log);
         }
@@ -131,13 +135,14 @@ namespace PuppetMaster
         {
             String cmd = "";
 
-            while(!cmd.Equals(EXIT_CMD))
+            while (!cmd.Equals(EXIT_CMD))
             {
                 Console.Write("[CMD] > ");
                 cmd = Console.ReadLine();
 
                 shell.ProcessCommand(cmd);
             }
+
         }
 
         private void ShutDownNetwork()
@@ -145,13 +150,14 @@ namespace PuppetMaster
 
             foreach (KeyValuePair<string, Entity> entry in network.Entities)
             {
-                //TODO
-                try {
+                try
+                {
                     entry.Value.GetRemoteEntity().Disconnect();
                 }
-                catch (Exception) {
+                catch (Exception)
+                {
+                }  
 
-                }
             }
         }
         #endregion
@@ -180,7 +186,8 @@ namespace PuppetMaster
                     else
                         shell.ProcessCommand(line, lineNr++);
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine("[INIT] Failed to parse {0} file, exception: {1}", fileName, e.Message);
             }
@@ -253,7 +260,7 @@ namespace PuppetMaster
 
         private void ProcessLoggingLevel(string[] splitedLine, int lineNr)
         {
-            if(splitedLine.Length != 2 || (!"full".Equals(splitedLine[1].ToLower()) && !"light".Equals(splitedLine[1].ToLower())))
+            if (splitedLine.Length != 2 || (!"full".Equals(splitedLine[1].ToLower()) && !"light".Equals(splitedLine[1].ToLower())))
             {
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [LoggingLevel]");
             }
@@ -286,7 +293,7 @@ namespace PuppetMaster
             siteName = splitedLine[5].ToLower();
             url = splitedLine[7].ToLower();
 
-            if(!network.SiteMap.TryGetValue(siteName, out parentSite))
+            if (!network.SiteMap.TryGetValue(siteName, out parentSite))
             {
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Process] site: " + siteName + " does not exist");
             }
@@ -314,7 +321,7 @@ namespace PuppetMaster
                 default:
                     break;
             }
-    
+
         }
 
         private void ProcessSite(string[] splitedLine, int lineNr)
@@ -330,12 +337,12 @@ namespace PuppetMaster
             targetSiteName = splitedLine[1].ToLower();
             parentSiteName = splitedLine[3].ToLower();
 
-            if(!network.SiteMap.TryGetValue(targetSiteName, out targetSite))
+            if (!network.SiteMap.TryGetValue(targetSiteName, out targetSite))
             {
                 targetSite = new Site(targetSiteName);
             }
-            
-            if(!"none".Equals(parentSiteName))
+
+            if (!"none".Equals(parentSiteName))
             {
                 if (!network.SiteMap.TryGetValue(parentSiteName, out parentSite))
                 {
@@ -353,8 +360,7 @@ namespace PuppetMaster
 
             targetSite.Parent = parentSite;
             network.AddSite(targetSite);
-            
-            
+
         }
         #endregion
 
@@ -365,7 +371,7 @@ namespace PuppetMaster
         {
             IRemotePuppetMasterSlave slave;
             string ipDomain = Utils.GetIPDomain(ent.Url);
-            if(!this.pmSlaves.TryGetValue(ipDomain, out slave))
+            if (!this.pmSlaves.TryGetValue(ipDomain, out slave))
             {
                 Console.WriteLine("[ERROR] Slave for ipdomain: " + ipDomain + "not found and process not launched");
             }
@@ -384,7 +390,7 @@ namespace PuppetMaster
         #region "Interface Methods"
         public void RegisterSlave(String url)
         {
-            
+
             try
             {
                 IRemotePuppetMasterSlave newSlave = (IRemotePuppetMasterSlave)Activator.GetObject(typeof(IRemotePuppetMasterSlave), url);
@@ -394,36 +400,36 @@ namespace PuppetMaster
                 {
                     this.pmSlaves.Add(ipDomain, newSlave);
                 }
-                
+
                 Console.WriteLine("[INFO] Added PM Slave for domain:'" + ipDomain + "'");
-            } 
+            }
             catch (Exception)
             {
                 Console.WriteLine("[ERROR] Failed to add PM Slave");
             }
-    
+
         }
 
         public void RegisterBroker(string url, string name)
         {
-            BrokerEntity bEntity = (BrokerEntity) this.network.GetEntity(name);
+            BrokerEntity bEntity = (BrokerEntity)this.network.GetEntity(name);
             IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), url);
             bEntity.RemoteEntity = newBroker;
             this.network.SystemConfig.Connections = bEntity.GetConnectionsUrl();
             newBroker.RegisterInitializationInfo(this.network.SystemConfig);
-            IncrementEntitiesProcessed();
+            PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Broker: {0} connected on url: {1}", name, url));
         }
 
         public void RegisterPublisher(string url, string name)
         {
-            PublisherEntity pEntity = (PublisherEntity) this.network.GetEntity(name);
+            PublisherEntity pEntity = (PublisherEntity)this.network.GetEntity(name);
             IRemotePublisher newPublisher = (IRemotePublisher)Activator.GetObject(typeof(IRemotePublisher), url);
             pEntity.RemoteEntity = newPublisher;
             this.network.SystemConfig.Connections = pEntity.GetConnectionsUrl();
             newPublisher.RegisterInitializationInfo(this.network.SystemConfig);
-            IncrementEntitiesProcessed();
+            PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Publisher: {0} connected on url: {1}", name, url));
         }
@@ -435,7 +441,7 @@ namespace PuppetMaster
             sEntity.RemoteEntity = newSubscriber;
             this.network.SystemConfig.Connections = sEntity.GetConnectionsUrl();
             newSubscriber.RegisterInitializationInfo(this.network.SystemConfig);
-            IncrementEntitiesProcessed();
+            PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));
         }
@@ -460,6 +466,15 @@ namespace PuppetMaster
         {
             log.LogEventDelivery(subscriber, publisher, topicname, eventNumber);
         }
+
+        public void PostEntityProcessed()
+        {
+            lock (this)
+            {
+                if (++this.entitiesProcessed == this.maxNumberEntities)
+                    SemaphoreRelease();
+            }
+        }
         #endregion
 
         #region "Semaphores"
@@ -473,21 +488,6 @@ namespace PuppetMaster
             PuppetMaster.sem.Release();
         }
 
-        public void IncrementEntitiesProcessed()
-        {
-
-            Monitor.Enter(lockObject);
-            try
-            {
-                if (++this.entitiesProcessed == this.maxNumberEntities)
-                    SemaphoreRelease();
-            }
-            finally
-            {
-                Monitor.Exit(lockObject);
-            }
-
-        }
         #endregion
 
     }

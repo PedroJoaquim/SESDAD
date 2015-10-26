@@ -41,7 +41,7 @@ namespace Shared_Library
     {
         void Subscribe(String topic);
         void Unsubscribe(String topic);
-        void NotifyEvent(Event  e);
+        void NotifyEvent(Event e);
     }
 
     public interface IRemotePuppetMaster
@@ -54,6 +54,7 @@ namespace Shared_Library
         void LogEventPublication(string publisher, string topicname, int eventNumber);
         void LogEventForwarding(string broker, string publisher, string topicname, int eventNumber);
         void LogEventDelivery(string subscriber, string publisher, string topicname, int eventNumber);
+        void PostEntityProcessed();
     }
 
     public interface IRemotePuppetMasterSlave
@@ -221,10 +222,10 @@ namespace Shared_Library
 
         public void Start()
         {
-           Register();
-           Thread t = new Thread(ProcessQueue);
-           t.Start();
-           Console.ReadLine();
+            Register();
+            Thread t = new Thread(ProcessQueue);
+            t.Start();
+            Console.ReadLine();
         }
 
 
@@ -248,7 +249,7 @@ namespace Shared_Library
                 {
                     case SysConfig.BROKER:
                         IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), conn.Item1);
-                        this.Brokers.Add(newBroker.GetEntityName(), newBroker); 
+                        this.Brokers.Add(newBroker.GetEntityName(), newBroker);
                         break;
                     case SysConfig.SUBSCRIBER:
                         IRemoteSubscriber newSubscriber = (IRemoteSubscriber)Activator.GetObject(typeof(IRemoteSubscriber), conn.Item1);
@@ -264,7 +265,9 @@ namespace Shared_Library
 
                 Console.WriteLine(String.Format("[INFO] {0} added on: {1}", conn.Item2, conn.Item1));
             }
-          
+
+            PuppetMaster.PostEntityProcessed();
+
         }
         #endregion
 
@@ -275,7 +278,7 @@ namespace Shared_Library
 
         public void Crash()
         {
-            throw new NotImplementedException();
+            Disconnect();
         }
 
         public void Freeze()
@@ -291,9 +294,9 @@ namespace Shared_Library
         private void ProcessQueue()
         {
             Command command;
-        
+
             while (true)
-            {  
+            {
                 command = events.Consume();
                 freezeSemaphore.WaitOne();       //see if the process is freeze
                 command.Execute(this);
@@ -304,15 +307,8 @@ namespace Shared_Library
 
         public void Disconnect()
         {
-
-            //Channel.StopListening(null);
-            //ChannelServices.UnregisterChannel(Channel);
-
-            //RemotingServices.Disconnect(this);
-
             Environment.Exit(0);
         }
-        
     }
 
     [Serializable()]
@@ -411,10 +407,10 @@ namespace Shared_Library
         public SysConfig(SerializationInfo info, StreamingContext ctxt)
         {
             //Get the values from info and assign them to the appropriate properties
-            logLevel = (String) info.GetValue("logLevel", typeof(String));
+            logLevel = (String)info.GetValue("logLevel", typeof(String));
             routingPolicy = (String)info.GetValue("routingPolicy", typeof(String));
             ordering = (String)info.GetValue("ordering", typeof(String));
-            connections = DeserializeConnections((String) info.GetValue("connections", typeof(String)));
+            connections = DeserializeConnections((String)info.GetValue("connections", typeof(String)));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -438,13 +434,13 @@ namespace Shared_Library
             }
 
             return result.Equals("") ? result : result.Remove(result.Length - 1);
-         } 
+        }
 
         private List<Tuple<String, String>> DeserializeConnections(String connStr)
         {
             List<Tuple<String, String>> result = new List<Tuple<string, string>>();
 
-            if(!connStr.Equals(""))
+            if (!connStr.Equals(""))
             {
                 string[] splitedConns = connStr.Split('#');
                 for (int i = 0; i < splitedConns.Length - 1; i = i + 2)
@@ -452,7 +448,7 @@ namespace Shared_Library
                     result.Add(new Tuple<string, string>(splitedConns[i], splitedConns[i + 1]));
                 }
             }
- 
+
             return result;
         }
         #endregion
@@ -557,9 +553,9 @@ namespace Shared_Library
 
         public Event(SerializationInfo info, StreamingContext ctxt)
         {
-            publisher = (String) info.GetValue("publisher", typeof(String));
-            topic = (String) info.GetValue("topic", typeof(String));
-            timestamp = (long) info.GetValue("timestamp", typeof(long));
+            publisher = (String)info.GetValue("publisher", typeof(String));
+            topic = (String)info.GetValue("topic", typeof(String));
+            timestamp = (long)info.GetValue("timestamp", typeof(long));
             eventNr = (int)info.GetValue("eventNr", typeof(int));
         }
 
