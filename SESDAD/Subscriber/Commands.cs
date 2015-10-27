@@ -34,7 +34,7 @@ namespace Subscriber
         public override void Execute(RemoteEntity entity)
         {
             IRemoteBroker broker = entity.Brokers.ElementAt(0).Value; //first broker
-            broker.DifundSubscribeEvent(topic, true); //remote call
+            broker.DifundSubscribeEvent(topic, entity.Name); //remote call
         }
     }
 
@@ -66,7 +66,7 @@ namespace Subscriber
         public override void Execute(RemoteEntity entity)
         {
             IRemoteBroker broker = entity.Brokers.ElementAt(0).Value; //first broker
-            broker.DifundUnSubscribeEvent(this.topic, true); //remote call
+            broker.DifundUnSubscribeEvent(this.topic, entity.Name); //remote call
         }
     }
 

@@ -26,9 +26,9 @@ namespace Shared_Library
 
     public interface IRemoteBroker : IRemoteEntity
     {
-        void DifundPublishEvent(Event e, bool source);
-        void DifundSubscribeEvent(string topic, bool source);
-        void DifundUnSubscribeEvent(string topic, bool source);
+        void DifundPublishEvent(Event e, string source);
+        void DifundSubscribeEvent(string topic, string source);
+        void DifundUnSubscribeEvent(string topic, string source);
     }
 
     public interface IRemotePublisher : IRemoteEntity
@@ -474,6 +474,20 @@ namespace Shared_Library
             return myUrl.Substring(myUrl.LastIndexOf("/") + 1);
         }
 
+        public static List<string> GetTopicElements(string topic)
+        {
+            string[] tmp = topic.Trim().Split('/'); //test without the /
+            List<string> result = new List<string>();
+
+            foreach (string item in tmp)
+            {
+                if (!item.Trim().Equals(""))
+                    result.Add(item);
+            }
+
+            return result;
+
+        }
     }
 
     public abstract class Command

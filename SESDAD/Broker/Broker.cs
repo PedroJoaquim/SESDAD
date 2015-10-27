@@ -13,13 +13,51 @@ namespace Broker
     class Broker : RemoteEntity, IRemoteBroker
     {
 
-        static void Main(string[] args)
-        {
-            if (args.Length < 3) return;
+        private Dictionary<string, Topic> topics = new Dictionary<string, Topic>();
+        private ForwardingTable forwardingTable = new ForwardingTable();
+        private ReceiveTable receiveTable = new ReceiveTable();
 
-            Broker b = new Broker(args[0], args[1], args[2]);
-            b.Start();
+        #region "properties"
+        public Dictionary<string, Topic> Topics
+        {
+            get
+            {
+                return topics;
+            }
+
+            set
+            {
+                topics = value;
+            }
         }
+
+        internal ForwardingTable ForwardingTable
+        {
+            get
+            {
+                return forwardingTable;
+            }
+
+            set
+            {
+                forwardingTable = value;
+            }
+        }
+
+        internal ReceiveTable ReceiveTable
+        {
+            get
+            {
+                return receiveTable;
+            }
+
+            set
+            {
+                receiveTable = value;
+            }
+        }
+        #endregion
+
 
         public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl) { }
 
@@ -43,20 +81,29 @@ namespace Broker
         }
 
         #region "interface methods"
-        public void DifundPublishEvent(Event e, bool source)
+        public void DifundPublishEvent(Event e, string source)
         {
             this.Events.Produce(new DifundPublishEventCommand(e, source));
         }
 
-        public void DifundSubscribeEvent(string topic, bool source)
+        public void DifundSubscribeEvent(string topic, string source)
         {
             this.Events.Produce(new DifundSubscribeEventCommand(topic, source));
         }
 
-        public void DifundUnSubscribeEvent(string topic, bool source)
+        public void DifundUnSubscribeEvent(string topic, string source)
         {
             this.Events.Produce(new DifundUnSubscribeEventCommand(topic, source));
         }
         #endregion
+
+
+        static void Main(string[] args)
+        {
+            if (args.Length < 3) return;
+
+            Broker b = new Broker(args[0], args[1], args[2]);
+            b.Start();
+        }
     }
 }

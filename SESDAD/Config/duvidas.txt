@@ -1,9 +1,7 @@
 #entidades nos sites tem o mesmo ip?
 #entidades na maquina do puppet master estao com localhost?
 
-depois de freeze os processos continuam a responder a comandos status do PM?
+os eventos de subscribe podem ser difundidos da maneira que quisermos independentemente da politica de routing?
 
-mais do que 1 broker por site na primeira entrega?
-
-podemos usar semaforos?
+podemos subscrever * ?
 

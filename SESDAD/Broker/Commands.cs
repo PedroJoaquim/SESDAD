@@ -11,7 +11,7 @@ namespace Broker
     {
         #region "Properties"
         private Event e;
-        private bool source;
+        private string source;
 
         public Event E
         {
@@ -26,7 +26,7 @@ namespace Broker
             }
         }
 
-        public bool Source
+        public string Source
         {
             get
             {
@@ -38,17 +38,45 @@ namespace Broker
                 source = value;
             }
         }
+
         #endregion
 
-        public DifundPublishEventCommand(Event e, bool source)
+        public DifundPublishEventCommand(Event e, string source)
         {
             this.E = e;
-            this.source = source;
+            this.Source = source;
         }
 
         public override void Execute(RemoteEntity entity)
         {
-            throw new NotImplementedException();
+            Broker broker = (Broker) entity;
+            bool entityFound;
+
+            foreach (string entityName in broker.ForwardingTable.GetInterestedEntities(this.E.Topic))
+            {
+                entityFound = false;
+
+                foreach(KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
+                {
+                    if (entry.Key.Equals(entityName))
+                    {
+                        entry.Value.DifundPublishEvent(this.E, broker.Name);
+                        entityFound = true;
+                        break;
+                    }
+                        
+                }
+
+                if (entityFound) continue;
+
+                foreach (KeyValuePair<string, IRemoteSubscriber> entry in broker.Subscribers)
+                {
+                    if (entry.Key.Equals(entityName))
+                    {
+                        entry.Value.NotifyEvent(this.E);
+                    }
+                }
+            }
         }
     }
 
@@ -56,7 +84,7 @@ namespace Broker
     {
         #region "Properties"
         private String topic;
-        private bool source;
+        private string source;
 
         public string Topic
         {
@@ -71,7 +99,7 @@ namespace Broker
             }
         }
 
-        public bool Source
+        public string Source
         {
             get
             {
@@ -85,7 +113,7 @@ namespace Broker
         }
         #endregion
 
-        public DifundSubscribeEventCommand(String topic, bool source)
+        public DifundSubscribeEventCommand(String topic, string source)
         {
             this.Topic = topic;
             this.Source = source;
@@ -93,7 +121,29 @@ namespace Broker
 
         public override void Execute(RemoteEntity entity)
         {
-            Console.WriteLine(this.topic);
+            Broker broker = (Broker)entity;
+            List<string> topicsEl = Utils.GetTopicElements(this.topic);
+            Dictionary<string, Topic> currentTopicList = broker.Topics;
+            Topic currentSubtopic = null;
+
+            foreach (string subTopic in topicsEl)
+            {
+                if(currentTopicList.TryGetValue(subTopic, out currentSubtopic))
+                {
+                    currentTopicList = currentSubtopic.SubTopics;
+                }
+                else
+                {
+                    currentSubtopic = new Topic(subTopic);
+                    currentTopicList.Add(subTopic, currentSubtopic);
+                }
+            }
+
+            currentSubtopic.AddRemoteEntity(this.source);
+
+            //TODO ... difund the event 
+
+
         }
     }
 
@@ -101,7 +151,7 @@ namespace Broker
     {
         #region "Properties"
         private String topic;
-        private bool source;
+        private string source;
 
         public string Topic
         {
@@ -116,7 +166,7 @@ namespace Broker
             }
         }
 
-        public bool Source
+        public string Source
         {
             get
             {
@@ -130,7 +180,7 @@ namespace Broker
         }
         #endregion
 
-        public DifundUnSubscribeEventCommand(String topic, bool source)
+        public DifundUnSubscribeEventCommand(String topic, string source)
         {
             this.Topic = topic;
             this.source = source;
