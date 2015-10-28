@@ -97,7 +97,6 @@ namespace Subscriber
         public override void Execute(RemoteEntity entity)
         {
             entity.PuppetMaster.LogEventDelivery(entity.Name, this.E.Publisher, this.E.Topic, this.E.EventNr);
-            Console.WriteLine(String.Format("Received Event\r\nfrom: {0}\r\ntopic: {1}\r\nevent nr: {2}", this.E.Publisher, this.E.Topic, this.E.EventNr));
         }
     }
 }

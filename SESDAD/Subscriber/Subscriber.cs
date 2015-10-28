@@ -57,7 +57,6 @@ namespace Subscriber
 
         public void NotifyEvent(Event e)
         {
-            Console.WriteLine("recebi");
             this.Events.Produce(new NotifyEvent(e));
         }
         #endregion

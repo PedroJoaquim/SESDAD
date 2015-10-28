@@ -1,0 +1,12 @@
+	
+FIFO
+
+	fifo assegurada pelo single thread do processamento da queue
+
+	a chamada de remoting so retorna quando o evento for inserido na queue logo temos a garantia FIFO se a queue for processada em single thread
+
+FILTERED
+
+	Nao foi feita uma solução em que nao se manda subscriptions de topicos ja abrangidos por outros pois existe aquele caso que num estado intermédio poderia
+	ser feito unsubscribe e mesmo que posteriormente fosse feito o subscribe existe um momento em que nao esta subscrito o topico menos abrangente
+

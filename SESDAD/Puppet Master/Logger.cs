@@ -68,9 +68,6 @@ namespace PuppetMaster
           
         }
 
-
-
-
         public string GetCurrentTime()
         {
             return DateTime.Now.ToString("HH:mm:ss | dd/MM/yy");
@@ -78,19 +75,22 @@ namespace PuppetMaster
 
         public void WriteToFile(string line)
         {
-            StreamWriter file = null;
+            lock (this)
+            {
+                StreamWriter file = null;
 
-            try {
-                file = new StreamWriter(LOG_FILE_PATH, true);
-                file.WriteLine(line);
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine("[LOG] Writing to log file failed (exception: {0}", e.Message);
-            }
-            finally
-            {
-                if (file != null) file.Close();
+                try
+                {
+                    file = new StreamWriter(LOG_FILE_PATH, true);
+                    file.WriteLine(line);
+                } catch (Exception e)
+                {
+                    Console.WriteLine("[LOG] Writing to log file failed (exception: {0}", e.Message);
+                }
+                finally
+                {
+                    if (file != null) file.Close();
+                }
             }
         }
 

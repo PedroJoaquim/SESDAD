@@ -14,6 +14,8 @@ namespace Publisher
     {
         #region "Properties"
         private int currentEventNr;
+        private Dictionary<string, int> topicRelativeNr = new Dictionary<string, int>();
+
 
         public int CurrentEventNr
         {

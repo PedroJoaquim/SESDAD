@@ -74,6 +74,7 @@ namespace Broker
 
         public void DifundSubscribeEvent(string topic, string source)
         {
+            Console.WriteLine("evento recebido");
             this.Events.Produce(new DifundSubscribeEventCommand(topic, source));
         }
 

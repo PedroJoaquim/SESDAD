@@ -15,6 +15,7 @@ namespace Publisher
         private int nrEvents;
         private int ms;
         private int eventNr;
+        private int topicRelativeEventNr;
 
         public string Topic
         {
@@ -65,6 +66,19 @@ namespace Publisher
             set
             {
                 eventNr = value;
+            }
+        }
+
+        public int TopicRelativeEventNr
+        {
+            get
+            {
+                return topicRelativeEventNr;
+            }
+
+            set
+            {
+                topicRelativeEventNr = value;
             }
         }
         #endregion

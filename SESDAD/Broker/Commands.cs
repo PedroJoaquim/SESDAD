@@ -83,7 +83,8 @@ namespace Broker
         //function to send the publish event to other brokers or subscribers
         private void ProcessEventRouting(Broker broker, List<string> interessedEntities)
         {
-            bool entityFound;
+            bool entityFound = false;
+            bool logDone = false;
 
             foreach (string entityName in interessedEntities)
             {
@@ -94,8 +95,15 @@ namespace Broker
                     if (entry.Key.Equals(entityName))
                     {
                         if (!entry.Key.Equals(this.source))
+                        {
                             entry.Value.DifundPublishEvent(this.E, broker.Name);
-
+                            if (!logDone && broker.SysConfig.LogLevel.Equals(SysConfig.FULL))
+                            {
+                                broker.PuppetMaster.LogEventForwarding(broker.Name, this.E.Publisher, this.E.Topic, this.E.EventNr);
+                                logDone = true;
+                            }
+                        }
+                            
                         entityFound = true;
                         break;
                     }
