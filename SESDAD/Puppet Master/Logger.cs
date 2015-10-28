@@ -78,16 +78,19 @@ namespace PuppetMaster
 
         public void WriteToFile(string line)
         {
-            try {
+            StreamWriter file = null;
 
-                StreamWriter file = new StreamWriter(LOG_FILE_PATH, true);
+            try {
+                file = new StreamWriter(LOG_FILE_PATH, true);
                 file.WriteLine(line);
-                file.Close();
-         
             }
             catch(Exception e)
             {
                 Console.WriteLine("[LOG] Writing to log file failed (exception: {0}", e.Message);
+            }
+            finally
+            {
+                if (file != null) file.Close();
             }
         }
 

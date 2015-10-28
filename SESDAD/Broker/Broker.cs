@@ -13,25 +13,11 @@ namespace Broker
     class Broker : RemoteEntity, IRemoteBroker
     {
 
-        private Dictionary<string, Topic> topics = new Dictionary<string, Topic>();
         private ForwardingTable forwardingTable = new ForwardingTable();
         private ReceiveTable receiveTable = new ReceiveTable();
 
         #region "properties"
-        public Dictionary<string, Topic> Topics
-        {
-            get
-            {
-                return topics;
-            }
-
-            set
-            {
-                topics = value;
-            }
-        }
-
-        internal ForwardingTable ForwardingTable
+        public ForwardingTable ForwardingTable
         {
             get
             {

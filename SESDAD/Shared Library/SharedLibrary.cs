@@ -321,6 +321,14 @@ namespace Shared_Library
         public const String BROKER = "broker";
         public const String PUBLISHER = "publisher";
         public const String SUBSCRIBER = "subscriber";
+        public const String FLOODING = "flooding";
+        public const String FILTER = "filter";
+        public const String LIGHT = "light";
+        public const String FULL = "full";
+        public const String FIFO = "fifo";
+        public const String TOTAL = "total";
+        public const String NO_ORDER = "no";
+
 
         #region "Attributes"
         private String logLevel = null;

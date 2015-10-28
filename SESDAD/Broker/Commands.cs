@@ -49,22 +49,57 @@ namespace Broker
 
         public override void Execute(RemoteEntity entity)
         {
-            Broker broker = (Broker) entity;
+            Broker b = (Broker)entity;
+            List<string> interessedEntities = GetInteressedEntities(b, entity.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
+            ProcessEventRouting((Broker)entity, interessedEntities);
+        }
+
+        //function that gets the interessed entities depending on the routing policy
+        private List<string> GetInteressedEntities(Broker b, bool filter)
+        {
+            List<string> result = new List<string>();
+            List<string> interessed = b.ForwardingTable.GetInterestedEntities(this.E.Topic);
+
+            if (filter)
+            {
+                return interessed;
+            }
+
+            foreach (string item in interessed)
+            {
+                result.Add(item);
+            }
+
+            foreach(string item in b.Brokers.Keys.ToList())
+            {
+                if (!result.Contains(item))
+                    result.Add(item);
+            }
+
+            return result;
+        }
+
+
+        //function to send the publish event to other brokers or subscribers
+        private void ProcessEventRouting(Broker broker, List<string> interessedEntities)
+        {
             bool entityFound;
 
-            foreach (string entityName in broker.ForwardingTable.GetInterestedEntities(this.E.Topic))
+            foreach (string entityName in interessedEntities)
             {
                 entityFound = false;
 
-                foreach(KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
+                foreach (KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
                 {
                     if (entry.Key.Equals(entityName))
                     {
-                        entry.Value.DifundPublishEvent(this.E, broker.Name);
+                        if (!entry.Key.Equals(this.source))
+                            entry.Value.DifundPublishEvent(this.E, broker.Name);
+
                         entityFound = true;
                         break;
                     }
-                        
+
                 }
 
                 if (entityFound) continue;
@@ -122,28 +157,21 @@ namespace Broker
         public override void Execute(RemoteEntity entity)
         {
             Broker broker = (Broker)entity;
-            List<string> topicsEl = Utils.GetTopicElements(this.topic);
-            Dictionary<string, Topic> currentTopicList = broker.Topics;
-            Topic currentSubtopic = null;
+            broker.ForwardingTable.AddEntity(this.topic, this.source);
 
-            foreach (string subTopic in topicsEl)
+            //check if is necessary to send the subscription event to other brokers
+            if (broker.ReceiveTable.HasTopic(this.Topic))
+                return;
+
+            foreach (KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
             {
-                if(currentTopicList.TryGetValue(subTopic, out currentSubtopic))
+                if(!entry.Key.Equals(this.source))
                 {
-                    currentTopicList = currentSubtopic.SubTopics;
-                }
-                else
-                {
-                    currentSubtopic = new Topic(subTopic);
-                    currentTopicList.Add(subTopic, currentSubtopic);
+                    entry.Value.DifundSubscribeEvent(this.Topic, broker.GetEntityName());
                 }
             }
 
-            currentSubtopic.AddRemoteEntity(this.source);
-
-            //TODO ... difund the event 
-
-
+            broker.ReceiveTable.AddTopic(this.Topic);
         }
     }
 
@@ -153,7 +181,7 @@ namespace Broker
         private String topic;
         private string source;
 
-        public string Topic
+        public string TopicName
         {
             get
             {
@@ -182,13 +210,28 @@ namespace Broker
 
         public DifundUnSubscribeEventCommand(String topic, string source)
         {
-            this.Topic = topic;
+            this.TopicName = topic;
             this.source = source;
         }
 
         public override void Execute(RemoteEntity entity)
         {
-            throw new NotImplementedException();
+            Broker broker = (Broker)entity;
+            List<string> topicsEl = Utils.GetTopicElements(this.topic);
+            broker.ForwardingTable.RemoveEntity(this.topic, this.source);
+
+            //check if we still have someone interested in that topic
+            if (!(broker.ForwardingTable.GetInterestedEntities(this.TopicName).Count == 0))
+                return;
+
+            foreach (KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
+            {
+                if (!entry.Key.Equals(this.source))
+                    entry.Value.DifundUnSubscribeEvent(this.topic, broker.Name);
+            }
+
+            broker.ReceiveTable.RemoveTopic(this.topic);
         }
+
     }
 }

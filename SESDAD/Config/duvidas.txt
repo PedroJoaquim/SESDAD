@@ -5,3 +5,13 @@ os eventos de subscribe podem ser difundidos da maneira que quisermos independen
 
 podemos subscrever * ?
 
+podem tentar dar inputs errados?
+
+
+sites não tem mais do que um pai certo???
+
+
+/pt/ulisboa/ so recebe mesmo /pt/ulisboa/
+
+
+freeze deve freezar um publisher em ciclo de envio???

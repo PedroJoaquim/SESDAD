@@ -250,7 +250,7 @@ namespace PuppetMaster
 
         private void ProcessOrdering(string[] splitedLine, int lineNr)
         {
-            if (splitedLine.Length != 2 || (!"no".Equals(splitedLine[1].ToLower()) && !"fifo".Equals(splitedLine[1].ToLower()) && !"total".Equals(splitedLine[1].ToLower())))
+            if (splitedLine.Length != 2 || (!SysConfig.NO_ORDER.Equals(splitedLine[1].ToLower()) && !SysConfig.FIFO.Equals(splitedLine[1].ToLower()) && !SysConfig.TOTAL.Equals(splitedLine[1].ToLower())))
             {
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [Ordering]");
             }
@@ -260,7 +260,7 @@ namespace PuppetMaster
 
         private void ProcessLoggingLevel(string[] splitedLine, int lineNr)
         {
-            if (splitedLine.Length != 2 || (!"full".Equals(splitedLine[1].ToLower()) && !"light".Equals(splitedLine[1].ToLower())))
+            if (splitedLine.Length != 2 || (!SysConfig.FULL.Equals(splitedLine[1].ToLower()) && !SysConfig.LIGHT.Equals(splitedLine[1].ToLower())))
             {
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [LoggingLevel]");
             }
@@ -270,7 +270,7 @@ namespace PuppetMaster
 
         private void ProcessRouting(string[] splitedLine, int lineNr)
         {
-            if (splitedLine.Length != 2 || (!"flooding".Equals(splitedLine[1].ToLower()) && !"filter".Equals(splitedLine[1].ToLower())))
+            if (splitedLine.Length != 2 || (!SysConfig.FLOODING.Equals(splitedLine[1].ToLower()) && !SysConfig.FILTER.Equals(splitedLine[1].ToLower())))
             {
                 throw new ConfigFileParseException("[Line " + lineNr + "]" + "Error in entry [RoutingPolicy]");
             }

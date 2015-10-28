@@ -1,2 +1,6 @@
-Freeze broker0
-Freeze broker1
+wait 5000
+subscriber subscriber2 subscribe cenas/lol
+subscriber subscriber0 subscribe cenas/lol
+publisher publisher0 publish 5 Ontopic cenas/lol interval 1000
+wait 2000
+subscriber subscriber0 unsubscribe cenas/lol

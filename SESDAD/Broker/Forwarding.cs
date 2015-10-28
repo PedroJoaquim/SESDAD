@@ -9,52 +9,39 @@ namespace Broker
 {
     class ForwardingTable
     {
-        private Dictionary<string, List<string>> links = new Dictionary<string, List<string>>();
+        private Topic general = new Topic(Topic.GENERAL); //base element
 
-        public void AddEntity(string topic, string entityName)
+        //tries to get the topic and if the topic does not exists is created
+        public Topic GetCreateTopic(string topicName)
         {
-            List<string> eList = null;
+            Topic currentSubtopic = general;
+            List<string> topicsEl = Utils.GetTopicElements(topicName);
 
-            this.links.TryGetValue(topic, out eList);
-
-            if (eList == null)
+            foreach (string subTopic in topicsEl)
             {
-                eList = new List<string>();
-                this.links.Add(topic, eList);
+                currentSubtopic = currentSubtopic.AddSubTopic(subTopic);    
             }
 
-            eList.Add(entityName);
+            return currentSubtopic;
         }
 
-        public void RemoveEntity(string topic, string entityName)
+        public void AddEntity(string topicName, string entityName)
         {
-            List<string> eList = null;
-
-            this.links.TryGetValue(topic, out eList);
-
-            if(eList != null)
-            {
-                foreach (string entityName2 in eList)
-                {
-                    if (entityName2.Equals(entityName))
-                        eList.Remove(entityName);
-                }
-
-                if(eList.Count == 0)
-                {
-                    this.links.Remove(topic);
-                }
-            }
-
+            GetCreateTopic(topicName).AddRemoteEntity(entityName);
         }
 
-        public List<string> GetInterestedEntities(string topic)
+        public void RemoveEntity(string topicName, string entityName)
         {
-            List<string> result;
-            return this.links.TryGetValue(topic, out result) ? result : new List<string>();
+            GetCreateTopic(topicName).RemoveRemoteEntity(entityName);
+        }
+
+        public List<string> GetInterestedEntities(string topicName)
+        {
+            return GetCreateTopic(topicName).Subscribers;
         }
     }
 
+    //has the subscriptions send to other brokers
     class ReceiveTable
     {
         List<string> topics = new List<string>();
@@ -66,48 +53,25 @@ namespace Broker
 
         public void RemoveTopic(string topic)
         {
-            foreach (string item in this.topics)
-            {
-                if (item.Equals(topic))
-                    this.topics.Remove(topic);
-            }
+            this.topics.Remove(topic);
         }
 
+        //checks if the given topic is already in the table
         public bool HasTopic(string topic)
         {
-            foreach (string item in this.topics)
-            {
-                if (Includes(item, topic))
-                    return true;
-            }
-
-            return false;
+            return this.topics.Contains(topic);
         }
 
-        //checks if topic2 is included in topic1
-        private bool Includes(string topic1, string topic2)
-        {
-            List<string> topicEl1 = Utils.GetTopicElements(topic1);
-            List<string> topicEl2 = Utils.GetTopicElements(topic2);
-            
-            for(int i = 0; i < topicEl1.Count && i < topicEl2.Count; i++)
-            {
-                if (topicEl1[i].Equals("*")) return true;
-                if (!topicEl1[i].Equals(topicEl2[i])) return false;
-            }
-
-            return topicEl1.Count == topicEl2.Count; //may be necessary to change wait teacher answer
-
-        }
     }
 
 
     class Topic
     {
+        public const string GENERAL = @"[b]";
         private string topicName;
         private Dictionary<string, Topic> subTopics = new Dictionary<string, Topic>();
         private List<string> subscribers = new List<string>();
-
+       
         #region "properties"
         public string TopicName
         {
@@ -122,7 +86,7 @@ namespace Broker
             }
         }
 
-        internal Dictionary<string, Topic> SubTopics
+        public Dictionary<string, Topic> SubTopics
         {
             get
             {
@@ -151,17 +115,19 @@ namespace Broker
 
         public Topic(string topicName)
         {
-            this.TopicName = topicName;
+            this.TopicName = topicName.ToLower();
         }
 
         public Topic GetSubTopic(string topicName)
         {
             Topic topic;
-            return this.SubTopics.TryGetValue(topicName, out topic) ? topic : null;
+            string topicName2 = topicName.ToLower();
+            return this.SubTopics.TryGetValue(topicName2, out topic) ? topic : null;
         }
 
-        public Topic AddSubTopic(string topicName)
+        public Topic AddSubTopic(string topic)
         {
+            string topicName = topic.ToLower();
             Topic subTopic = GetSubTopic(topicName);
 
             if(subTopic == null)
@@ -173,19 +139,22 @@ namespace Broker
             return subTopic;           
         }
 
-        public void RemoveSubtopic(string topic)
+        public void RemoveSubtopic(string topicName)
         {
-            this.SubTopics.Remove(topic);
+            string topicName2 = topicName.ToLower();
+            this.SubTopics.Remove(topicName2);
         }
 
-        public void AddRemoteEntity(string entity)
+        public void AddRemoteEntity(string entityName)
         {
-            this.Subscribers.Add(entity);
+            string entityName2 = entityName.ToLower();
+            if(!this.Subscribers.Contains(entityName2)) this.Subscribers.Add(entityName2);
         }
 
         public void RemoveRemoteEntity(string entityName)
         {
-            this.Subscribers.Remove(entityName);
+            string entityName2 = entityName.ToLower();
+            if(this.Subscribers.Contains(entityName2)) this.Subscribers.Remove(entityName2);
         }
     }
 }
