@@ -27,6 +27,7 @@ namespace Broker
 
         public void AddEntity(string topicName, string entityName)
         {
+            Console.WriteLine(String.Format("{0}  --->  {1}", topicName, entityName));
             GetCreateTopic(topicName).AddRemoteEntity(entityName);
         }
 
@@ -44,22 +45,36 @@ namespace Broker
     //has the subscriptions send to other brokers
     class ReceiveTable
     {
-        List<string> topics = new List<string>();
+        private Dictionary<string, List<string>> topicsSubscribed = new Dictionary<string, List<string>>();
 
-        public void AddTopic(string topic)
+        public void AddTopic(string topic, string broker)
         {
-            this.topics.Add(topic);
+            List<string> brokers = GetCreateTopicList(topic);
+
+            if (!brokers.Contains(broker))
+                brokers.Add(broker);
         }
 
         public void RemoveTopic(string topic)
         {
-            this.topics.Remove(topic);
+            this.topicsSubscribed.Remove(topic);
         }
 
-        //checks if the given topic is already in the table
+        //checks if the given topic is already was subscribed to all brokers
         public bool HasTopic(string topic)
         {
-            return this.topics.Contains(topic);
+            return this.topicsSubscribed.ContainsKey(topic);
+        }
+
+
+        public List<string> GetCreateTopicList(string topic)
+        {
+            if(!this.topicsSubscribed.ContainsKey(topic))
+            {
+                this.topicsSubscribed[topic] = new List<string>();
+            }
+
+            return this.topicsSubscribed[topic];
         }
 
     }

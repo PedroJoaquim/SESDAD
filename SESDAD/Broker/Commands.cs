@@ -96,12 +96,14 @@ namespace Broker
                     {
                         if (!entry.Key.Equals(this.source))
                         {
-                            entry.Value.DifundPublishEvent(this.E, broker.Name);
+                           
                             if (!logDone && broker.SysConfig.LogLevel.Equals(SysConfig.FULL))
                             {
                                 broker.PuppetMaster.LogEventForwarding(broker.Name, this.E.Publisher, this.E.Topic, this.E.EventNr);
                                 logDone = true;
                             }
+
+                            entry.Value.DifundPublishEvent(this.E, broker.Name);
                         }
                             
                         entityFound = true;
@@ -164,22 +166,22 @@ namespace Broker
 
         public override void Execute(RemoteEntity entity)
         {
-            Broker broker = (Broker)entity;
+            Broker broker = (Broker) entity;
+            List<string> iBrokers = broker.ReceiveTable.GetCreateTopicList(this.topic);
             broker.ForwardingTable.AddEntity(this.topic, this.source);
 
-            //check if is necessary to send the subscription event to other brokers
-            if (broker.ReceiveTable.HasTopic(this.Topic))
-                return;
-
+            //we only send the subscription to the brokers that we have not yet subscribed that topic to
+            //if the request comes from a broker we do not subscribe that topic to him becouse thats pointless
             foreach (KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
             {
-                if(!entry.Key.Equals(this.source))
+                if(!entry.Key.Equals(this.source) && !iBrokers.Contains(entry.Key.ToLower()))
                 {
+                    broker.ReceiveTable.AddTopic(this.Topic, entry.Key.ToLower());
                     entry.Value.DifundSubscribeEvent(this.Topic, broker.GetEntityName());
                 }
             }
 
-            broker.ReceiveTable.AddTopic(this.Topic);
+           
         }
     }
 
@@ -232,10 +234,9 @@ namespace Broker
             if (!(broker.ForwardingTable.GetInterestedEntities(this.TopicName).Count == 0))
                 return;
 
-            foreach (KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
+            foreach (string brokerName in broker.ReceiveTable.GetCreateTopicList(this.topic))
             {
-                if (!entry.Key.Equals(this.source))
-                    entry.Value.DifundUnSubscribeEvent(this.topic, broker.Name);
+                broker.Brokers[brokerName].DifundUnSubscribeEvent(this.topic, broker.Name);
             }
 
             broker.ReceiveTable.RemoveTopic(this.topic);
