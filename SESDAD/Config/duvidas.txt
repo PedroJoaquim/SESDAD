@@ -17,3 +17,10 @@ sites não tem mais do que um pai certo???
 freeze deve freezar um publisher em ciclo de envio???
 
 publishers com varios publishe events devem tratar 1 de cada vez?
+
+
+
+se tivermos feito subscribe pt/ulisbboa/tecnico
+depois pt/ulisboa/*
+
+depois pt/ulisboa/* unsbscribe mantemos o pt/ulisboa/tecnico?

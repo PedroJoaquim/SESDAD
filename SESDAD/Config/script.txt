@@ -1,6 +1,10 @@
-wait 5000
-subscriber subscriber2 subscribe cenas/lol
-subscriber subscriber0 subscribe cenas/lol
-subscriber subscriber3 subscribe cenas/lol
-publisher publisher0 publish 5 Ontopic cenas/lol interval 1000
-
+wait 2000
+subscriber subscriber2 subscribe cenas/benfica/jogadores
+wait 1000
+subscriber subscriber2 subscribe cenas/*
+subscriber subscriber3 subscribe cenas/benfica/*
+subscriber subscriber0 subscribe cenas/benfica/jogadores
+wait 1000
+publisher publisher0 publish 7 Ontopic cenas/benfica/jogadores interval 1000
+wait 3000
+subscriber subscriber2 unsubscribe cenas/*

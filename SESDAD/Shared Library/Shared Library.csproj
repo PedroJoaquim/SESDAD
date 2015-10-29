@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventQueue.cs" />
+    <Compile Include="RemoteEntity.cs" />
+    <Compile Include="RemoteInterfaces.cs" />
     <Compile Include="SharedLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

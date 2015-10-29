@@ -11,305 +11,6 @@ using System.Threading.Tasks;
 
 namespace Shared_Library
 {
-    public interface IRemoteEntity
-    {
-        void RegisterInitializationInfo(SysConfig sysConfig);
-        void EstablishConnections();
-        string GetEntityName();
-
-        void Status();
-        void Crash();
-        void Freeze();
-        void Unfreeze();
-        void Disconnect();
-    }
-
-    public interface IRemoteBroker : IRemoteEntity
-    {
-        void DifundPublishEvent(Event e, string source);
-        void DifundSubscribeEvent(string topic, string source);
-        void DifundUnSubscribeEvent(string topic, string source);
-    }
-
-    public interface IRemotePublisher : IRemoteEntity
-    {
-        void Publish(String topic, int nrEvents, int ms);
-
-    }
-
-    public interface IRemoteSubscriber : IRemoteEntity
-    {
-        void Subscribe(String topic);
-        void Unsubscribe(String topic);
-        void NotifyEvent(Event e);
-    }
-
-    public interface IRemotePuppetMaster
-    {
-        void RegisterSlave(String url);
-        void RegisterBroker(String url, String name);
-        void RegisterPublisher(String url, String name);
-        void RegisterSubscriber(String url, String name);
-        void Notify(String msg);
-        void LogEventPublication(string publisher, string topicname, int eventNumber);
-        void LogEventForwarding(string broker, string publisher, string topicname, int eventNumber);
-        void LogEventDelivery(string subscriber, string publisher, string topicname, int eventNumber);
-        void PostEntityProcessed();
-    }
-
-    public interface IRemotePuppetMasterSlave
-    {
-        void StartNewProcess(String objName, String objType, String objUrl);
-    }
-
-    public abstract class RemoteEntity : MarshalByRefObject, IRemoteEntity
-    {
-        #region "Attributes"
-        private String name;
-        private String url;
-        private String pmURL;
-
-        private TcpChannel channel;
-
-        private IRemotePuppetMaster puppetMaster;
-        private SysConfig sysConfig;
-        private Dictionary<String, IRemoteBroker> brokers = new Dictionary<string, IRemoteBroker>();
-        private Dictionary<String, IRemotePublisher> publishers = new Dictionary<string, IRemotePublisher>();
-        private Dictionary<String, IRemoteSubscriber> subscribers = new Dictionary<string, IRemoteSubscriber>();
-
-        private EventQueue events = new EventQueue(50);
-        private static Semaphore freezeSemaphore = new Semaphore(1, 1); //semaphore for freeze command
-        #endregion
-
-        #region Properties
-        public string Name
-        {
-            get
-            {
-                return name;
-            }
-
-            set
-            {
-                name = value;
-            }
-        }
-
-        public string Url
-        {
-            get
-            {
-                return url;
-            }
-
-            set
-            {
-                url = value;
-            }
-        }
-
-        public string PmURL
-        {
-            get
-            {
-                return pmURL;
-            }
-
-            set
-            {
-                pmURL = value;
-            }
-        }
-
-        public SysConfig SysConfig
-        {
-            get
-            {
-                return sysConfig;
-            }
-
-            set
-            {
-                sysConfig = value;
-            }
-        }
-
-        public Dictionary<string, IRemoteBroker> Brokers
-        {
-            get
-            {
-                return brokers;
-            }
-
-            set
-            {
-                brokers = value;
-            }
-        }
-
-        public Dictionary<string, IRemotePublisher> Publishers
-        {
-            get
-            {
-                return publishers;
-            }
-
-            set
-            {
-                publishers = value;
-            }
-        }
-
-        public Dictionary<string, IRemoteSubscriber> Subscribers
-        {
-            get
-            {
-                return subscribers;
-            }
-
-            set
-            {
-                subscribers = value;
-            }
-        }
-
-        public IRemotePuppetMaster PuppetMaster
-        {
-            get
-            {
-                return puppetMaster;
-            }
-
-            set
-            {
-                puppetMaster = value;
-            }
-        }
-
-        public EventQueue Events
-        {
-            get
-            {
-                return events;
-            }
-
-            set
-            {
-                events = value;
-            }
-        }
-
-        public TcpChannel Channel
-        {
-            get
-            {
-                return channel;
-            }
-
-            set
-            {
-                channel = value;
-            }
-        }
-        #endregion
-
-        public RemoteEntity(String name, String url, String pmUrl)
-        {
-            this.Name = name;
-            this.Url = url;
-            this.PmURL = pmUrl;
-        }
-
-        public void Start()
-        {
-            Register();
-            Thread t = new Thread(ProcessQueue);
-            t.Start();
-            Console.ReadLine();
-        }
-
-
-        #region "Interface methods"
-
-        //not yet implemented
-        public abstract void Register();
-        public abstract void Status();
-
-
-        public void RegisterInitializationInfo(SysConfig sysConfig)
-        {
-            this.SysConfig = sysConfig;
-        }
-
-        public void EstablishConnections()
-        {
-            foreach (Tuple<String, String> conn in this.SysConfig.Connections)
-            {
-                switch (conn.Item2)
-                {
-                    case SysConfig.BROKER:
-                        IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), conn.Item1);
-                        this.Brokers.Add(newBroker.GetEntityName(), newBroker);
-                        break;
-                    case SysConfig.SUBSCRIBER:
-                        IRemoteSubscriber newSubscriber = (IRemoteSubscriber)Activator.GetObject(typeof(IRemoteSubscriber), conn.Item1);
-                        this.Subscribers.Add(newSubscriber.GetEntityName(), newSubscriber);
-                        break;
-                    case SysConfig.PUBLISHER:
-                        IRemotePublisher newPublisher = (IRemotePublisher)Activator.GetObject(typeof(IRemotePublisher), conn.Item1);
-                        this.Publishers.Add(newPublisher.GetEntityName(), newPublisher);
-                        break;
-                    default:
-                        break;
-                }
-
-                Console.WriteLine(String.Format("[INFO] {0} added on: {1}", conn.Item2, conn.Item1));
-            }
-
-            PuppetMaster.PostEntityProcessed();
-
-        }
-        #endregion
-
-        public string GetEntityName()
-        {
-            return this.Name;
-        }
-
-        public void Crash()
-        {
-            Disconnect();
-        }
-
-        public void Freeze()
-        {
-            freezeSemaphore.WaitOne();
-        }
-
-        public void Unfreeze()
-        {
-            freezeSemaphore.Release();
-        }
-
-        private void ProcessQueue()
-        {
-            Command command;
-
-            while (true)
-            {
-                command = events.Consume();
-                freezeSemaphore.WaitOne();       //see if the process is freeze
-                command.Execute(this);
-                freezeSemaphore.Release();
-            }
-
-        }
-
-        public void Disconnect()
-        {
-            Environment.Exit(0);
-        }
-    }
 
     [Serializable()]
     public class SysConfig : ISerializable
@@ -495,6 +196,29 @@ namespace Shared_Library
 
             return result;
 
+        }
+
+        public static List<T> MergeListsNoRepetitions<T>(List<T> l1, List<T> l2)
+        {
+            List<T> result = new List<T>();
+
+            foreach (T item in l1)
+            {
+                if(!result.Contains(item))
+                {
+                    result.Add(item);
+                }
+            }
+
+            foreach (T item in l2)
+            {
+                if (!result.Contains(item))
+                {
+                    result.Add(item);
+                }
+            }
+
+            return result;
         }
     }
 

@@ -48,6 +48,7 @@
     <Compile Include="Forwarding.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PublishEventManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

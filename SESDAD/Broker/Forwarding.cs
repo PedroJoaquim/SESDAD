@@ -9,7 +9,7 @@ namespace Broker
 {
     class ForwardingTable
     {
-        private Topic general = new Topic(Topic.GENERAL); //base element
+        private Topic general = new Topic(Topic.GENERAL, null); //base element
 
         //tries to get the topic and if the topic does not exists is created
         public Topic GetCreateTopic(string topicName)
@@ -40,6 +40,40 @@ namespace Broker
         {
             return GetCreateTopic(topicName).Subscribers;
         }
+
+        public List<string> GetAllInterestedEntities(string topicName)
+        {
+            List<string> result = new List<string>();
+            Topic currentTopic = GetCreateTopic(topicName);
+
+            result = Utils.MergeListsNoRepetitions(result, currentTopic.Subscribers);
+            
+            if (currentTopic.GetSubTopic("*") != null)
+            {
+                result = Utils.MergeListsNoRepetitions(result, currentTopic.GetSubTopic("*").Subscribers);
+            }
+
+            while (currentTopic.Parent != null)
+            {
+                currentTopic = currentTopic.Parent;
+                if (currentTopic.GetSubTopic("*") != null)
+                {
+                    result = Utils.MergeListsNoRepetitions(result, currentTopic.GetSubTopic("*").Subscribers);
+                }
+            }
+
+            return result;
+        }
+
+        public void PrintStatus()
+        {
+            foreach (KeyValuePair<string, Topic> entry in general.SubTopics)
+            {
+                entry.Value.Print();
+            }
+        }
+
+        
     }
 
     //has the subscriptions send to other brokers
@@ -51,32 +85,54 @@ namespace Broker
         {
             List<string> brokers = GetCreateTopicList(topic);
 
-            if (!brokers.Contains(broker))
-                brokers.Add(broker);
+            if (!brokers.Contains(broker.ToLower()))
+                brokers.Add(broker.ToLower());
         }
 
         public void RemoveTopic(string topic)
         {
-            this.topicsSubscribed.Remove(topic);
+            this.topicsSubscribed.Remove(topic.ToLower());
+        }
+
+        public void RemoveEntityFromTopic(string topic, string entity)
+        {
+            GetCreateTopicList(topic.ToLower()).Remove(entity.ToLower());
         }
 
         //checks if the given topic is already was subscribed to all brokers
         public bool HasTopic(string topic)
         {
-            return this.topicsSubscribed.ContainsKey(topic);
+            return this.topicsSubscribed.ContainsKey(topic.ToLower());
         }
 
 
         public List<string> GetCreateTopicList(string topic)
         {
-            if(!this.topicsSubscribed.ContainsKey(topic))
+            if(!this.topicsSubscribed.ContainsKey(topic.ToLower()))
             {
-                this.topicsSubscribed[topic] = new List<string>();
+                this.topicsSubscribed[topic.ToLower()] = new List<string>();
             }
 
-            return this.topicsSubscribed[topic];
+            return this.topicsSubscribed[topic.ToLower()];
         }
 
+        //checks if the we have already subscribed that topic to that entity
+        public bool IsSubscribedTo(string topic, string entity)
+        {
+            return GetCreateTopicList(topic.ToLower()).Contains(entity.ToLower());
+        }
+
+        public void PrintStatus()
+        {
+            foreach (KeyValuePair<string, List<string>> entry in topicsSubscribed)
+            {
+                foreach (string entity in entry.Value)
+                {
+                    Console.WriteLine("{0} ----------> {1}", entity, entry.Value);
+                    Console.WriteLine();
+                }
+            }
+        }
     }
 
 
@@ -86,7 +142,9 @@ namespace Broker
         private string topicName;
         private Dictionary<string, Topic> subTopics = new Dictionary<string, Topic>();
         private List<string> subscribers = new List<string>();
-       
+        private Topic parent;
+        private string fullName;
+
         #region "properties"
         public string TopicName
         {
@@ -126,11 +184,34 @@ namespace Broker
                 subscribers = value;
             }
         }
+
+        internal Topic Parent
+        {
+            get
+            {
+                return parent;
+            }
+
+            set
+            {
+                parent = value;
+            }
+        }
         #endregion
 
-        public Topic(string topicName)
+        public Topic(string topicName, Topic parent)
         {
             this.TopicName = topicName.ToLower();
+            this.parent = parent;
+
+            if(parent == null)
+            {
+                this.fullName = "/";
+            }
+            else
+            {
+                this.fullName = parent.fullName + "/" + topicName;
+            }
         }
 
         public Topic GetSubTopic(string topicName)
@@ -147,7 +228,7 @@ namespace Broker
 
             if(subTopic == null)
             {
-                subTopic = new Topic(topicName);
+                subTopic = new Topic(topicName, this);
                 this.SubTopics.Add(topicName, subTopic);
             }
 
@@ -170,6 +251,25 @@ namespace Broker
         {
             string entityName2 = entityName.ToLower();
             if(this.Subscribers.Contains(entityName2)) this.Subscribers.Remove(entityName2);
+        }
+
+        public void Print()
+        {
+            string spaces = new string(' ', this.fullName.Length + 13);
+            int i = 0;
+
+            Console.WriteLine();
+
+            foreach (string entity in this.Subscribers)
+            {
+                Console.WriteLine(String.Format("{0} ----------> {1}", i==0 ? fullName : spaces, entity));
+                i++;
+            }
+
+            foreach (KeyValuePair<string, Topic> entry in this.SubTopics)
+            {
+                entry.Value.Print();
+            }
         }
     }
 }

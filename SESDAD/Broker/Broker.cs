@@ -15,6 +15,7 @@ namespace Broker
 
         private ForwardingTable forwardingTable = new ForwardingTable();
         private ReceiveTable receiveTable = new ReceiveTable();
+        private PublishEventManager pEventManager;
 
         #region "properties"
         public ForwardingTable ForwardingTable
@@ -42,8 +43,20 @@ namespace Broker
                 receiveTable = value;
             }
         }
-        #endregion
 
+        internal PublishEventManager PEventManager
+        {
+            get
+            {
+                return pEventManager;
+            }
+
+            set
+            {
+                pEventManager = value;
+            }
+        }
+        #endregion
 
         public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl) { }
 
@@ -52,24 +65,52 @@ namespace Broker
             int port = Int32.Parse(Utils.GetIPPort(this.Url));
             string objName = Utils.GetObjName(this.Url);
 
-            Channel= new TcpChannel(port);
+            TcpChannel Channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(Channel, false);
             RemotingServices.Marshal(this, objName, typeof(IRemoteBroker));
 
             IRemotePuppetMaster pm = (IRemotePuppetMaster)Activator.GetObject(typeof(IRemotePuppetMaster), this.PmURL);
             pm.RegisterBroker(this.Url, this.Name);
             this.PuppetMaster = pm;
+
+            if (this.SysConfig.Ordering.Equals(SysConfig.FIFO))
+                this.PEventManager = new FIFOPublishEventManager(this.Name);
+
+            if (this.SysConfig.Ordering.Equals(SysConfig.NO_ORDER))
+                this.PEventManager = new NoOrderPublishEventManager(this.Name);
+
+            if (this.SysConfig.Ordering.Equals(SysConfig.TOTAL))
+                this.PEventManager = new TotalOrderPublishEventManager(this.Name);
         }
 
         public override void Status()
         {
-            throw new NotImplementedException();
+            Console.WriteLine(String.Format("======================STATUS: {0}=====================", this.Name));
+
+            Console.WriteLine(String.Format("---------------------Connections----------------------"));
+            foreach (KeyValuePair<string, IRemoteBroker> entry in this.Brokers)
+            {
+                Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
+            }
+            foreach (KeyValuePair<string, IRemotePublisher> entry in this.Publishers)
+            {
+                Console.WriteLine(String.Format("[PUBLISHER] {0}", entry.Key));
+            }
+            foreach (KeyValuePair<string, IRemoteSubscriber> entry in this.Subscribers)
+            {
+                Console.WriteLine(String.Format("[SUBSCRIBER] {0}", entry.Key));
+            }
+            Console.WriteLine(String.Format("-------------------Forwarding Table-------------------"));
+            this.ForwardingTable.PrintStatus();
+            Console.WriteLine(String.Format("---------------------Receive Table--------------------"));
+            this.ReceiveTable.PrintStatus();
+            Console.WriteLine(String.Format("------------------------------------------------------"));
         }
 
         #region "interface methods"
-        public void DifundPublishEvent(Event e, string source)
+        public void DifundPublishEvent(Event e, string source, int seqNumber)
         {
-            this.Events.Produce(new DifundPublishEventCommand(e, source));
+            this.Events.Produce(new DifundPublishEventCommand(e, source, seqNumber));
         }
 
         public void DifundSubscribeEvent(string topic, string source)

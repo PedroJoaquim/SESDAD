@@ -64,7 +64,7 @@ namespace Publisher
             int port = Int32.Parse(Utils.GetIPPort(this.Url));
             string objName = Utils.GetObjName(this.Url);
 
-            Channel = new TcpChannel(port);
+            TcpChannel Channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(Channel, false);
             RemotingServices.Marshal(this, objName, typeof(IRemotePublisher));
 
@@ -75,7 +75,7 @@ namespace Publisher
 
         public override void Status()
         {
-            throw new NotImplementedException();
+            Console.WriteLine("todo");
         }
 
         #region "interface methods"

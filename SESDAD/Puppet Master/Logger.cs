@@ -15,7 +15,7 @@ namespace PuppetMaster
          */
         private bool fullLogging = false;
 
-        private static String LOG_FILE_PATH = @"../../Log/log.txt";
+        private static String LOG_FILE_PATH = @"../../Log/SESDAD.log";
 
 
 
