@@ -1,7 +1,15 @@
 	
 FIFO
 
-	fifo assegurada pelo single thread do processamento da queue
+	em cada sentido da ligação de brokers existe 1 numero de sequencia associado nr de eventos de um certo publisher que ja passaram naquele sentido
+	estes eventos são colocados na queue do broker que recebe o evento e as threads que processam o buffer só podem fazer forwarding dos eventos para outros
+	brokers ou para os subscribers pela ordem do seq number colocado na queue
+
+	como o seq number está associado á ligação entre brokers e ao publisher eventos de publishers diferentes podem ser processados concorrentemente só os 
+	eventos dos mesmos brokers é que tem de ser processados pela ordem correcta.
+
+	Ao fazer este processamento entre todos os brokers é garantida a ordem FIFO na chegada ao subscriber independentemente de ele não ter recebido todos os tópicos que 
+	fora publicados por aquele subscriber
 
 	a chamada de remoting so retorna quando o evento for inserido na queue logo temos a garantia FIFO se a queue for processada em single thread
 

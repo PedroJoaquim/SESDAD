@@ -23,4 +23,6 @@ publishers com varios publishe events devem tratar 1 de cada vez?
 se tivermos feito subscribe pt/ulisbboa/tecnico
 depois pt/ulisboa/*
 
+brokers que fazem forward para subscribers tmb devem lançar evento de log????
+
 depois pt/ulisboa/* unsbscribe mantemos o pt/ulisboa/tecnico?

@@ -2553,3 +2553,143 @@
 [LOG: 23:35:54 | 29/10/15] - BroEvent broker2, publisher0, cenas/benfica/jogadores, 7
 [LOG: 23:35:54 | 29/10/15] - SubEvent subscriber0, publisher0, cenas/benfica/jogadores, 7
 [LOG: 23:35:54 | 29/10/15] - SubEvent subscriber3, publisher0, cenas/benfica/jogadores, 7
+
+####################################################################################################
+############################    New Connection @ 01:10:09 | 30/10/15    ############################
+####################################################################################################
+
+[LOG: 01:10:18 | 30/10/15] - wait 1000
+[LOG: 01:10:18 | 30/10/15] - subscriber subscriber2 subscribe cenas/*
+[LOG: 01:10:18 | 30/10/15] - subscriber subscriber3 subscribe cenas/benfica/*
+[LOG: 01:10:18 | 30/10/15] - subscriber subscriber0 subscribe cenas/benfica/jogadores
+[LOG: 01:10:19 | 30/10/15] - wait 1000
+[LOG: 01:10:19 | 30/10/15] - publisher publisher0 publish 3 Ontopic cenas/benfica/jogadores interval 1000
+[LOG: 01:10:19 | 30/10/15] - publisher publisher1 publish 3 Ontopic cenas/benfica/jogadores interval 2000
+[LOG: 01:10:19 | 30/10/15] - PubEvent publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - publisher publisher2 publish 3 Ontopic cenas/benfica/jogadores interval 3000
+[LOG: 01:10:19 | 30/10/15] - PubEvent publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - PubEvent publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - BroEvent broker4, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - BroEvent broker4, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - BroEvent broker1, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - BroEvent broker2, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - BroEvent broker2, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber2, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - BroEvent broker0, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber0, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber2, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - BroEvent broker2, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber0, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber2, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber0, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber3, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber3, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:19 | 30/10/15] - SubEvent subscriber3, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:20 | 30/10/15] - PubEvent publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:20 | 30/10/15] - BroEvent broker4, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:20 | 30/10/15] - BroEvent broker2, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:20 | 30/10/15] - SubEvent subscriber0, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:20 | 30/10/15] - SubEvent subscriber3, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:20 | 30/10/15] - SubEvent subscriber2, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:21 | 30/10/15] - PubEvent publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:21 | 30/10/15] - PubEvent publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:21 | 30/10/15] - BroEvent broker4, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:21 | 30/10/15] - BroEvent broker2, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:21 | 30/10/15] - BroEvent broker4, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:21 | 30/10/15] - SubEvent subscriber2, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:21 | 30/10/15] - BroEvent broker2, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:21 | 30/10/15] - SubEvent subscriber3, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:21 | 30/10/15] - SubEvent subscriber3, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:21 | 30/10/15] - SubEvent subscriber0, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:21 | 30/10/15] - SubEvent subscriber2, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:21 | 30/10/15] - SubEvent subscriber0, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:22 | 30/10/15] - PubEvent publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:22 | 30/10/15] - BroEvent broker1, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:22 | 30/10/15] - SubEvent subscriber0, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:22 | 30/10/15] - BroEvent broker0, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:22 | 30/10/15] - BroEvent broker2, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:22 | 30/10/15] - SubEvent subscriber3, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:22 | 30/10/15] - SubEvent subscriber2, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:23 | 30/10/15] - PubEvent publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:23 | 30/10/15] - BroEvent broker4, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:23 | 30/10/15] - BroEvent broker2, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:23 | 30/10/15] - SubEvent subscriber0, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:23 | 30/10/15] - SubEvent subscriber2, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:23 | 30/10/15] - SubEvent subscriber3, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:25 | 30/10/15] - PubEvent publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:25 | 30/10/15] - BroEvent broker1, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:25 | 30/10/15] - SubEvent subscriber0, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:25 | 30/10/15] - BroEvent broker0, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:25 | 30/10/15] - BroEvent broker2, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:25 | 30/10/15] - SubEvent subscriber3, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:25 | 30/10/15] - SubEvent subscriber2, publisher2, cenas/benfica/jogadores, 3
+
+####################################################################################################
+############################    New Connection @ 01:10:42 | 30/10/15    ############################
+####################################################################################################
+
+[LOG: 01:10:51 | 30/10/15] - wait 1000
+[LOG: 01:10:51 | 30/10/15] - subscriber subscriber2 subscribe cenas/*
+[LOG: 01:10:51 | 30/10/15] - subscriber subscriber3 subscribe cenas/benfica/*
+[LOG: 01:10:51 | 30/10/15] - subscriber subscriber0 subscribe cenas/benfica/jogadores
+[LOG: 01:10:52 | 30/10/15] - wait 1000
+[LOG: 01:10:52 | 30/10/15] - publisher publisher0 publish 3 Ontopic cenas/benfica/jogadores interval 1000
+[LOG: 01:10:52 | 30/10/15] - publisher publisher1 publish 3 Ontopic cenas/benfica/jogadores interval 2000
+[LOG: 01:10:52 | 30/10/15] - PubEvent publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - publisher publisher2 publish 3 Ontopic cenas/benfica/jogadores interval 3000
+[LOG: 01:10:52 | 30/10/15] - PubEvent publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - PubEvent publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - BroEvent broker4, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - BroEvent broker1, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - BroEvent broker4, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - BroEvent broker2, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - BroEvent broker0, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber0, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber2, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - BroEvent broker2, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber0, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - BroEvent broker2, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber0, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber2, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber2, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber3, publisher0, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber3, publisher1, cenas/benfica/jogadores, 1
+[LOG: 01:10:52 | 30/10/15] - SubEvent subscriber3, publisher2, cenas/benfica/jogadores, 1
+[LOG: 01:10:53 | 30/10/15] - PubEvent publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:53 | 30/10/15] - BroEvent broker4, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:53 | 30/10/15] - BroEvent broker2, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:53 | 30/10/15] - SubEvent subscriber0, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:53 | 30/10/15] - SubEvent subscriber2, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:53 | 30/10/15] - SubEvent subscriber3, publisher0, cenas/benfica/jogadores, 2
+[LOG: 01:10:54 | 30/10/15] - PubEvent publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:54 | 30/10/15] - PubEvent publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:54 | 30/10/15] - BroEvent broker4, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:54 | 30/10/15] - BroEvent broker2, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:54 | 30/10/15] - BroEvent broker4, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:54 | 30/10/15] - SubEvent subscriber0, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:54 | 30/10/15] - BroEvent broker2, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:54 | 30/10/15] - SubEvent subscriber3, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:54 | 30/10/15] - SubEvent subscriber0, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:54 | 30/10/15] - SubEvent subscriber2, publisher1, cenas/benfica/jogadores, 2
+[LOG: 01:10:54 | 30/10/15] - SubEvent subscriber2, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:54 | 30/10/15] - SubEvent subscriber3, publisher0, cenas/benfica/jogadores, 3
+[LOG: 01:10:55 | 30/10/15] - PubEvent publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:55 | 30/10/15] - BroEvent broker1, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:55 | 30/10/15] - SubEvent subscriber0, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:55 | 30/10/15] - BroEvent broker0, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:55 | 30/10/15] - BroEvent broker2, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:55 | 30/10/15] - SubEvent subscriber3, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:55 | 30/10/15] - SubEvent subscriber2, publisher2, cenas/benfica/jogadores, 2
+[LOG: 01:10:56 | 30/10/15] - PubEvent publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:56 | 30/10/15] - BroEvent broker4, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:56 | 30/10/15] - BroEvent broker2, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:56 | 30/10/15] - SubEvent subscriber0, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:56 | 30/10/15] - SubEvent subscriber3, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:56 | 30/10/15] - SubEvent subscriber2, publisher1, cenas/benfica/jogadores, 3
+[LOG: 01:10:58 | 30/10/15] - PubEvent publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:58 | 30/10/15] - BroEvent broker1, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:58 | 30/10/15] - SubEvent subscriber0, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:58 | 30/10/15] - BroEvent broker0, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:58 | 30/10/15] - BroEvent broker2, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:58 | 30/10/15] - SubEvent subscriber3, publisher2, cenas/benfica/jogadores, 3
+[LOG: 01:10:58 | 30/10/15] - SubEvent subscriber2, publisher2, cenas/benfica/jogadores, 3

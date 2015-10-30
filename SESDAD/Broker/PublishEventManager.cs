@@ -123,7 +123,7 @@ namespace Broker
 
     class FIFOPublishEventManager : PublishEventManager
     {
-        //1 string = remote entity name       2 - string publisher name
+        //1 string = source remote entity name       2 - string publisher name
         private Dictionary<string, Dictionary<string, PublisherEventsOrder>> inTable = new Dictionary<string, Dictionary<string, PublisherEventsOrder>>();
         private Dictionary<string, Dictionary<string, int>> outTable = new Dictionary<string, Dictionary<string, int>>();
 
@@ -134,7 +134,8 @@ namespace Broker
         {
             List<string> interessedEntities = GetInteressedEntities(b, e, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
 
-            WaitTurn(source, e.Publisher, seqNumber);
+            //only send event if all the other events from this publisher have already been sent
+            WaitTurn(source, e.Publisher, seqNumber); 
             ProcessEventRouting(b, interessedEntities, e, source);
             EndTurn(source, e.Publisher);
         }
