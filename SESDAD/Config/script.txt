@@ -1,8 +1,11 @@
 wait 1000
-subscriber subscriber2 subscribe cenas/*
-subscriber subscriber3 subscribe cenas/benfica/*
-subscriber subscriber0 subscribe cenas/benfica/jogadores
+subscriber subscriber2 subscribe cenas
+subscriber subscriber3 subscribe cenas/benfica/
+subscriber subscriber3 subscribe cenas
+subscriber subscriber0 subscribe cenas/benfica/
 wait 1000
-publisher publisher0 publish 3 Ontopic cenas/benfica/jogadores interval 1000
-publisher publisher1 publish 3 Ontopic cenas/benfica/jogadores interval 2000
-publisher publisher2 publish 3 Ontopic cenas/benfica/jogadores interval 3000
+freeze broker2
+publisher publisher0 publish 200 Ontopic cenas/benfica interval 0
+publisher publisher0 publish 200 Ontopic cenas interval 0
+wait 10
+unfreeze broker2

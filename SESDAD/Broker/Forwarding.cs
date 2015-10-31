@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared_Library;
+using System.Runtime.CompilerServices;
 
 namespace Broker
 {
@@ -12,42 +13,47 @@ namespace Broker
         private Topic general = new Topic(Topic.GENERAL, null); //base element
 
         //tries to get the topic and if the topic does not exists is created
-        public Topic GetCreateTopic(string topicName)
+        private Topic GetCreateTopic(string topicName)
         {
+
             Topic currentSubtopic = general;
             List<string> topicsEl = Utils.GetTopicElements(topicName);
 
             foreach (string subTopic in topicsEl)
             {
-                currentSubtopic = currentSubtopic.AddSubTopic(subTopic);    
+                currentSubtopic = currentSubtopic.AddSubTopic(subTopic);
             }
 
             return currentSubtopic;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddEntity(string topicName, string entityName)
         {
             Console.WriteLine(String.Format("{0}  --->  {1}", topicName, entityName));
             GetCreateTopic(topicName).AddRemoteEntity(entityName);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void RemoveEntity(string topicName, string entityName)
         {
             GetCreateTopic(topicName).RemoveRemoteEntity(entityName);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public List<string> GetInterestedEntities(string topicName)
         {
             return GetCreateTopic(topicName).Subscribers;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public List<string> GetAllInterestedEntities(string topicName)
         {
             List<string> result = new List<string>();
             Topic currentTopic = GetCreateTopic(topicName);
 
             result = Utils.MergeListsNoRepetitions(result, currentTopic.Subscribers);
-            
+
             if (currentTopic.GetSubTopic("*") != null)
             {
                 result = Utils.MergeListsNoRepetitions(result, currentTopic.GetSubTopic("*").Subscribers);
@@ -65,6 +71,7 @@ namespace Broker
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void PrintStatus()
         {
             foreach (KeyValuePair<string, Topic> entry in general.SubTopics)
@@ -81,6 +88,7 @@ namespace Broker
     {
         private Dictionary<string, List<string>> topicsSubscribed = new Dictionary<string, List<string>>();
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddTopic(string topic, string broker)
         {
             List<string> brokers = GetCreateTopicList(topic);
@@ -89,23 +97,26 @@ namespace Broker
                 brokers.Add(broker.ToLower());
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void RemoveTopic(string topic)
         {
             this.topicsSubscribed.Remove(topic.ToLower());
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void RemoveEntityFromTopic(string topic, string entity)
         {
             GetCreateTopicList(topic.ToLower()).Remove(entity.ToLower());
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         //checks if the given topic is already was subscribed to all brokers
         public bool HasTopic(string topic)
         {
             return this.topicsSubscribed.ContainsKey(topic.ToLower());
         }
 
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public List<string> GetCreateTopicList(string topic)
         {
             if(!this.topicsSubscribed.ContainsKey(topic.ToLower()))
@@ -116,12 +127,14 @@ namespace Broker
             return this.topicsSubscribed[topic.ToLower()];
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         //checks if the we have already subscribed that topic to that entity
         public bool IsSubscribedTo(string topic, string entity)
         {
             return GetCreateTopicList(topic.ToLower()).Contains(entity.ToLower());
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void PrintStatus()
         {
             foreach (KeyValuePair<string, List<string>> entry in topicsSubscribed)

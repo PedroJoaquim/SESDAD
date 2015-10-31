@@ -14,7 +14,6 @@ namespace Publisher
         private String topic;
         private int nrEvents;
         private int ms;
-        private int eventNr;
         private int topicRelativeEventNr;
 
         public string Topic
@@ -56,19 +55,6 @@ namespace Publisher
             }
         }
 
-        public int EventNr
-        {
-            get
-            {
-                return eventNr;
-            }
-
-            set
-            {
-                eventNr = value;
-            }
-        }
-
         public int TopicRelativeEventNr
         {
             get
@@ -83,28 +69,23 @@ namespace Publisher
         }
         #endregion
 
-        public PublishCommand(String topic, int nrEvents, int ms, int eventNr)
+        public PublishCommand(String topic, int nrEvents, int ms)
         {
             this.Topic = topic;
             this.NrEvents = nrEvents;
             this.Ms = ms;
-            this.EventNr = eventNr;
         }
 
         public override void Execute(RemoteEntity entity)
         {
-            IRemoteBroker broker = entity.Brokers.ElementAt(0).Value; //first broker
-            Event newEvent;
+          
+            Publisher publisher = (Publisher) entity;
 
             for (int i = 0; i < this.nrEvents; i++)
             {
-                newEvent = new Event(entity.Name, this.Topic, new DateTime().Ticks, this.EventNr + i);
-                entity.PuppetMaster.LogEventPublication(entity.Name, newEvent.Topic, newEvent.EventNr);
-                broker.DifundPublishEvent(newEvent, entity.Name, newEvent.EventNr); // remote call
-
-                Thread.Sleep(this.Ms);
+               publisher.ExecuteEventPublication(this.Topic);
+               Thread.Sleep(this.Ms);
             }
-             
 
         }
     }

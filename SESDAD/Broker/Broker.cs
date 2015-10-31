@@ -132,5 +132,15 @@ namespace Broker
             Broker b = new Broker(args[0], args[1], args[2]);
             b.Start();
         }
+
+        public override int NumThreads()
+        {
+            return 10;
+        }
+
+        public override int SizeQueue()
+        {
+            return 200;
+        }
     }
 }

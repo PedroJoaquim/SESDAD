@@ -61,10 +61,11 @@ namespace PuppetMaster
         private const string NAME = @"[a-zA-Z0-9]+";
         private const string TOPIC_REGEX = @"(\/)?(([a-zA-Z0-9]+\/)+|\*\/)*([a-zA-Z0-9]+(\/)?|\*(\/)?)";
         private const string POSITIVE_NUMBERS = @"[1-9][0-9]*";
+        private const string ALL_NUMBERS = @"[0-9]+";
         #endregion
 
         private const string SUBSCRIBE_CMD_REGEX = SUBSCRIBER + SPACE + NAME + SPACE + SUBSCRIBE + "|" + UNSUBSCRIBE + SPACE + TOPIC_REGEX;
-        private const string PUBLISH_CMD_REGEX = PUBLISHER + SPACE + NAME + SPACE + PUBLISH + SPACE + POSITIVE_NUMBERS + SPACE + ON_TOPIC + SPACE + TOPIC_REGEX + SPACE + INTERVAL + SPACE + POSITIVE_NUMBERS;
+        private const string PUBLISH_CMD_REGEX = PUBLISHER + SPACE + NAME + SPACE + PUBLISH + SPACE + POSITIVE_NUMBERS + SPACE + ON_TOPIC + SPACE + TOPIC_REGEX + SPACE + INTERVAL + SPACE + ALL_NUMBERS;
         private const string STATUS_CMD_REGEX = STATUS;
         private const string CRASH_CMD_REGEX = CRASH + SPACE + NAME;
         private const string FREEZE_CMD_REGEX = FREEZE + SPACE + NAME;

@@ -59,6 +59,16 @@ namespace Subscriber
         {
             this.Events.Produce(new NotifyEvent(e));
         }
+
+        public override int NumThreads()
+        {
+            return 1;
+        }
+
+        public override int SizeQueue()
+        {
+            return 100;
+        }
         #endregion
     }
 }

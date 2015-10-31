@@ -22,8 +22,10 @@ namespace Shared_Library
         private Dictionary<String, IRemotePublisher> publishers = new Dictionary<string, IRemotePublisher>();
         private Dictionary<String, IRemoteSubscriber> subscribers = new Dictionary<string, IRemoteSubscriber>();
 
-        private EventQueue events = new EventQueue(50);
-        private static Semaphore freezeSemaphore = new Semaphore(1, 1); //semaphore for freeze command
+        private EventQueue events;
+
+        private static bool freeze = false;
+       
         #endregion
 
         #region Properties
@@ -150,14 +152,23 @@ namespace Shared_Library
             this.Name = name;
             this.Url = url;
             this.PmURL = pmUrl;
+            this.events = new EventQueue(SizeQueue());
         }
 
         public void Start()
         {
+            Thread t;
+
             Console.WriteLine(String.Format("================== {0} ==================", Name));
             Register();
-            Thread t = new Thread(ProcessQueue);
-            t.Start();
+
+            //launch workers
+            for (int i = 0; i < NumThreads(); i++)
+            {
+                t = new Thread(ProcessQueue);
+                t.Start();
+            }
+            
             Console.ReadLine();
         }
 
@@ -167,7 +178,8 @@ namespace Shared_Library
         //not yet implemented
         public abstract void Register();
         public abstract void Status();
-
+        public abstract int NumThreads();
+        public abstract int SizeQueue();
 
         public void RegisterInitializationInfo(SysConfig sysConfig)
         {
@@ -216,12 +228,31 @@ namespace Shared_Library
 
         public void Freeze()
         {
-            freezeSemaphore.WaitOne();
+            lock (this)
+            {
+                freeze = true;
+            }
+
         }
 
         public void Unfreeze()
         {
-            freezeSemaphore.Release();
+            lock (this)
+            {
+                freeze = false;
+                Monitor.PulseAll(this);
+            }
+        }
+
+        private void CheckFreeze()
+        {
+            lock(this)
+            {
+                while(freeze)
+                {
+                    Monitor.Wait(this);
+                }
+            }
         }
 
         private void ProcessQueue()
@@ -230,10 +261,9 @@ namespace Shared_Library
 
             while (true)
             {
+                CheckFreeze();
                 command = events.Consume();
-                freezeSemaphore.WaitOne();       //see if the process is freeze
-                command.Execute(this);
-                freezeSemaphore.Release();
+                command.Execute(this); 
             }
 
         }

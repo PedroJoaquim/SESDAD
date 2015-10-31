@@ -45,17 +45,16 @@ namespace Publisher
         }
 
 
-        private int ConcurrentEventNumberGetter(int nrEvents)
+        public void ExecuteEventPublication(string topic)
         {
-            int result;
-
-            lock (this)
+            lock(this)
             {
-                result = this.CurrentEventNr;
-                this.CurrentEventNr = result + nrEvents;
-            }
-
-            return result;
+                Event newEvent = new Event(this.Name, topic, new DateTime().Ticks, this.CurrentEventNr);
+                this.PuppetMaster.LogEventPublication(this.Name, newEvent.Topic, newEvent.EventNr); //remote call
+                this.Brokers.ElementAt(0).Value.DifundPublishEvent(newEvent, this.Name, newEvent.EventNr); // remote call
+                Console.WriteLine("[EVENT] - #" + this.CurrentEventNr);
+                this.CurrentEventNr++;
+            } 
         }
 
 
@@ -81,9 +80,18 @@ namespace Publisher
         #region "interface methods"
         public void Publish(string topic, int nrEvents, int ms)
         {
-            int eventNumber = ConcurrentEventNumberGetter(nrEvents);
-            this.Events.Produce(new PublishCommand(topic, nrEvents, ms, eventNumber));
+            this.Events.Produce(new PublishCommand(topic, nrEvents, ms));
         }
         #endregion
+
+        public override int NumThreads()
+        {
+            return 10;
+        }
+
+        public override int SizeQueue()
+        {
+            return 10;
+        }
     }
 }
