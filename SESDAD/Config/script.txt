@@ -13,5 +13,6 @@ subscriber subscriber3 subscribe cenas/lol
 wait 1000
 publisher publisher6 publish 1 Ontopic cenas/lol interval 1
 Status
-subscriber subscriber3 unsubscribe cenas/lol
-subscriber subscriber0 unsubscribe cenas/lol
+subscriber subscriber0 subscribe cenas/lol
+wait 1000
+publisher publisher6 publish 200 Ontopic cenas/lol interval 0

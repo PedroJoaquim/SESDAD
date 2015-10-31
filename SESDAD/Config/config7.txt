@@ -1,0 +1,11 @@
+Site site0 Parent none
+Site site1 Parent site0
+Process broker0 Is broker On site0 URL tcp://193.136.131.204:3333/broker
+Process broker1 Is broker On site1 URL tcp://194.210.159.248:3337/broker
+Process subscriber0 Is subscriber On site0 URL tcp://193.136.131.204:3335/sub
+Process subscriber1 Is subscriber On site1 URL tcp://194.210.159.248:3336/sub
+Process publisher1 Is publisher On site1 URL tcp://194.210.159.248:3334/pub
+RoutingPolicy filter
+Ordering NO
+LoggingLevel full
+Distributed 193.136.131.204
