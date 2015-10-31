@@ -15,10 +15,10 @@ namespace Shared_Library
     [Serializable()]
     public class SysConfig : ISerializable
     {
-        public const int PM_PORT = 56000;
-        public const int PM_SLAVE_PORT = 55000;
-        public const String PM_NAME = "PuppetMaster";
-        public const String PM_SLAVE_NAME = "PuppetMasterSlave";
+        public const int PM_PORT = 30000;
+        public const int PM_SLAVE_PORT = 30000;
+        public const String PM_NAME = "puppet";
+        public const String PM_SLAVE_NAME = "puppet";
         public const String BROKER = "broker";
         public const String PUBLISHER = "publisher";
         public const String SUBSCRIBER = "subscriber";

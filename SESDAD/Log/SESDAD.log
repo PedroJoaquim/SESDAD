@@ -2014,3 +2014,250 @@
 [LOG: 12:33:29 | 31/10/15] - SubEvent subscriber3, publisher0, cenas, 398
 [LOG: 12:33:29 | 31/10/15] - SubEvent subscriber3, publisher0, cenas, 399
 [LOG: 12:33:29 | 31/10/15] - SubEvent subscriber3, publisher0, cenas, 400
+
+####################################################################################################
+############################    New Connection @ 14:45:32 | 31/10/15    ############################
+####################################################################################################
+
+[LOG: 14:45:40 | 31/10/15] - wait 1000
+
+####################################################################################################
+############################    New Connection @ 14:46:51 | 31/10/15    ############################
+####################################################################################################
+
+[LOG: 14:46:59 | 31/10/15] - wait 1000
+[LOG: 14:46:59 | 31/10/15] - subscriber subscriber7 subscribe cenas/lol
+[LOG: 14:47:00 | 31/10/15] - wait 1000
+[LOG: 14:47:00 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 14:47:00 | 31/10/15] - PubEvent publisher6, cenas/lol, 1
+[LOG: 14:47:00 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 1
+[LOG: 14:47:00 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 1
+[LOG: 14:47:00 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 1
+
+####################################################################################################
+############################    New Connection @ 14:53:53 | 31/10/15    ############################
+####################################################################################################
+
+[LOG: 14:54:01 | 31/10/15] - wait 1000
+[LOG: 14:54:01 | 31/10/15] - subscriber subscriber0 subscribe cenas/lol
+[LOG: 14:54:02 | 31/10/15] - wait 1000
+[LOG: 14:54:02 | 31/10/15] - subscriber subscriber7 subscribe cenas/lol
+[LOG: 14:54:03 | 31/10/15] - wait 1000
+[LOG: 14:54:03 | 31/10/15] - publisher publisher4 publish 1 Ontopic cenas/lol interval 1
+[LOG: 14:54:03 | 31/10/15] - PubEvent publisher4, cenas/lol, 1
+[LOG: 14:54:03 | 31/10/15] - BroEvent broker4, publisher4, cenas/lol, 1
+[LOG: 14:54:03 | 31/10/15] - BroEvent broker2, publisher4, cenas/lol, 1
+[LOG: 14:54:03 | 31/10/15] - BroEvent broker5, publisher4, cenas/lol, 1
+[LOG: 14:54:03 | 31/10/15] - SubEvent subscriber0, publisher4, cenas/lol, 1
+[LOG: 14:54:03 | 31/10/15] - SubEvent subscriber7, publisher4, cenas/lol, 1
+[LOG: 14:54:04 | 31/10/15] - wait 1000
+[LOG: 14:54:04 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol
+[LOG: 14:54:05 | 31/10/15] - wait 1000
+[LOG: 14:54:05 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 14:54:05 | 31/10/15] - PubEvent publisher6, cenas/lol, 1
+[LOG: 14:54:05 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 1
+[LOG: 14:54:05 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 1
+[LOG: 14:54:05 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 1
+[LOG: 14:54:06 | 31/10/15] - wait 1000
+[LOG: 14:54:06 | 31/10/15] - subscriber subscriber3 subscribe cenas/lol
+[LOG: 14:54:07 | 31/10/15] - wait 1000
+[LOG: 14:54:07 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 14:54:07 | 31/10/15] - PubEvent publisher6, cenas/lol, 2
+[LOG: 14:54:07 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 2
+[LOG: 14:54:07 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 2
+[LOG: 14:54:07 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 2
+[LOG: 14:54:07 | 31/10/15] - BroEvent broker4, publisher6, cenas/lol, 2
+[LOG: 14:54:07 | 31/10/15] - BroEvent broker2, publisher6, cenas/lol, 2
+[LOG: 14:54:07 | 31/10/15] - SubEvent subscriber3, publisher6, cenas/lol, 2
+
+####################################################################################################
+############################    New Connection @ 14:56:54 | 31/10/15    ############################
+####################################################################################################
+
+[LOG: 14:57:01 | 31/10/15] - wait 1000
+[LOG: 14:57:01 | 31/10/15] - subscriber subscriber0 subscribe cenas/lol
+[LOG: 14:57:02 | 31/10/15] - wait 1000
+[LOG: 14:57:02 | 31/10/15] - subscriber subscriber7 subscribe cenas/lol
+[LOG: 14:57:03 | 31/10/15] - wait 1000
+[LOG: 14:57:03 | 31/10/15] - publisher publisher4 publish 1 Ontopic cenas/lol interval 1
+[LOG: 14:57:03 | 31/10/15] - PubEvent publisher4, cenas/lol, 1
+[LOG: 14:57:03 | 31/10/15] - BroEvent broker4, publisher4, cenas/lol, 1
+[LOG: 14:57:03 | 31/10/15] - BroEvent broker2, publisher4, cenas/lol, 1
+[LOG: 14:57:03 | 31/10/15] - BroEvent broker5, publisher4, cenas/lol, 1
+[LOG: 14:57:03 | 31/10/15] - SubEvent subscriber0, publisher4, cenas/lol, 1
+[LOG: 14:57:03 | 31/10/15] - SubEvent subscriber7, publisher4, cenas/lol, 1
+[LOG: 14:57:04 | 31/10/15] - wait 1000
+[LOG: 14:57:04 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol
+[LOG: 14:57:05 | 31/10/15] - wait 1000
+[LOG: 14:57:05 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 14:57:05 | 31/10/15] - PubEvent publisher6, cenas/lol, 1
+[LOG: 14:57:05 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 1
+[LOG: 14:57:05 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 1
+[LOG: 14:57:05 | 31/10/15] - BroEvent broker4, publisher6, cenas/lol, 1
+[LOG: 14:57:05 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 1
+[LOG: 14:57:06 | 31/10/15] - wait 1000
+[LOG: 14:57:06 | 31/10/15] - subscriber subscriber3 subscribe cenas/lol
+[LOG: 14:57:07 | 31/10/15] - wait 1000
+[LOG: 14:57:07 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 14:57:07 | 31/10/15] - PubEvent publisher6, cenas/lol, 2
+[LOG: 14:57:07 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 2
+[LOG: 14:57:07 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 2
+[LOG: 14:57:07 | 31/10/15] - BroEvent broker4, publisher6, cenas/lol, 2
+[LOG: 14:57:07 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 2
+[LOG: 14:57:07 | 31/10/15] - BroEvent broker2, publisher6, cenas/lol, 2
+[LOG: 14:57:07 | 31/10/15] - SubEvent subscriber3, publisher6, cenas/lol, 2
+
+####################################################################################################
+############################    New Connection @ 15:01:38 | 31/10/15    ############################
+####################################################################################################
+
+[LOG: 15:01:46 | 31/10/15] - wait 1000
+[LOG: 15:01:46 | 31/10/15] - subscriber subscriber0 subscribe cenas/lol
+[LOG: 15:01:47 | 31/10/15] - wait 1000
+[LOG: 15:01:47 | 31/10/15] - subscriber subscriber7 subscribe cenas/lol
+[LOG: 15:01:48 | 31/10/15] - wait 1000
+[LOG: 15:01:48 | 31/10/15] - publisher publisher4 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:01:48 | 31/10/15] - PubEvent publisher4, cenas/lol, 1
+[LOG: 15:01:48 | 31/10/15] - BroEvent broker4, publisher4, cenas/lol, 1
+[LOG: 15:01:48 | 31/10/15] - BroEvent broker2, publisher4, cenas/lol, 1
+[LOG: 15:01:48 | 31/10/15] - BroEvent broker5, publisher4, cenas/lol, 1
+[LOG: 15:01:48 | 31/10/15] - SubEvent subscriber0, publisher4, cenas/lol, 1
+[LOG: 15:01:48 | 31/10/15] - SubEvent subscriber7, publisher4, cenas/lol, 1
+[LOG: 15:01:49 | 31/10/15] - wait 1000
+[LOG: 15:01:49 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol
+[LOG: 15:01:50 | 31/10/15] - wait 1000
+[LOG: 15:01:50 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:01:50 | 31/10/15] - PubEvent publisher6, cenas/lol, 1
+[LOG: 15:01:50 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 1
+[LOG: 15:01:50 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 1
+[LOG: 15:01:50 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 1
+[LOG: 15:01:51 | 31/10/15] - wait 1000
+[LOG: 15:01:51 | 31/10/15] - subscriber subscriber3 subscribe cenas/lol
+[LOG: 15:01:52 | 31/10/15] - wait 1000
+[LOG: 15:01:52 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:01:52 | 31/10/15] - PubEvent publisher6, cenas/lol, 2
+[LOG: 15:01:52 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 2
+[LOG: 15:01:52 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 2
+[LOG: 15:01:52 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 2
+[LOG: 15:01:52 | 31/10/15] - BroEvent broker4, publisher6, cenas/lol, 2
+[LOG: 15:01:52 | 31/10/15] - BroEvent broker2, publisher6, cenas/lol, 2
+[LOG: 15:01:52 | 31/10/15] - SubEvent subscriber3, publisher6, cenas/lol, 2
+
+####################################################################################################
+############################    New Connection @ 15:13:18 | 31/10/15    ############################
+####################################################################################################
+
+
+####################################################################################################
+############################    New Connection @ 15:14:04 | 31/10/15    ############################
+####################################################################################################
+
+[LOG: 15:14:13 | 31/10/15] - wait 1000
+[LOG: 15:14:13 | 31/10/15] - subscriber subscriber0 subscribe cenas/lol
+[LOG: 15:14:14 | 31/10/15] - wait 1000
+[LOG: 15:14:14 | 31/10/15] - subscriber subscriber7 subscribe cenas/lol
+[LOG: 15:14:15 | 31/10/15] - wait 1000
+[LOG: 15:14:15 | 31/10/15] - publisher publisher4 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:14:15 | 31/10/15] - PubEvent publisher4, cenas/lol, 1
+[LOG: 15:14:15 | 31/10/15] - BroEvent broker4, publisher4, cenas/lol, 1
+[LOG: 15:14:15 | 31/10/15] - BroEvent broker2, publisher4, cenas/lol, 1
+[LOG: 15:14:15 | 31/10/15] - BroEvent broker5, publisher4, cenas/lol, 1
+[LOG: 15:14:15 | 31/10/15] - SubEvent subscriber0, publisher4, cenas/lol, 1
+[LOG: 15:14:15 | 31/10/15] - SubEvent subscriber7, publisher4, cenas/lol, 1
+[LOG: 15:14:16 | 31/10/15] - wait 1000
+[LOG: 15:14:16 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol
+[LOG: 15:14:17 | 31/10/15] - wait 1000
+[LOG: 15:14:17 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:14:17 | 31/10/15] - PubEvent publisher6, cenas/lol, 1
+[LOG: 15:14:17 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 1
+[LOG: 15:14:17 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 1
+[LOG: 15:14:17 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 1
+[LOG: 15:14:18 | 31/10/15] - wait 1000
+[LOG: 15:14:18 | 31/10/15] - subscriber subscriber3 subscribe cenas/lol
+[LOG: 15:14:19 | 31/10/15] - wait 1000
+[LOG: 15:14:19 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:14:19 | 31/10/15] - PubEvent publisher6, cenas/lol, 2
+[LOG: 15:14:19 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 2
+[LOG: 15:14:19 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 2
+[LOG: 15:14:19 | 31/10/15] - BroEvent broker4, publisher6, cenas/lol, 2
+[LOG: 15:14:19 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 2
+[LOG: 15:14:19 | 31/10/15] - BroEvent broker2, publisher6, cenas/lol, 2
+[LOG: 15:14:19 | 31/10/15] - SubEvent subscriber3, publisher6, cenas/lol, 2
+[LOG: 15:14:19 | 31/10/15] - subscriber subscriber3 unsubscribe cenas/lol
+[LOG: 15:14:19 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol
+
+####################################################################################################
+############################    New Connection @ 15:17:49 | 31/10/15    ############################
+####################################################################################################
+
+[LOG: 15:17:57 | 31/10/15] - wait 1000
+[LOG: 15:17:57 | 31/10/15] - subscriber subscriber0 subscribe cenas/lol
+[LOG: 15:17:58 | 31/10/15] - wait 1000
+[LOG: 15:17:58 | 31/10/15] - subscriber subscriber7 subscribe cenas/lol
+[LOG: 15:17:59 | 31/10/15] - wait 1000
+[LOG: 15:17:59 | 31/10/15] - publisher publisher4 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:17:59 | 31/10/15] - PubEvent publisher4, cenas/lol, 1
+[LOG: 15:17:59 | 31/10/15] - BroEvent broker4, publisher4, cenas/lol, 1
+[LOG: 15:17:59 | 31/10/15] - BroEvent broker2, publisher4, cenas/lol, 1
+[LOG: 15:17:59 | 31/10/15] - BroEvent broker5, publisher4, cenas/lol, 1
+[LOG: 15:17:59 | 31/10/15] - SubEvent subscriber0, publisher4, cenas/lol, 1
+[LOG: 15:17:59 | 31/10/15] - SubEvent subscriber7, publisher4, cenas/lol, 1
+[LOG: 15:18:00 | 31/10/15] - wait 1000
+[LOG: 15:18:00 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol
+[LOG: 15:18:01 | 31/10/15] - wait 1000
+[LOG: 15:18:01 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:18:01 | 31/10/15] - PubEvent publisher6, cenas/lol, 1
+[LOG: 15:18:01 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 1
+[LOG: 15:18:01 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 1
+[LOG: 15:18:01 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 1
+[LOG: 15:18:02 | 31/10/15] - wait 1000
+[LOG: 15:18:02 | 31/10/15] - subscriber subscriber3 subscribe cenas/lol
+[LOG: 15:18:03 | 31/10/15] - wait 1000
+[LOG: 15:18:03 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:18:03 | 31/10/15] - PubEvent publisher6, cenas/lol, 2
+[LOG: 15:18:03 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 2
+[LOG: 15:18:03 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 2
+[LOG: 15:18:03 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 2
+[LOG: 15:18:03 | 31/10/15] - BroEvent broker4, publisher6, cenas/lol, 2
+[LOG: 15:18:03 | 31/10/15] - BroEvent broker2, publisher6, cenas/lol, 2
+[LOG: 15:18:03 | 31/10/15] - SubEvent subscriber3, publisher6, cenas/lol, 2
+[LOG: 15:18:03 | 31/10/15] - subscriber subscriber3 unsubscribe cenas/lol
+[LOG: 15:18:03 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol
+
+####################################################################################################
+############################    New Connection @ 15:21:38 | 31/10/15    ############################
+####################################################################################################
+
+[LOG: 15:21:46 | 31/10/15] - wait 1000
+[LOG: 15:21:46 | 31/10/15] - subscriber subscriber0 subscribe cenas/lol
+[LOG: 15:21:47 | 31/10/15] - wait 1000
+[LOG: 15:21:48 | 31/10/15] - subscriber subscriber7 subscribe cenas/lol
+[LOG: 15:21:49 | 31/10/15] - wait 1000
+[LOG: 15:21:49 | 31/10/15] - publisher publisher4 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:21:49 | 31/10/15] - PubEvent publisher4, cenas/lol, 1
+[LOG: 15:21:49 | 31/10/15] - BroEvent broker4, publisher4, cenas/lol, 1
+[LOG: 15:21:49 | 31/10/15] - BroEvent broker2, publisher4, cenas/lol, 1
+[LOG: 15:21:49 | 31/10/15] - BroEvent broker5, publisher4, cenas/lol, 1
+[LOG: 15:21:49 | 31/10/15] - SubEvent subscriber0, publisher4, cenas/lol, 1
+[LOG: 15:21:49 | 31/10/15] - SubEvent subscriber7, publisher4, cenas/lol, 1
+[LOG: 15:21:50 | 31/10/15] - wait 1000
+[LOG: 15:21:50 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol
+[LOG: 15:21:51 | 31/10/15] - wait 1000
+[LOG: 15:21:51 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:21:51 | 31/10/15] - PubEvent publisher6, cenas/lol, 1
+[LOG: 15:21:51 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 1
+[LOG: 15:21:51 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 1
+[LOG: 15:21:51 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 1
+[LOG: 15:21:52 | 31/10/15] - wait 1000
+[LOG: 15:21:52 | 31/10/15] - subscriber subscriber3 subscribe cenas/lol
+[LOG: 15:21:53 | 31/10/15] - wait 1000
+[LOG: 15:21:53 | 31/10/15] - publisher publisher6 publish 1 Ontopic cenas/lol interval 1
+[LOG: 15:21:53 | 31/10/15] - PubEvent publisher6, cenas/lol, 2
+[LOG: 15:21:53 | 31/10/15] - BroEvent broker6, publisher6, cenas/lol, 2
+[LOG: 15:21:53 | 31/10/15] - BroEvent broker5, publisher6, cenas/lol, 2
+[LOG: 15:21:53 | 31/10/15] - SubEvent subscriber7, publisher6, cenas/lol, 2
+[LOG: 15:21:53 | 31/10/15] - BroEvent broker4, publisher6, cenas/lol, 2
+[LOG: 15:21:53 | 31/10/15] - BroEvent broker2, publisher6, cenas/lol, 2
+[LOG: 15:21:53 | 31/10/15] - SubEvent subscriber3, publisher6, cenas/lol, 2
+[LOG: 15:21:53 | 31/10/15] - subscriber subscriber3 unsubscribe cenas/lol
+[LOG: 15:21:53 | 31/10/15] - subscriber subscriber0 unsubscribe cenas/lol

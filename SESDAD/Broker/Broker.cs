@@ -85,9 +85,11 @@ namespace Broker
 
         public override void Status()
         {
-            Console.WriteLine(String.Format("======================STATUS: {0}=====================", this.Name));
+            Console.WriteLine();
+            Console.WriteLine(String.Format("##################### STATUS: {0} #####################", this.Name));
+            Console.WriteLine();
+            Console.WriteLine(String.Format("*********************** Connections *********************** \r\n"));
 
-            Console.WriteLine(String.Format("---------------------Connections----------------------"));
             foreach (KeyValuePair<string, IRemoteBroker> entry in this.Brokers)
             {
                 Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
@@ -100,11 +102,14 @@ namespace Broker
             {
                 Console.WriteLine(String.Format("[SUBSCRIBER] {0}", entry.Key));
             }
-            Console.WriteLine(String.Format("-------------------Forwarding Table-------------------"));
+
+            Console.WriteLine();
+            Console.WriteLine(String.Format("********************* Forwarding Table ********************"));
             this.ForwardingTable.PrintStatus();
-            Console.WriteLine(String.Format("---------------------Receive Table--------------------"));
+            Console.WriteLine();
+            Console.WriteLine(String.Format("********************** Receive Table **********************\r\n"));
             this.ReceiveTable.PrintStatus();
-            Console.WriteLine(String.Format("------------------------------------------------------"));
+            Console.WriteLine(String.Format("###########################################################"));
         }
 
         #region "interface methods"

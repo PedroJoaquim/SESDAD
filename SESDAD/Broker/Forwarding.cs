@@ -30,7 +30,6 @@ namespace Broker
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddEntity(string topicName, string entityName)
         {
-            Console.WriteLine(String.Format("{0}  --->  {1}", topicName, entityName));
             GetCreateTopic(topicName).AddRemoteEntity(entityName);
         }
 
@@ -141,7 +140,7 @@ namespace Broker
             {
                 foreach (string entity in entry.Value)
                 {
-                    Console.WriteLine("{0} ----------> {1}", entity, entry.Value);
+                    Console.WriteLine("{0} <---------- {1}", entry.Key, entity);
                     Console.WriteLine();
                 }
             }
@@ -223,7 +222,7 @@ namespace Broker
             }
             else
             {
-                this.fullName = parent.fullName + "/" + topicName;
+                this.fullName = parent.fullName + topicName + "/";
             }
         }
 
@@ -268,7 +267,7 @@ namespace Broker
 
         public void Print()
         {
-            string spaces = new string(' ', this.fullName.Length + 13);
+            string spaces = new string(' ', this.fullName.Length);
             int i = 0;
 
             Console.WriteLine();

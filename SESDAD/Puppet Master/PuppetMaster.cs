@@ -33,8 +33,6 @@ namespace PuppetMaster
         public Logger log = new Logger();
         public Shell shell;
 
-        private TcpChannel channel;
-
         private Dictionary<String, IRemotePuppetMasterSlave> pmSlaves = new Dictionary<string, IRemotePuppetMasterSlave>();
 
         private static Semaphore sem = new Semaphore(0, 1);
@@ -75,7 +73,7 @@ namespace PuppetMaster
 
         private void RegisterPM()
         {
-            channel = new TcpChannel(SysConfig.PM_PORT);
+            TcpChannel channel = new TcpChannel(SysConfig.PM_PORT);
             ChannelServices.RegisterChannel(channel, false);
             RemotingServices.Marshal(this, SysConfig.PM_NAME, typeof(IRemotePuppetMaster));
         }

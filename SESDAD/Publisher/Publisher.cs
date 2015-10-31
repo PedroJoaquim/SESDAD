@@ -74,7 +74,24 @@ namespace Publisher
 
         public override void Status()
         {
-            Console.WriteLine("todo");
+            Console.WriteLine();
+            Console.WriteLine(String.Format("##################### STATUS: {0} #####################", this.Name));
+            Console.WriteLine();
+            Console.WriteLine(String.Format("*********************** Connections *********************** \r\n"));
+
+            foreach (KeyValuePair<string, IRemoteBroker> entry in this.Brokers)
+            {
+                Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
+            }
+            foreach (KeyValuePair<string, IRemotePublisher> entry in this.Publishers)
+            {
+                Console.WriteLine(String.Format("[PUBLISHER] {0}", entry.Key));
+            }
+            foreach (KeyValuePair<string, IRemoteSubscriber> entry in this.Subscribers)
+            {
+                Console.WriteLine(String.Format("[SUBSCRIBER] {0}", entry.Key));
+            }
+            Console.WriteLine(String.Format("###########################################################"));
         }
 
         #region "interface methods"
