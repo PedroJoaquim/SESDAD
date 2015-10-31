@@ -41,8 +41,9 @@ namespace Puppet_Master_Slave
 
             IRemotePuppetMaster pm = (IRemotePuppetMaster) Activator.GetObject(typeof(IRemotePuppetMaster), pmUrl);
             pm.RegisterSlave(myUrl);
-
             this.pmURL = pmUrl;
+
+            Console.WriteLine("[INIT] Successfully connected to PuppetMaster");
         }
 
 

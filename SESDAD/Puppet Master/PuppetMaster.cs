@@ -28,7 +28,7 @@ namespace PuppetMaster
         private static String CONFIG_FILE_PATH = @"../../Config/config.txt";
         private static String SCRIPT_FILE_PATH = @"../../Config/script.txt";
         private static String EXIT_CMD = "exit";
-        private static String PM_URL = @"tcp://localhost:56000/PuppetMaster";
+        
         private SystemNetwork network = new SystemNetwork();
         public Logger log = new Logger();
         public Shell shell;
@@ -56,15 +56,16 @@ namespace PuppetMaster
         #region "Main Functions"
         public void Start()
         {
-            Console.WriteLine("[INFO] Registering PuppetMaster Remote Object...");
+            Console.WriteLine("[INIT] Registering PuppetMaster Remote Object...");
             RegisterPM();
-            Console.WriteLine("[INFO] Start reading configuration file...");
+            Console.WriteLine("[INIT] Start reading configuration file...");
             ReadFile("config");
             log.newConnection();
-            Console.WriteLine("[INFO] Successfully parsed configuration file, deploying network...");
+            Console.WriteLine("[INIT] Successfully parsed configuration file, deploying network...");
             CreateNetwork();
-            Console.WriteLine("[INFO] Successfully generated the network, waiting input...");
+            Console.WriteLine("[INIT] Successfully generated the network, processing script file...");
             ReadFile("script");
+            Console.WriteLine("[INIT] Waiting input (exit to finish)");
             RunMode();
             Console.WriteLine("[INFO] Shutingdown the network...");
             ShutDownNetwork();
@@ -379,7 +380,7 @@ namespace PuppetMaster
 
         private void LaunchProcess(Entity ent)
         {
-            String args = String.Format("{0} {1} {2}", ent.Name, ent.Url, PM_URL);
+            String args = String.Format("{0} {1} tcp://localhost:{2}/{3}", ent.Name, ent.Url, SysConfig.PM_PORT, SysConfig.PM_NAME);
             ProcessManager.LaunchProcess(ent.EntityType(), args);
         }
 

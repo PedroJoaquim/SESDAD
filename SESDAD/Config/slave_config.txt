@@ -1,2 +1,2 @@
-tcp://localhost:56000/PuppetMaster
-tcp://localhost:55000/PuppetMasterSlave
+tcp://localhost:30000/puppet
+tcp://localhost:30000/puppet
