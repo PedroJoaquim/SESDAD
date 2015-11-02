@@ -39,7 +39,7 @@ namespace Shared_Library
                 busy++;
                 if (busy == 1)
                 {
-                    Monitor.Pulse(this);
+                    Monitor.PulseAll(this);
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace Shared_Library
                 busy--;
                 if (busy == size - 1)
                 {
-                    Monitor.Pulse(this);
+                    Monitor.PulseAll(this);
                 }
             }
             return o;

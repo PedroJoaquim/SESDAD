@@ -58,7 +58,7 @@ namespace Broker
         }
         #endregion
 
-        public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl) { }
+        public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, 300, 20) { }
 
         public override void Register()
         {
@@ -136,16 +136,6 @@ namespace Broker
 
             Broker b = new Broker(args[0], args[1], args[2]);
             b.Start();
-        }
-
-        public override int NumThreads()
-        {
-            return 10;
-        }
-
-        public override int SizeQueue()
-        {
-            return 200;
         }
     }
 }

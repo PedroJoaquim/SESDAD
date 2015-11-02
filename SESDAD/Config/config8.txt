@@ -1,0 +1,29 @@
+Site site0 Parent none
+Site site1 Parent site0
+Site site2 Parent site0
+Site site3 Parent site2
+Site site4 Parent site2
+Site site5 Parent site4
+Site site6 Parent site5
+Site site7 Parent site5
+Site site8 Parent site6
+Process broker0 Is broker On site0 URL tcp://193.136.131.204:3333/broker
+Process broker1 Is broker On site1 URL tcp://193.136.131.204:3334/broker
+Process broker2 Is broker On site2 URL tcp://193.136.131.204:3335/broker
+Process broker3 Is broker On site3 URL tcp://194.210.159.248:3336/broker
+Process broker4 Is broker On site4 URL tcp://194.210.159.248:3337/broker
+Process broker5 Is broker On site5 URL tcp://194.210.159.248:3338/broker
+Process broker6 Is broker On site6 URL tcp://194.210.159.248:3339/broker
+Process broker7 Is broker On site7 URL tcp://194.210.159.248:3340/broker
+Process broker8 Is broker On site8 URL tcp://194.210.159.248:3341/broker
+Process publisher1 Is publisher On site1 URL tcp://193.136.131.204:4330/pub
+Process publisher4 Is publisher On site4 URL tcp://194.210.159.248:4331/pub
+Process publisher6 Is publisher On site6 URL tcp://194.210.159.248:4332/pub
+Process subscriber0 Is subscriber On site0 URL tcp://193.136.131.204:5330/sub
+Process subscriber3 Is subscriber On site3 URL tcp://194.210.159.248:5331/sub
+Process subscriber7 Is subscriber On site7 URL tcp://194.210.159.248:5332/sub
+Process subscriber8 Is subscriber On site8 URL tcp://194.210.159.248:5333/sub
+RoutingPolicy filter
+Ordering FIFO
+LoggingLevel full
+Distributed 193.136.131.204

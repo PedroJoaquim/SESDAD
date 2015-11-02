@@ -39,7 +39,7 @@ namespace Publisher
             p.Start();
         }
 
-        public Publisher(String name, String url, String pmUrl) : base(name, url, pmUrl)
+        public Publisher(String name, String url, String pmUrl) : base(name, url, pmUrl, 10, 10)
         {
             this.CurrentEventNr = 1;
         }
@@ -47,6 +47,8 @@ namespace Publisher
 
         public void ExecuteEventPublication(string topic)
         {
+            CheckFreeze();
+
             lock(this)
             {
                 Event newEvent = new Event(this.Name, topic, new DateTime().Ticks, this.CurrentEventNr);
@@ -100,15 +102,5 @@ namespace Publisher
             this.Events.Produce(new PublishCommand(topic, nrEvents, ms));
         }
         #endregion
-
-        public override int NumThreads()
-        {
-            return 10;
-        }
-
-        public override int SizeQueue()
-        {
-            return 10;
-        }
     }
 }

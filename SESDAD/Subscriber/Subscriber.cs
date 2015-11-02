@@ -22,7 +22,7 @@ namespace Subscriber
         }
 
 
-        public Subscriber(String name, String url, String pmUrl) : base(name, url, pmUrl) { }
+        public Subscriber(String name, String url, String pmUrl) : base(name, url, pmUrl, 100, 1) { }
 
 
         public override void Register()
@@ -77,15 +77,6 @@ namespace Subscriber
             this.Events.Produce(new NotifyEvent(e));
         }
 
-        public override int NumThreads()
-        {
-            return 1;
-        }
-
-        public override int SizeQueue()
-        {
-            return 100;
-        }
         #endregion
     }
 }

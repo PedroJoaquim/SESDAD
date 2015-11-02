@@ -1,2 +1,2 @@
-tcp://localhost:30000/puppet
-tcp://localhost:30000/puppet
+tcp://194.210.159.242:30000/puppet
+tcp://193.136.131.204:30000/puppet

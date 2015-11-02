@@ -115,20 +115,28 @@ namespace PuppetMaster
             this.maxNumberEntities = this.network.Entities.Count;
             SemaphoreWait(); //wait all processes to be up and running
 
-            Thread t;
-            this.entitiesProcessed = 0;
-
-            foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
-            {
-                t = new Thread(entry.Value.GetRemoteEntity().EstablishConnections);
-                t.Start();
-            }
-
-            SemaphoreWait(); //wait all processes to be up and running
-
+            NotifyEntitiesToEstablishConnections();
+            
             this.shell = new Shell(this.Network, this.log);
         }
 
+        //notifies all entities that they can start establishing all conections
+        private void NotifyEntitiesToEstablishConnections()
+        {
+            List<Thread> threads = new List<Thread>();
+
+            foreach (KeyValuePair<string, Entity> entry in this.network.Entities)
+            {
+                Thread t = new Thread(entry.Value.GetRemoteEntity().EstablishConnections);
+                t.Start();
+                threads.Add(t);
+            }
+
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+        }
 
         private void RunMode()
         {
@@ -414,8 +422,9 @@ namespace PuppetMaster
             BrokerEntity bEntity = (BrokerEntity)this.network.GetEntity(name);
             IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), url);
             bEntity.RemoteEntity = newBroker;
-            this.network.SystemConfig.Connections = bEntity.GetConnectionsUrl();
-            newBroker.RegisterInitializationInfo(this.network.SystemConfig);
+            SysConfig config = this.network.SystemConfig.cloneConfig();
+            config.Connections = bEntity.GetConnectionsUrl();
+            newBroker.RegisterInitializationInfo(config);
             PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Broker: {0} connected on url: {1}", name, url));
@@ -426,8 +435,9 @@ namespace PuppetMaster
             PublisherEntity pEntity = (PublisherEntity)this.network.GetEntity(name);
             IRemotePublisher newPublisher = (IRemotePublisher)Activator.GetObject(typeof(IRemotePublisher), url);
             pEntity.RemoteEntity = newPublisher;
-            this.network.SystemConfig.Connections = pEntity.GetConnectionsUrl();
-            newPublisher.RegisterInitializationInfo(this.network.SystemConfig);
+            SysConfig config = this.network.SystemConfig.cloneConfig();
+            config.Connections = pEntity.GetConnectionsUrl();
+            newPublisher.RegisterInitializationInfo(config);
             PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Publisher: {0} connected on url: {1}", name, url));
@@ -435,11 +445,12 @@ namespace PuppetMaster
 
         public void RegisterSubscriber(string url, string name)
         {
-            SubscriberEntity sEntity = (SubscriberEntity)this.network.GetEntity(name);
+            SubscriberEntity sEntity = (SubscriberEntity) this.network.GetEntity(name);
             IRemoteSubscriber newSubscriber = (IRemoteSubscriber)Activator.GetObject(typeof(IRemoteSubscriber), url);
             sEntity.RemoteEntity = newSubscriber;
-            this.network.SystemConfig.Connections = sEntity.GetConnectionsUrl();
-            newSubscriber.RegisterInitializationInfo(this.network.SystemConfig);
+            SysConfig config = this.network.SystemConfig.cloneConfig();
+            config.Connections = sEntity.GetConnectionsUrl();
+            newSubscriber.RegisterInitializationInfo(config);
             PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));

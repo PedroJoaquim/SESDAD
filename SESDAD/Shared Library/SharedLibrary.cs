@@ -112,6 +112,19 @@ namespace Shared_Library
 
         }
 
+        public SysConfig cloneConfig()
+        {
+            SysConfig result = new SysConfig();
+
+            result.LogLevel = this.LogLevel;
+            result.RoutingPolicy = this.RoutingPolicy;
+            result.Ordering = this.Ordering;
+            result.Distributed = this.Distributed;
+            result.Connections = this.Connections;
+
+            return result;
+        }
+
         #region "Serialization"
         public SysConfig(SerializationInfo info, StreamingContext ctxt)
         {

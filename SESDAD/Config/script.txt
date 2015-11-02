@@ -1,18 +1,9 @@
 wait 1000
-subscriber subscriber0 subscribe cenas/lol
-wait 1000
-subscriber subscriber7 subscribe cenas/lol
-wait 1000
-publisher publisher4 publish 1 Ontopic cenas/lol interval 1
-wait 1000
-subscriber subscriber0 unsubscribe cenas/lol
-wait 1000
-publisher publisher6 publish 1 Ontopic cenas/lol interval 1
-wait 1000
+subscriber subscriber2 subscribe cenas/lol
+subscriber subscriber1 subscribe cenas/lol
 subscriber subscriber3 subscribe cenas/lol
 wait 1000
-publisher publisher6 publish 1 Ontopic cenas/lol interval 1
-Status
-subscriber subscriber0 subscribe cenas/lol
-wait 1000
-publisher publisher6 publish 200 Ontopic cenas/lol interval 0
+publisher publisher1 publish 100 OnTopic cenas/lol Interval 0
+freeze broker1
+wait 10000
+unfreeze broker1

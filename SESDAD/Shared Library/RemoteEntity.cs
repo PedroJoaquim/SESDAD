@@ -15,6 +15,7 @@ namespace Shared_Library
         private String name;
         private String url;
         private String pmURL;
+        private int numThreads;
 
         private IRemotePuppetMaster puppetMaster;
         private SysConfig sysConfig;
@@ -147,12 +148,13 @@ namespace Shared_Library
         }
         #endregion
 
-        public RemoteEntity(String name, String url, String pmUrl)
+        public RemoteEntity(String name, String url, String pmUrl, int queueSize, int numThreads)
         {
             this.Name = name;
             this.Url = url;
             this.PmURL = pmUrl;
-            this.events = new EventQueue(SizeQueue());
+            this.events = new EventQueue(queueSize);
+            this.numThreads = numThreads;
         }
 
         public void Start()
@@ -163,7 +165,7 @@ namespace Shared_Library
             Register();
 
             //launch workers
-            for (int i = 0; i < NumThreads(); i++)
+            for (int i = 0; i < this.numThreads; i++)
             {
                 t = new Thread(ProcessQueue);
                 t.Start();
@@ -178,8 +180,6 @@ namespace Shared_Library
         //not yet implemented
         public abstract void Register();
         public abstract void Status();
-        public abstract int NumThreads();
-        public abstract int SizeQueue();
 
         public void RegisterInitializationInfo(SysConfig sysConfig)
         {
@@ -188,6 +188,8 @@ namespace Shared_Library
 
         public void EstablishConnections()
         {
+            string entityName = "";
+
             foreach (Tuple<String, String> conn in this.SysConfig.Connections)
             {
                 switch (conn.Item2)
@@ -195,20 +197,23 @@ namespace Shared_Library
                     case SysConfig.BROKER:
                         IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), conn.Item1);
                         this.Brokers.Add(newBroker.GetEntityName(), newBroker);
+                        entityName = newBroker.GetEntityName();
                         break;
                     case SysConfig.SUBSCRIBER:
                         IRemoteSubscriber newSubscriber = (IRemoteSubscriber)Activator.GetObject(typeof(IRemoteSubscriber), conn.Item1);
                         this.Subscribers.Add(newSubscriber.GetEntityName(), newSubscriber);
+                        entityName = newSubscriber.GetEntityName();
                         break;
                     case SysConfig.PUBLISHER:
                         IRemotePublisher newPublisher = (IRemotePublisher)Activator.GetObject(typeof(IRemotePublisher), conn.Item1);
                         this.Publishers.Add(newPublisher.GetEntityName(), newPublisher);
+                        entityName = newPublisher.GetEntityName();
                         break;
                     default:
                         break;
                 }
 
-                Console.WriteLine(String.Format("[INFO] {0} added on: {1}", conn.Item2, conn.Item1));
+                Console.WriteLine(String.Format("[INFO] {0} [{1}] added on: {2}", entityName, conn.Item2, conn.Item1));
             }
 
             PuppetMaster.PostEntityProcessed();
@@ -244,7 +249,7 @@ namespace Shared_Library
             }
         }
 
-        private void CheckFreeze()
+        protected void CheckFreeze()
         {
             lock(this)
             {
@@ -258,6 +263,7 @@ namespace Shared_Library
         private void ProcessQueue()
         {
             Command command;
+            Random rnd = new Random();
 
             while (true)
             {
