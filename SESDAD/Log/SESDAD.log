@@ -1,0 +1,1185 @@
+
+####################################################################################################
+############################    New Connection @ 11:07:51 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 11:08:00 | 05-11-15] - wait 1000
+[LOG: 11:08:00 | 05-11-15] - subscriber subscriber2 subscribe cenas/lol
+[LOG: 11:08:00 | 05-11-15] - subscriber subscriber1 subscribe cenas/lol
+[LOG: 11:08:00 | 05-11-15] - subscriber subscriber3 subscribe cenas/lol
+[LOG: 11:08:01 | 05-11-15] - wait 1000
+[LOG: 11:08:01 | 05-11-15] - publisher publisher1 publish 100 OnTopic cenas/lol Interval 0
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 1
+[LOG: 11:08:01 | 05-11-15] - freeze broker1
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 2
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 3
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 1
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 4
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 2
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 1
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 1
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 5
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 2
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 2
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 6
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 3
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 3
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 7
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 3
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 4
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 4
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 8
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 4
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 5
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 9
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 5
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 5
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 6
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 10
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 6
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 6
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 7
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 11
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 7
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 7
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 8
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 12
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 8
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 8
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 9
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 13
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 9
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 9
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 10
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 14
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 10
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 10
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 11
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 15
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 11
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 11
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 12
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 16
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 12
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 12
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 13
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 17
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 13
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 13
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 14
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 18
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 14
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 14
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 15
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 19
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 15
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 15
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 16
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 20
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 16
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 16
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 17
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 21
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 17
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 17
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 18
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 22
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 18
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 18
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 19
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 23
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 19
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 19
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 20
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 24
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 20
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 20
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 25
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 21
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 21
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 26
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 22
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 22
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 27
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 23
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 23
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 28
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 24
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 24
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 29
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 25
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 25
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 30
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 26
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 26
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 31
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 27
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 27
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 32
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 28
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 28
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 33
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 29
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 29
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 34
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 30
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 30
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 35
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 31
+[LOG: 11:08:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 31
+[LOG: 11:08:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 36
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 32
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 32
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 37
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 33
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 33
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 38
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 34
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 34
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 39
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 35
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 35
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 40
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 36
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 36
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 41
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 37
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 37
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 42
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 38
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 38
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 43
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 39
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 39
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 44
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 40
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 40
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 45
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 41
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 41
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 46
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 42
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 42
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 47
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 43
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 43
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 48
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 44
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 44
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 49
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 45
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 45
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 46
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 50
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 46
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 47
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 51
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 47
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 48
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 52
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 48
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 49
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 53
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 49
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 50
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 54
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 50
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 51
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 55
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 51
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 52
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 56
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 52
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 53
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 57
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 53
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 54
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 58
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 54
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 55
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 59
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 55
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 56
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 60
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 56
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 57
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 61
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 57
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 58
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 62
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 58
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 63
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 59
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 59
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 64
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 60
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 60
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 65
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 61
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 61
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 66
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 62
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 62
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 67
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 63
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 63
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 68
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 64
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 64
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 69
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 65
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 65
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 70
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 66
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 66
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 71
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 67
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 67
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 72
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 68
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 68
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 73
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 69
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 69
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 74
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 70
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 70
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 75
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 71
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 71
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 76
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 72
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 72
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 77
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 73
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 73
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 78
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 74
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 74
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 79
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 75
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 75
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 80
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 76
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 76
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 81
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 77
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 77
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 82
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 78
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 78
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 83
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 79
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 79
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 84
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 80
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 80
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 85
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 81
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 81
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 86
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 82
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 82
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 87
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 83
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 83
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 88
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 84
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 84
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 89
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 85
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 85
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 90
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 86
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 86
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 91
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 87
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 87
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 92
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 88
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 88
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 93
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 89
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 89
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 94
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 90
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 90
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 95
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 91
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 91
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 96
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 92
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 92
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 97
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 93
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 93
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 98
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 94
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 94
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 99
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 95
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 95
+[LOG: 11:08:02 | 05-11-15] - PubEvent publisher1, cenas/lol, 100
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 96
+[LOG: 11:08:02 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 96
+[LOG: 11:08:03 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 97
+[LOG: 11:08:03 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 97
+[LOG: 11:08:03 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 98
+[LOG: 11:08:03 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 98
+[LOG: 11:08:03 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 99
+[LOG: 11:08:03 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 99
+[LOG: 11:08:03 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 100
+[LOG: 11:08:03 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 100
+[LOG: 11:08:11 | 05-11-15] - wait 10000
+[LOG: 11:08:11 | 05-11-15] - unfreeze broker1
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 21
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 22
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 23
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 24
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 25
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 26
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 27
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 28
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 29
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 30
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 31
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 32
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 33
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 34
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 35
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 36
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 37
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 38
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 39
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 40
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 41
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 42
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 43
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 44
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 45
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 46
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 47
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 48
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 49
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 50
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 51
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 52
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 53
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 54
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 55
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 56
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 57
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 58
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 59
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 60
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 61
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 62
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 63
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 64
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 65
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 66
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 67
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 68
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 69
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 70
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 71
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 72
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 73
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 74
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 75
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 76
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 77
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 78
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 79
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 80
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 81
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 82
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 83
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 84
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 85
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 86
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 87
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 88
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 89
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 90
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 91
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 92
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 93
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 94
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 95
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 96
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 97
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 98
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 99
+[LOG: 11:08:11 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 100
+
+####################################################################################################
+############################    New Connection @ 11:08:50 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 11:08:58 | 05-11-15] - wait 1000
+[LOG: 11:08:58 | 05-11-15] - subscriber subscriber2 subscribe cenas/lol
+[LOG: 11:08:58 | 05-11-15] - subscriber subscriber1 subscribe cenas/lol
+[LOG: 11:08:58 | 05-11-15] - subscriber subscriber3 subscribe cenas/lol
+[LOG: 11:08:59 | 05-11-15] - wait 1000
+[LOG: 11:08:59 | 05-11-15] - publisher publisher1 publish 100 OnTopic cenas/lol Interval 0
+[LOG: 11:08:59 | 05-11-15] - PubEvent publisher1, cenas/lol, 1
+[LOG: 11:08:59 | 05-11-15] - freeze broker1
+[LOG: 11:08:59 | 05-11-15] - PubEvent publisher1, cenas/lol, 2
+[LOG: 11:08:59 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 1
+[LOG: 11:08:59 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 1
+[LOG: 11:08:59 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 1
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 3
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 2
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 2
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 2
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 4
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 3
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 3
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 3
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 5
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 4
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 4
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 4
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 6
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 5
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 5
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 5
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 7
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 6
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 6
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 6
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 8
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 7
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 7
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 7
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 9
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 8
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 8
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 8
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 10
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 9
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 9
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 9
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 11
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 10
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 10
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 10
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 12
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 11
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 11
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 11
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 13
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 12
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 12
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 12
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 14
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 13
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 13
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 13
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 15
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 14
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 14
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 14
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 16
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 15
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 15
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 15
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 17
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 16
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 16
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 16
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 18
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 17
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 17
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 17
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 19
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 18
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 18
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 18
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 20
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 19
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 19
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 19
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 21
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 20
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 20
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 20
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 22
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 21
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 21
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 22
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 23
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 22
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 24
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 23
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 23
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 25
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 24
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 24
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 26
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 25
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 25
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 27
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 26
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 26
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 28
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 27
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 27
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 29
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 28
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 28
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 30
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 29
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 29
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 31
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 30
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 30
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 32
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 31
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 31
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 33
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 32
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 32
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 34
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 33
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 33
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 35
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 34
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 34
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 36
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 35
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 35
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 37
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 36
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 36
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 38
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 37
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 37
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 39
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 38
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 38
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 40
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 39
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 39
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 41
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 40
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 40
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 42
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 41
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 41
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 43
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 42
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 42
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 44
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 43
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 43
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 45
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 44
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 44
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 46
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 45
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 45
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 47
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 46
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 46
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 48
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 47
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 47
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 49
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 48
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 48
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 50
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 49
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 51
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 50
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 49
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 52
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 51
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 50
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 53
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 52
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 51
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 54
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 53
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 52
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 55
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 54
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 53
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 56
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 55
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 54
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 57
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 56
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 55
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 58
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 57
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 56
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 59
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 58
+[LOG: 11:09:00 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 57
+[LOG: 11:09:00 | 05-11-15] - PubEvent publisher1, cenas/lol, 60
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 59
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 58
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 61
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 60
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 59
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 62
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 61
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 60
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 63
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 62
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 61
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 64
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 63
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 65
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 62
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 64
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 66
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 63
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 65
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 67
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 64
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 66
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 68
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 65
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 67
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 69
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 66
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 68
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 70
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 67
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 69
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 71
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 68
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 70
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 72
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 69
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 71
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 73
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 70
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 72
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 74
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 71
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 73
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 75
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 72
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 74
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 76
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 73
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 75
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 77
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 74
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 76
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 78
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 75
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 77
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 79
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 76
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 78
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 80
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 77
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 79
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 81
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 78
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 80
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 82
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 79
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 81
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 83
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 80
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 82
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 84
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 81
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 83
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 85
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 82
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 84
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 86
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 83
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 85
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 87
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 84
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 86
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 88
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 85
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 87
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 89
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 86
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 88
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 90
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 87
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 89
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 91
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 88
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 90
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 92
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 89
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 91
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 93
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 90
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 92
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 94
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 91
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 93
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 95
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 92
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 94
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 96
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 93
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 95
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 97
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 94
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 96
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 98
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 95
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 97
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 99
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 96
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 98
+[LOG: 11:09:01 | 05-11-15] - PubEvent publisher1, cenas/lol, 100
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 97
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 99
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 98
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber1, publisher1, cenas/lol, 100
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 99
+[LOG: 11:09:01 | 05-11-15] - SubEvent subscriber2, publisher1, cenas/lol, 100
+[LOG: 11:09:09 | 05-11-15] - wait 10000
+[LOG: 11:09:10 | 05-11-15] - unfreeze broker1
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 21
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 22
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 23
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 24
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 25
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 26
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 27
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 28
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 29
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 30
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 31
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 32
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 33
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 34
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 35
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 36
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 37
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 38
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 39
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 40
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 41
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 42
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 43
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 44
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 45
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 46
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 47
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 48
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 49
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 50
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 51
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 52
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 53
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 54
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 55
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 56
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 57
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 58
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 59
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 60
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 61
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 62
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 63
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 64
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 65
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 66
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 67
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 68
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 69
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 70
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 71
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 72
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 73
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 74
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 75
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 76
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 77
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 78
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 79
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 80
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 81
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 82
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 83
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 84
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 85
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 86
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 87
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 88
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 89
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 90
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 91
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 92
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 93
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 94
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 95
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 96
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 97
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 98
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 99
+[LOG: 11:09:10 | 05-11-15] - SubEvent subscriber3, publisher1, cenas/lol, 100
+
+####################################################################################################
+############################    New Connection @ 11:09:20 | 05-11-15    ############################
+####################################################################################################
+
+
+####################################################################################################
+############################    New Connection @ 11:12:55 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 11:13:01 | 05-11-15] - Subscriber subscriber1 Subscribe /testtopic
+[LOG: 11:13:01 | 05-11-15] - Publisher publisher0 Publish 12 Ontopic /testtopic Interval 5000
+[LOG: 11:13:01 | 05-11-15] - PubEvent publisher0, /testtopic, 1
+[LOG: 11:13:01 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 1
+[LOG: 11:13:01 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 1
+[LOG: 11:13:01 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 1
+[LOG: 11:13:06 | 05-11-15] - PubEvent publisher0, /testtopic, 2
+[LOG: 11:13:06 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 2
+[LOG: 11:13:06 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 2
+[LOG: 11:13:06 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 2
+[LOG: 11:13:11 | 05-11-15] - PubEvent publisher0, /testtopic, 3
+[LOG: 11:13:11 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 3
+[LOG: 11:13:11 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 3
+[LOG: 11:13:11 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 3
+[LOG: 11:13:16 | 05-11-15] - PubEvent publisher0, /testtopic, 4
+[LOG: 11:13:16 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 4
+[LOG: 11:13:16 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 4
+[LOG: 11:13:16 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 4
+[LOG: 11:13:21 | 05-11-15] - PubEvent publisher0, /testtopic, 5
+[LOG: 11:13:21 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 5
+[LOG: 11:13:21 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 5
+[LOG: 11:13:21 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 5
+[LOG: 11:13:26 | 05-11-15] - PubEvent publisher0, /testtopic, 6
+[LOG: 11:13:26 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 6
+[LOG: 11:13:26 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 6
+[LOG: 11:13:26 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 6
+[LOG: 11:13:31 | 05-11-15] - Wait 30000
+[LOG: 11:13:31 | 05-11-15] - PubEvent publisher0, /testtopic, 7
+[LOG: 11:13:31 | 05-11-15] - Subscriber subscriber1 Unsubscribe /testtopic
+[LOG: 11:13:31 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 7
+[LOG: 11:13:34 | 05-11-15] - Wait 3000
+[LOG: 11:13:36 | 05-11-15] - PubEvent publisher0, /testtopic, 8
+[LOG: 11:13:36 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 8
+[LOG: 11:13:41 | 05-11-15] - PubEvent publisher0, /testtopic, 9
+[LOG: 11:13:41 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 9
+[LOG: 11:13:46 | 05-11-15] - PubEvent publisher0, /testtopic, 10
+[LOG: 11:13:46 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 10
+[LOG: 11:13:51 | 05-11-15] - PubEvent publisher0, /testtopic, 11
+[LOG: 11:13:51 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 11
+[LOG: 11:13:56 | 05-11-15] - PubEvent publisher0, /testtopic, 12
+[LOG: 11:13:56 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 12
+
+####################################################################################################
+############################    New Connection @ 11:26:24 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 11:26:30 | 05-11-15] - Subscriber subscriber1 Subscribe /testtopic
+[LOG: 11:26:30 | 05-11-15] - Publisher publisher0 Publish 12 Ontopic /testtopic Interval 5000
+[LOG: 11:26:30 | 05-11-15] - PubEvent publisher0, /testtopic, 1
+[LOG: 11:26:30 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 1
+[LOG: 11:26:30 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 1
+[LOG: 11:26:30 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 1
+[LOG: 11:26:35 | 05-11-15] - PubEvent publisher0, /testtopic, 2
+[LOG: 11:26:35 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 2
+[LOG: 11:26:35 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 2
+[LOG: 11:26:35 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 2
+[LOG: 11:26:40 | 05-11-15] - PubEvent publisher0, /testtopic, 3
+[LOG: 11:26:40 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 3
+[LOG: 11:26:40 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 3
+[LOG: 11:26:40 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 3
+[LOG: 11:26:45 | 05-11-15] - PubEvent publisher0, /testtopic, 4
+[LOG: 11:26:45 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 4
+[LOG: 11:26:45 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 4
+[LOG: 11:26:45 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 4
+[LOG: 11:26:50 | 05-11-15] - PubEvent publisher0, /testtopic, 5
+[LOG: 11:26:50 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 5
+[LOG: 11:26:50 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 5
+[LOG: 11:26:50 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 5
+[LOG: 11:26:55 | 05-11-15] - PubEvent publisher0, /testtopic, 6
+[LOG: 11:26:55 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 6
+[LOG: 11:26:55 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 6
+[LOG: 11:26:55 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 6
+[LOG: 11:27:00 | 05-11-15] - Wait 30000
+[LOG: 11:27:00 | 05-11-15] - PubEvent publisher0, /testtopic, 7
+[LOG: 11:27:00 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 7
+[LOG: 11:27:00 | 05-11-15] - BroEvent broker1, publisher0, /testtopic, 7
+[LOG: 11:27:00 | 05-11-15] - Status
+[LOG: 11:27:00 | 05-11-15] - SubEvent subscriber1, publisher0, /testtopic, 7
+[LOG: 11:27:00 | 05-11-15] - Subscriber subscriber1 Unsubscribe /testtopic
+[LOG: 11:27:03 | 05-11-15] - Wait 3000
+[LOG: 11:27:03 | 05-11-15] - Status
+[LOG: 11:27:05 | 05-11-15] - PubEvent publisher0, /testtopic, 8
+[LOG: 11:27:05 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 8
+[LOG: 11:27:10 | 05-11-15] - PubEvent publisher0, /testtopic, 9
+[LOG: 11:27:10 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 9
+[LOG: 11:27:15 | 05-11-15] - PubEvent publisher0, /testtopic, 10
+[LOG: 11:27:15 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 10
+[LOG: 11:27:20 | 05-11-15] - PubEvent publisher0, /testtopic, 11
+[LOG: 11:27:20 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 11
+[LOG: 11:27:25 | 05-11-15] - PubEvent publisher0, /testtopic, 12
+[LOG: 11:27:25 | 05-11-15] - BroEvent broker0, publisher0, /testtopic, 12
+
+####################################################################################################
+############################    New Connection @ 11:31:19 | 05-11-15    ############################
+####################################################################################################
+
+
+####################################################################################################
+############################    New Connection @ 11:37:05 | 05-11-15    ############################
+####################################################################################################
+
+
+####################################################################################################
+############################    New Connection @ 11:37:36 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 11:37:45 | 05-11-15] - Subscriber subscriber1 Subscribe /p00-0
+[LOG: 11:37:45 | 05-11-15] - Subscriber subscriber1 Subscribe /p01-1
+[LOG: 11:37:45 | 05-11-15] - Subscriber subscriber2 Subscribe /p00-1
+[LOG: 11:37:45 | 05-11-15] - Subscriber subscriber2 Subscribe /p01-0
+
+####################################################################################################
+############################    New Connection @ 11:39:47 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 11:39:55 | 05-11-15] - Subscriber subscriber1 Subscribe /p00-0
+[LOG: 11:39:55 | 05-11-15] - Subscriber subscriber1 Subscribe /p01-1
+[LOG: 11:39:55 | 05-11-15] - Subscriber subscriber2 Subscribe /p00-1
+[LOG: 11:39:55 | 05-11-15] - Subscriber subscriber2 Subscribe /p01-0
+
+####################################################################################################
+############################    New Connection @ 11:41:31 | 05-11-15    ############################
+####################################################################################################
+
+
+####################################################################################################
+############################    New Connection @ 11:42:00 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 11:42:08 | 05-11-15] - Subscriber subscriber1 Subscribe /p00-0
+[LOG: 11:42:08 | 05-11-15] - Subscriber subscriber1 Subscribe /p01-1
+[LOG: 11:42:08 | 05-11-15] - Subscriber subscriber2 Subscribe /p00-1
+[LOG: 11:42:08 | 05-11-15] - Subscriber subscriber2 Subscribe /p01-0
+
+####################################################################################################
+############################    New Connection @ 11:42:36 | 05-11-15    ############################
+####################################################################################################
+
+
+####################################################################################################
+############################    New Connection @ 11:42:45 | 05-11-15    ############################
+####################################################################################################
+
+
+####################################################################################################
+############################    New Connection @ 11:43:03 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 11:43:11 | 05-11-15] - Subscriber subscriber1 Subscribe /p00-0
+[LOG: 11:43:11 | 05-11-15] - Subscriber subscriber1 Subscribe /p01-1
+[LOG: 11:43:11 | 05-11-15] - Subscriber subscriber2 Subscribe /p00-1
+[LOG: 11:43:11 | 05-11-15] - Subscriber subscriber2 Subscribe /p01-0
+
+####################################################################################################
+############################    New Connection @ 12:06:48 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 12:06:57 | 05-11-15] - Subscriber subscriber1 Subscribe /p00-0
+[LOG: 12:06:57 | 05-11-15] - Subscriber subscriber1 Subscribe /p01-1
+[LOG: 12:06:57 | 05-11-15] - Subscriber subscriber2 Subscribe /p00-1
+[LOG: 12:06:57 | 05-11-15] - Subscriber subscriber2 Subscribe /p01-0
+
+####################################################################################################
+############################    New Connection @ 12:07:21 | 05-11-15    ############################
+####################################################################################################
+
+
+####################################################################################################
+############################    New Connection @ 12:07:37 | 05-11-15    ############################
+####################################################################################################
+
+[LOG: 12:07:45 | 05-11-15] - Subscriber subscriber1 Subscribe /p00-0
+[LOG: 12:07:45 | 05-11-15] - Subscriber subscriber1 Subscribe /p01-1
+[LOG: 12:07:45 | 05-11-15] - Subscriber subscriber2 Subscribe /p00-1
+[LOG: 12:07:45 | 05-11-15] - Subscriber subscriber2 Subscribe /p01-0
+[LOG: 12:07:52 | 05-11-15] - Publisher publisher00 Publish 12 Ontopic /p00-0 Interval 5000
+[LOG: 12:07:52 | 05-11-15] - PubEvent publisher00, /p00-0, 1
+[LOG: 12:07:55 | 05-11-15] - BroEvent broker0, publisher00, /p00-0, 1
+[LOG: 12:07:55 | 05-11-15] - BroEvent broker1, publisher00, /p00-0, 1
+[LOG: 12:07:55 | 05-11-15] - PubEvent publisher00, /p00-1, 2
+[LOG: 12:07:55 | 05-11-15] - Publisher publisher00 Publish 12 Ontopic /p00-1 Interval 5000
+[LOG: 12:07:56 | 05-11-15] - SubEvent subscriber1, publisher00, /p00-0, 1
+[LOG: 12:07:56 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 2
+[LOG: 12:07:56 | 05-11-15] - Publisher publisher01 Publish 12 Ontopic /p01-0 Interval 5000
+[LOG: 12:07:56 | 05-11-15] - PubEvent publisher01, /p01-0, 1
+[LOG: 12:07:56 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 2
+[LOG: 12:07:56 | 05-11-15] - Publisher publisher01 Publish 12 Ontopic /p01-1 Interval 5000
+[LOG: 12:07:56 | 05-11-15] - BroEvent broker0, publisher01, /p01-0, 1
+[LOG: 12:07:56 | 05-11-15] - PubEvent publisher01, /p01-1, 2
+[LOG: 12:07:56 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 2
+[LOG: 12:07:56 | 05-11-15] - BroEvent broker2, publisher01, /p01-0, 1
+[LOG: 12:07:56 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 2
+[LOG: 12:07:56 | 05-11-15] - SubEvent subscriber2, publisher01, /p01-0, 1
+[LOG: 12:07:56 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 2
+[LOG: 12:07:56 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 2
+[LOG: 12:08:00 | 05-11-15] - PubEvent publisher00, /p00-0, 3
+[LOG: 12:08:00 | 05-11-15] - BroEvent broker0, publisher00, /p00-0, 3
+[LOG: 12:08:00 | 05-11-15] - BroEvent broker1, publisher00, /p00-0, 3
+[LOG: 12:08:00 | 05-11-15] - SubEvent subscriber1, publisher00, /p00-0, 3
+[LOG: 12:08:01 | 05-11-15] - PubEvent publisher00, /p00-1, 4
+[LOG: 12:08:01 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 4
+[LOG: 12:08:01 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 4
+[LOG: 12:08:01 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 4
+[LOG: 12:08:01 | 05-11-15] - PubEvent publisher01, /p01-0, 3
+[LOG: 12:08:01 | 05-11-15] - BroEvent broker0, publisher01, /p01-0, 3
+[LOG: 12:08:01 | 05-11-15] - BroEvent broker2, publisher01, /p01-0, 3
+[LOG: 12:08:01 | 05-11-15] - SubEvent subscriber2, publisher01, /p01-0, 3
+[LOG: 12:08:01 | 05-11-15] - PubEvent publisher01, /p01-1, 4
+[LOG: 12:08:01 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 4
+[LOG: 12:08:01 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 4
+[LOG: 12:08:01 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 4
+[LOG: 12:08:05 | 05-11-15] - PubEvent publisher00, /p00-0, 5
+[LOG: 12:08:05 | 05-11-15] - BroEvent broker0, publisher00, /p00-0, 5
+[LOG: 12:08:05 | 05-11-15] - BroEvent broker1, publisher00, /p00-0, 5
+[LOG: 12:08:05 | 05-11-15] - SubEvent subscriber1, publisher00, /p00-0, 5
+[LOG: 12:08:06 | 05-11-15] - PubEvent publisher00, /p00-1, 6
+[LOG: 12:08:06 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 6
+[LOG: 12:08:06 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 6
+[LOG: 12:08:06 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 6
+[LOG: 12:08:06 | 05-11-15] - PubEvent publisher01, /p01-0, 5
+[LOG: 12:08:06 | 05-11-15] - BroEvent broker0, publisher01, /p01-0, 5
+[LOG: 12:08:06 | 05-11-15] - BroEvent broker2, publisher01, /p01-0, 5
+[LOG: 12:08:06 | 05-11-15] - SubEvent subscriber2, publisher01, /p01-0, 5
+[LOG: 12:08:06 | 05-11-15] - PubEvent publisher01, /p01-1, 6
+[LOG: 12:08:06 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 6
+[LOG: 12:08:06 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 6
+[LOG: 12:08:06 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 6
+[LOG: 12:08:10 | 05-11-15] - PubEvent publisher00, /p00-0, 7
+[LOG: 12:08:10 | 05-11-15] - BroEvent broker0, publisher00, /p00-0, 7
+[LOG: 12:08:10 | 05-11-15] - BroEvent broker1, publisher00, /p00-0, 7
+[LOG: 12:08:10 | 05-11-15] - SubEvent subscriber1, publisher00, /p00-0, 7
+[LOG: 12:08:11 | 05-11-15] - PubEvent publisher00, /p00-1, 8
+[LOG: 12:08:11 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 8
+[LOG: 12:08:11 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 8
+[LOG: 12:08:11 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 8
+[LOG: 12:08:11 | 05-11-15] - PubEvent publisher01, /p01-0, 7
+[LOG: 12:08:11 | 05-11-15] - BroEvent broker0, publisher01, /p01-0, 7
+[LOG: 12:08:11 | 05-11-15] - BroEvent broker2, publisher01, /p01-0, 7
+[LOG: 12:08:11 | 05-11-15] - SubEvent subscriber2, publisher01, /p01-0, 7
+[LOG: 12:08:11 | 05-11-15] - PubEvent publisher01, /p01-1, 8
+[LOG: 12:08:11 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 8
+[LOG: 12:08:11 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 8
+[LOG: 12:08:11 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 8
+[LOG: 12:08:15 | 05-11-15] - PubEvent publisher00, /p00-0, 9
+[LOG: 12:08:15 | 05-11-15] - BroEvent broker0, publisher00, /p00-0, 9
+[LOG: 12:08:15 | 05-11-15] - BroEvent broker1, publisher00, /p00-0, 9
+[LOG: 12:08:15 | 05-11-15] - SubEvent subscriber1, publisher00, /p00-0, 9
+[LOG: 12:08:16 | 05-11-15] - PubEvent publisher00, /p00-1, 10
+[LOG: 12:08:16 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 10
+[LOG: 12:08:16 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 10
+[LOG: 12:08:16 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 10
+[LOG: 12:08:16 | 05-11-15] - PubEvent publisher01, /p01-0, 9
+[LOG: 12:08:16 | 05-11-15] - BroEvent broker0, publisher01, /p01-0, 9
+[LOG: 12:08:16 | 05-11-15] - BroEvent broker2, publisher01, /p01-0, 9
+[LOG: 12:08:16 | 05-11-15] - SubEvent subscriber2, publisher01, /p01-0, 9
+[LOG: 12:08:16 | 05-11-15] - PubEvent publisher01, /p01-1, 10
+[LOG: 12:08:16 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 10
+[LOG: 12:08:16 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 10
+[LOG: 12:08:16 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 10
+[LOG: 12:08:20 | 05-11-15] - PubEvent publisher00, /p00-0, 11
+[LOG: 12:08:20 | 05-11-15] - BroEvent broker0, publisher00, /p00-0, 11
+[LOG: 12:08:20 | 05-11-15] - BroEvent broker1, publisher00, /p00-0, 11
+[LOG: 12:08:21 | 05-11-15] - SubEvent subscriber1, publisher00, /p00-0, 11
+[LOG: 12:08:21 | 05-11-15] - PubEvent publisher00, /p00-1, 12
+[LOG: 12:08:21 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 12
+[LOG: 12:08:21 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 12
+[LOG: 12:08:21 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 12
+[LOG: 12:08:21 | 05-11-15] - PubEvent publisher01, /p01-0, 11
+[LOG: 12:08:21 | 05-11-15] - BroEvent broker0, publisher01, /p01-0, 11
+[LOG: 12:08:21 | 05-11-15] - BroEvent broker2, publisher01, /p01-0, 11
+[LOG: 12:08:21 | 05-11-15] - SubEvent subscriber2, publisher01, /p01-0, 11
+[LOG: 12:08:21 | 05-11-15] - PubEvent publisher01, /p01-1, 12
+[LOG: 12:08:21 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 12
+[LOG: 12:08:21 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 12
+[LOG: 12:08:21 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 12
+[LOG: 12:08:25 | 05-11-15] - PubEvent publisher00, /p00-0, 13
+[LOG: 12:08:25 | 05-11-15] - BroEvent broker0, publisher00, /p00-0, 13
+[LOG: 12:08:26 | 05-11-15] - BroEvent broker1, publisher00, /p00-0, 13
+[LOG: 12:08:26 | 05-11-15] - SubEvent subscriber1, publisher00, /p00-0, 13
+[LOG: 12:08:26 | 05-11-15] - PubEvent publisher00, /p00-1, 14
+[LOG: 12:08:26 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 14
+[LOG: 12:08:26 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 14
+[LOG: 12:08:26 | 05-11-15] - Wait 30000
+[LOG: 12:08:26 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 14
+[LOG: 12:08:26 | 05-11-15] - PubEvent publisher01, /p01-0, 13
+[LOG: 12:08:26 | 05-11-15] - BroEvent broker0, publisher01, /p01-0, 13
+[LOG: 12:08:26 | 05-11-15] - BroEvent broker2, publisher01, /p01-0, 13
+[LOG: 12:08:26 | 05-11-15] - PubEvent publisher01, /p01-1, 14
+[LOG: 12:08:26 | 05-11-15] - SubEvent subscriber2, publisher01, /p01-0, 13
+[LOG: 12:08:26 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 14
+[LOG: 12:08:26 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 14
+[LOG: 12:08:26 | 05-11-15] - Status
+[LOG: 12:08:26 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 14
+[LOG: 12:08:26 | 05-11-15] - Subscriber subscriber1 Unsubscribe /p00-0
+[LOG: 12:08:26 | 05-11-15] - Subscriber subscriber2 Unsubscribe /p01-0
+[LOG: 12:08:29 | 05-11-15] - Wait 3000
+[LOG: 12:08:29 | 05-11-15] - Status
+[LOG: 12:08:30 | 05-11-15] - PubEvent publisher00, /p00-0, 15
+[LOG: 12:08:31 | 05-11-15] - PubEvent publisher00, /p00-1, 16
+[LOG: 12:08:31 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 16
+[LOG: 12:08:31 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 16
+[LOG: 12:08:31 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 16
+[LOG: 12:08:31 | 05-11-15] - PubEvent publisher01, /p01-0, 15
+[LOG: 12:08:31 | 05-11-15] - PubEvent publisher01, /p01-1, 16
+[LOG: 12:08:31 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 16
+[LOG: 12:08:31 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 16
+[LOG: 12:08:31 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 16
+[LOG: 12:08:36 | 05-11-15] - PubEvent publisher00, /p00-0, 17
+[LOG: 12:08:36 | 05-11-15] - PubEvent publisher00, /p00-1, 18
+[LOG: 12:08:36 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 18
+[LOG: 12:08:36 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 18
+[LOG: 12:08:36 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 18
+[LOG: 12:08:36 | 05-11-15] - PubEvent publisher01, /p01-0, 17
+[LOG: 12:08:36 | 05-11-15] - PubEvent publisher01, /p01-1, 18
+[LOG: 12:08:36 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 18
+[LOG: 12:08:36 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 18
+[LOG: 12:08:36 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 18
+[LOG: 12:08:41 | 05-11-15] - PubEvent publisher00, /p00-0, 19
+[LOG: 12:08:41 | 05-11-15] - PubEvent publisher00, /p00-1, 20
+[LOG: 12:08:41 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 20
+[LOG: 12:08:41 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 20
+[LOG: 12:08:41 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 20
+[LOG: 12:08:41 | 05-11-15] - PubEvent publisher01, /p01-0, 19
+[LOG: 12:08:41 | 05-11-15] - PubEvent publisher01, /p01-1, 20
+[LOG: 12:08:41 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 20
+[LOG: 12:08:41 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 20
+[LOG: 12:08:41 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 20
+[LOG: 12:08:46 | 05-11-15] - PubEvent publisher00, /p00-0, 21
+[LOG: 12:08:46 | 05-11-15] - PubEvent publisher00, /p00-1, 22
+[LOG: 12:08:46 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 22
+[LOG: 12:08:46 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 22
+[LOG: 12:08:46 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 22
+[LOG: 12:08:46 | 05-11-15] - PubEvent publisher01, /p01-0, 21
+[LOG: 12:08:46 | 05-11-15] - PubEvent publisher01, /p01-1, 22
+[LOG: 12:08:46 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 22
+[LOG: 12:08:46 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 22
+[LOG: 12:08:46 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 22
+[LOG: 12:08:51 | 05-11-15] - PubEvent publisher00, /p00-0, 23
+[LOG: 12:08:51 | 05-11-15] - PubEvent publisher00, /p00-1, 24
+[LOG: 12:08:51 | 05-11-15] - BroEvent broker0, publisher00, /p00-1, 24
+[LOG: 12:08:51 | 05-11-15] - BroEvent broker2, publisher00, /p00-1, 24
+[LOG: 12:08:51 | 05-11-15] - SubEvent subscriber2, publisher00, /p00-1, 24
+[LOG: 12:08:51 | 05-11-15] - PubEvent publisher01, /p01-0, 23
+[LOG: 12:08:51 | 05-11-15] - PubEvent publisher01, /p01-1, 24
+[LOG: 12:08:51 | 05-11-15] - BroEvent broker0, publisher01, /p01-1, 24
+[LOG: 12:08:51 | 05-11-15] - BroEvent broker1, publisher01, /p01-1, 24
+[LOG: 12:08:51 | 05-11-15] - SubEvent subscriber1, publisher01, /p01-1, 24

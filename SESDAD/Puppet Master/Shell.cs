@@ -59,7 +59,7 @@ namespace PuppetMaster
 
         private const string SPACE = @"[ /t]";
         private const string NAME = @"[a-zA-Z0-9]+";
-        private const string TOPIC_REGEX = @"(\/)?(([a-zA-Z0-9]+\/)+|\*\/)*([a-zA-Z0-9]+(\/)?|\*(\/)?)";
+        private const string TOPIC_REGEX = @"(\/)?(([a-zA-Z0-9\-]+\/)+|\*\/)*([a-zA-Z0-9\-]+(\/)?|\*(\/)?)";
         private const string POSITIVE_NUMBERS = @"[1-9][0-9]*";
         private const string ALL_NUMBERS = @"[0-9]+";
         #endregion
@@ -99,7 +99,7 @@ namespace PuppetMaster
                     break;
 
                 case STATUS:
-                    processStatusCommand();
+                    processStatusCommand(cmd);
                     break;
 
                 case CRASH:
@@ -132,7 +132,6 @@ namespace PuppetMaster
         private void validateCMD(string cmd, string regex, string cmdType)
         {
             Regex rgx = new Regex(regex, RegexOptions.IgnoreCase);
-
             if (cmd == null || !rgx.IsMatch(cmd))
             {
                 throw new Exception("Invalid syntax for command [" + cmdType + "]");
@@ -191,12 +190,13 @@ namespace PuppetMaster
             Log.logCMD(cmd);
         }
 
-        private void processStatusCommand()
+        private void processStatusCommand(String cmd)
         {
             foreach (KeyValuePair<string, Entity> entry in Network.Entities)
             {
                 entry.Value.GetRemoteEntity().Status();
             }
+            Log.logCMD(cmd);
         }
 
         private void processPublisherCommand(string[] splitedCMD, string cmd)

@@ -61,7 +61,6 @@ namespace PuppetMaster
             Console.WriteLine("[INIT] Start reading configuration file...");
             ReadFile("config");
             log.newConnection();
-            Console.WriteLine("[INIT] Successfully parsed configuration file, deploying network...");
             CreateNetwork();
             Console.WriteLine("[INIT] Successfully generated the network, processing script file...");
             ReadFile("script");
@@ -193,6 +192,7 @@ namespace PuppetMaster
                     else
                         shell.ProcessCommand(line, lineNr++);
                 }
+                Console.WriteLine("[INIT] Successfully parsed configuration file, deploying network...");
             }
             catch (Exception e)
             {
