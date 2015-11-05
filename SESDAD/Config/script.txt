@@ -1,9 +1,10 @@
-wait 1000
-subscriber subscriber2 subscribe cenas/lol
-subscriber subscriber1 subscribe cenas/lol
-subscriber subscriber3 subscribe cenas/lol
-wait 1000
-publisher publisher1 publish 100 OnTopic cenas/lol Interval 0
+subscriber subscriber0 subscribe /jaquim/feio
+subscriber subscriber1 subscribe /jaquim/feio
+subscriber subscriber2 subscribe /andriy/feio
+subscriber subscriber3 subscribe /andriy/feio
+wait 5000
+publisher publisher2 publish 20 OnTopic /jaquim/feio Interval 0
+publisher publisher2 publish 20 OnTopic /andriy/feio Interval 0
 freeze broker1
 wait 10000
 unfreeze broker1

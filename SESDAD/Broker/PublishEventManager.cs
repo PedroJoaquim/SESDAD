@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Shared_Library;
 namespace Broker
 {
-    delegate void AsyncDelegateForwarding(Event e, string s, int i);
-
     abstract class PublishEventManager
     {
         private string myName;
@@ -64,8 +62,8 @@ namespace Broker
         {
             bool entityFound = false;
             bool logDone = false;
+            int outNumber;
 
-            AsyncDelegateForwarding del;
 
             foreach (string entityName in interessedEntities)
             {
@@ -83,10 +81,12 @@ namespace Broker
                                 broker.PuppetMaster.LogEventForwarding(broker.Name, e.Publisher, e.Topic, e.EventNr);
                                 logDone = true;
                             }
-
-                            del = new AsyncDelegateForwarding(entry.Value.DifundPublishEvent);
-                            del.BeginInvoke(e, this.MyName, GetOutgoingSeqNumber(entry.Key, e.Publisher), null, null);
-
+                            outNumber = GetOutgoingSeqNumber(entry.Key, e.Publisher);
+                            new Task(() =>
+                            {
+                                entry.Value.DifundPublishEvent(e, this.MyName, outNumber);
+                            }).Start();
+                            
                         }
 
                         entityFound = true;
