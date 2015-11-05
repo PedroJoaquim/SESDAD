@@ -81,6 +81,7 @@ namespace Broker
                                 broker.PuppetMaster.LogEventForwarding(broker.Name, e.Publisher, e.Topic, e.EventNr);
                                 logDone = true;
                             }
+
                             outNumber = GetOutgoingSeqNumber(entry.Key, e.Publisher);
                             new Task(() =>
                             {
@@ -134,7 +135,7 @@ namespace Broker
     class FIFOPublishEventManager : PublishEventManager
     {
         //1 string = source remote entity name       2 - string publisher name
-        private Dictionary<string, Dictionary<string, PublisherEventsOrder>> inTable = new Dictionary<string, Dictionary<string, PublisherEventsOrder>>();
+        private Dictionary<string, Dictionary<string, PublishEventsStorage>> inTable = new Dictionary<string, Dictionary<string, PublishEventsStorage>>();
         private Dictionary<string, Dictionary<string, int>> outTable = new Dictionary<string, Dictionary<string, int>>();
 
         public FIFOPublishEventManager(string myName) : base(myName) { }
@@ -142,40 +143,37 @@ namespace Broker
 
         public override void ExecuteDistribution(Broker b, string source, Event e, int seqNumber)
         {
-            List<string> interessedEntities = GetInteressedEntities(b, e, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
+            List<string> interessedEntities;
+            Event outgoingEvent;
+            PublishEventsStorage storedEvents = GetCreateEventOrder(source, e.Publisher);
 
-            //only send event if all the other events from this publisher have already been sent
-            WaitTurn(source, e.Publisher, seqNumber); 
-            ProcessEventRouting(b, interessedEntities, e, source);
-            EndTurn(source, e.Publisher);
+            lock(storedEvents)
+            {
+                storedEvents.InsertInOrder(e, seqNumber);
+                
+                while(storedEvents.CanSendEvent())
+                {
+                    outgoingEvent = storedEvents.GetFirstEvent();
+                    interessedEntities = GetInteressedEntities(b, outgoingEvent, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
+                    ProcessEventRouting(b, interessedEntities, outgoingEvent, source);
+                    storedEvents.FirstEventSend();
+                }
+            }
         }
 
-
-        private void WaitTurn(string sourceName, string publisherName, int seqNumber)
+        private PublishEventsStorage GetCreateEventOrder(string sourceName, string publisherName)
         {
-            PublisherEventsOrder order = GetCreateEventOrder(sourceName, publisherName);
-            order.WaitSeqNumber(seqNumber);
-        }
-
-        private void EndTurn(string sourceName, string publisher)
-        {
-            PublisherEventsOrder order = GetCreateEventOrder(sourceName, publisher);
-            order.IncSeqNumber();
-        }
-
-        private PublisherEventsOrder GetCreateEventOrder(string sourceName, string publisherName)
-        {
-            PublisherEventsOrder result;
+            PublishEventsStorage result;
             string cleanRemoteName = sourceName.ToLower();
             string cleanPName = publisherName.ToLower();
 
             lock (this.inTable)
             {
                 if (!this.inTable.ContainsKey(cleanRemoteName))
-                    this.inTable[cleanRemoteName] = new Dictionary<string, PublisherEventsOrder>();
+                    this.inTable[cleanRemoteName] = new Dictionary<string, PublishEventsStorage>();
 
                 if (!this.inTable[cleanRemoteName].ContainsKey(cleanPName))
-                    this.inTable[cleanRemoteName][cleanPName] = new PublisherEventsOrder();
+                    this.inTable[cleanRemoteName][cleanPName] = new PublishEventsStorage();
 
                 result = this.inTable[cleanRemoteName][cleanPName];
             }
@@ -222,33 +220,36 @@ namespace Broker
         }
     }
 
-    class PublisherEventsOrder
+    class PublishEventsStorage
     {
-        private int seqNumber;
-       
-        public PublisherEventsOrder()
+        private List<Tuple<Event, int>> storedEvents = new List<Tuple<Event, int>>();
+        private int nextSeqNumber;
+
+        public PublishEventsStorage()
         {
-            this.seqNumber = 1;
+            this.nextSeqNumber = 1;
         }
 
-        public void WaitSeqNumber(int seqNr)
+        public void InsertInOrder(Event e, int inSeqNumber)
         {
-            lock(this)
-            {
-                while(this.seqNumber != seqNr)
-                {
-                    Monitor.Wait(this);
-                }
-            }
+            this.storedEvents.Add(new Tuple<Event, int>(e, inSeqNumber));
+            storedEvents.Sort((x, y) => x.Item2.CompareTo(y.Item2));
         }
 
-        public void IncSeqNumber()
+        public bool CanSendEvent()
         {
-            lock(this)
-            {
-                this.seqNumber++;
-                Monitor.PulseAll(this);
-            }
+            return this.storedEvents.Count > 0 && this.storedEvents.ElementAt(0).Item2 == this.nextSeqNumber;
+        }
+
+        public Event GetFirstEvent()
+        {
+            return this.storedEvents.Count == 0 ? null : this.storedEvents.ElementAt(0).Item1;
+        }
+
+        public void FirstEventSend()
+        {
+            this.storedEvents.RemoveAt(0);
+            this.nextSeqNumber++;
         }
 
 
