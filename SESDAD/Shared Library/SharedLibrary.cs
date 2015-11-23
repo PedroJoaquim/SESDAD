@@ -36,7 +36,8 @@ namespace Shared_Library
         private String routingPolicy = null;
         private String ordering = null;
         private String distributed = null;
-        private List<Tuple<String, String>> connections = null;
+        private List<Connection> connections = null;
+
         #endregion
 
         #region "Properties"
@@ -79,18 +80,6 @@ namespace Shared_Library
             }
         }
 
-        public List<Tuple<string, string>> Connections
-        {
-            get
-            {
-                return connections;
-            }
-
-            set
-            {
-                connections = value;
-            }
-        }
 
         public string Distributed
         {
@@ -105,6 +94,18 @@ namespace Shared_Library
             }
         }
 
+        public List<Connection> Connections
+        {
+            get
+            {
+                return connections;
+            }
+
+            set
+            {
+                connections = value;
+            }
+        }
         #endregion
 
         public SysConfig()
@@ -120,7 +121,7 @@ namespace Shared_Library
             result.RoutingPolicy = this.RoutingPolicy;
             result.Ordering = this.Ordering;
             result.Distributed = this.Distributed;
-            result.Connections = this.Connections;
+            result.connections = this.Connections;
 
             return result;
         }
@@ -146,34 +147,105 @@ namespace Shared_Library
         private string serializeConnections()
         {
             String result = "";
-
-            if (this.Connections != null)
+            
+            if (Connections != null)
             {
-                foreach (Tuple<String, String> conn in this.Connections)
+                foreach (Connection conn in Connections)
                 {
-                    result += conn.Item1 + "#" + conn.Item2 + "#";
+                    result += conn.EntityName + "#" + conn.EntityURL + "#" + conn.EntitySite + "#" + conn.EntityType + "#";
                 }
             }
 
             return result.Equals("") ? result : result.Remove(result.Length - 1);
         }
 
-        private List<Tuple<String, String>> DeserializeConnections(String connStr)
+        private List<Connection> DeserializeConnections(String connStr)
         {
-            List<Tuple<String, String>> result = new List<Tuple<string, string>>();
+            List<Connection> result = new List<Connection>();
 
             if (!connStr.Equals(""))
             {
                 string[] splitedConns = connStr.Split('#');
-                for (int i = 0; i < splitedConns.Length - 1; i = i + 2)
+                for (int i = 0; i < splitedConns.Length - 1; i = i + 4)
                 {
-                    result.Add(new Tuple<string, string>(splitedConns[i], splitedConns[i + 1]));
+                    result.Add(new Connection(splitedConns[i], splitedConns[i+1], splitedConns[i + 2], splitedConns[i + 3]));
                 }
             }
 
             return result;
         }
         #endregion
+    }
+
+
+    public class Connection
+    {
+        private string entityType;
+        private string entityName;
+        private string entitySite;
+        private string entityURL;
+
+        #region "properties"
+        public string EntityType
+        {
+            get
+            {
+                return entityType;
+            }
+
+            set
+            {
+                entityType = value;
+            }
+        }
+
+        public string EntityName
+        {
+            get
+            {
+                return entityName;
+            }
+
+            set
+            {
+                entityName = value;
+            }
+        }
+
+        public string EntitySite
+        {
+            get
+            {
+                return entitySite;
+            }
+
+            set
+            {
+                entitySite = value;
+            }
+        }
+
+        public string EntityURL
+        {
+            get
+            {
+                return entityURL;
+            }
+
+            set
+            {
+                entityURL = value;
+            }
+        }
+        #endregion
+
+        public Connection(string entityName, string entityURL, string entitySite, string entityType)
+        {
+            this.entityName = entityName;
+            this.entityURL = entityURL;
+            this.entitySite = entitySite;
+            this.entityType = entityType;
+        }
     }
 
     public class Utils
@@ -232,6 +304,12 @@ namespace Shared_Library
             }
 
             return result;
+        }
+
+        public static int CalcBrokerForwardIndex(int numBrokers, String sourcePublisherName)
+        {
+            int hashCode = sourcePublisherName.GetHashCode();
+            return hashCode % numBrokers;
         }
     }
 

@@ -16,6 +16,7 @@ namespace Broker
         private ForwardingTable forwardingTable = new ForwardingTable();
         private ReceiveTable receiveTable = new ReceiveTable();
         private PublishEventManager pEventManager;
+        private FaultManager fManager;
 
         #region "properties"
         public ForwardingTable ForwardingTable
@@ -56,6 +57,19 @@ namespace Broker
                 pEventManager = value;
             }
         }
+
+        internal FaultManager FManager
+        {
+            get
+            {
+                return fManager;
+            }
+
+            set
+            {
+                fManager = value;
+            }
+        }
         #endregion
 
         public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, 300, 20) { }
@@ -81,6 +95,8 @@ namespace Broker
 
             if (this.SysConfig.Ordering.Equals(SysConfig.TOTAL))
                 this.PEventManager = new TotalOrderPublishEventManager(this.Name);
+
+            this.FManager = new FaultManager(this);
         }
 
         public override void Status()
@@ -90,15 +106,22 @@ namespace Broker
             Console.WriteLine();
             Console.WriteLine(String.Format("*********************** Connections *********************** \r\n"));
 
-            foreach (KeyValuePair<string, IRemoteBroker> entry in this.Brokers)
+            foreach (KeyValuePair<string, IRemoteBroker> entry in this.RemoteNetwork.InBrokers)
             {
                 Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
             }
-            foreach (KeyValuePair<string, IRemotePublisher> entry in this.Publishers)
+            foreach (KeyValuePair<string, Dictionary<string, IRemoteBroker>> entry in this.RemoteNetwork.OutBrokers)
+            {
+                foreach (KeyValuePair<string, IRemoteBroker> entry2 in entry.Value)
+                {
+                    Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
+                }
+            }
+            foreach (KeyValuePair<string, IRemotePublisher> entry in this.RemoteNetwork.Publishers)
             {
                 Console.WriteLine(String.Format("[PUBLISHER] {0}", entry.Key));
             }
-            foreach (KeyValuePair<string, IRemoteSubscriber> entry in this.Subscribers)
+            foreach (KeyValuePair<string, IRemoteSubscriber> entry in this.RemoteNetwork.Subscribers)
             {
                 Console.WriteLine(String.Format("[SUBSCRIBER] {0}", entry.Key));
             }
@@ -129,6 +152,15 @@ namespace Broker
         }
         #endregion
 
+        public override void ActionTimedout(DifundPublishEventProperties p)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void ActionTimedout(DifundSubscribeEventProperties p)
+        {
+            throw new NotImplementedException();
+        }
 
         static void Main(string[] args)
         {

@@ -19,11 +19,9 @@ namespace Shared_Library
 
         private IRemotePuppetMaster puppetMaster;
         private SysConfig sysConfig;
-        private Dictionary<String, IRemoteBroker> brokers = new Dictionary<string, IRemoteBroker>();
-        private Dictionary<String, IRemotePublisher> publishers = new Dictionary<string, IRemotePublisher>();
-        private Dictionary<String, IRemoteSubscriber> subscribers = new Dictionary<string, IRemoteSubscriber>();
-
+        private RemoteNetwork remoteNetwork;
         private EventQueue events;
+        private TimeoutMonitor tMonitor;
 
         private static bool freeze = false;
        
@@ -82,45 +80,6 @@ namespace Shared_Library
             }
         }
 
-        public Dictionary<string, IRemoteBroker> Brokers
-        {
-            get
-            {
-                return brokers;
-            }
-
-            set
-            {
-                brokers = value;
-            }
-        }
-
-        public Dictionary<string, IRemotePublisher> Publishers
-        {
-            get
-            {
-                return publishers;
-            }
-
-            set
-            {
-                publishers = value;
-            }
-        }
-
-        public Dictionary<string, IRemoteSubscriber> Subscribers
-        {
-            get
-            {
-                return subscribers;
-            }
-
-            set
-            {
-                subscribers = value;
-            }
-        }
-
         public IRemotePuppetMaster PuppetMaster
         {
             get
@@ -146,6 +105,32 @@ namespace Shared_Library
                 events = value;
             }
         }
+
+        public RemoteNetwork RemoteNetwork
+        {
+            get
+            {
+                return remoteNetwork;
+            }
+
+            set
+            {
+                remoteNetwork = value;
+            }
+        }
+
+        public TimeoutMonitor TMonitor
+        {
+            get
+            {
+                return tMonitor;
+            }
+
+            set
+            {
+                tMonitor = value;
+            }
+        }
         #endregion
 
         public RemoteEntity(String name, String url, String pmUrl, int queueSize, int numThreads)
@@ -154,6 +139,8 @@ namespace Shared_Library
             this.Url = url;
             this.PmURL = pmUrl;
             this.events = new EventQueue(queueSize);
+            this.RemoteNetwork = new RemoteNetwork();
+            this.tMonitor = new TimeoutMonitor(this);
             this.numThreads = numThreads;
         }
 
@@ -177,49 +164,21 @@ namespace Shared_Library
 
         #region "Interface methods"
 
-        //not yet implemented
         public abstract void Register();
         public abstract void Status();
 
-        public void RegisterInitializationInfo(SysConfig sysConfig)
+        public void RegisterInitializationInfo(SysConfig sysConfig, string siteName)
         {
             this.SysConfig = sysConfig;
+            this.RemoteNetwork.SiteName = siteName;
         }
 
         public void EstablishConnections()
         {
-            string entityName = "";
-
-            foreach (Tuple<String, String> conn in this.SysConfig.Connections)
-            {
-                switch (conn.Item2)
-                {
-                    case SysConfig.BROKER:
-                        IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), conn.Item1);
-                        this.Brokers.Add(newBroker.GetEntityName(), newBroker);
-                        entityName = newBroker.GetEntityName();
-                        break;
-                    case SysConfig.SUBSCRIBER:
-                        IRemoteSubscriber newSubscriber = (IRemoteSubscriber)Activator.GetObject(typeof(IRemoteSubscriber), conn.Item1);
-                        this.Subscribers.Add(newSubscriber.GetEntityName(), newSubscriber);
-                        entityName = newSubscriber.GetEntityName();
-                        break;
-                    case SysConfig.PUBLISHER:
-                        IRemotePublisher newPublisher = (IRemotePublisher)Activator.GetObject(typeof(IRemotePublisher), conn.Item1);
-                        this.Publishers.Add(newPublisher.GetEntityName(), newPublisher);
-                        entityName = newPublisher.GetEntityName();
-                        break;
-                    default:
-                        break;
-                }
-
-                Console.WriteLine(String.Format("[INFO] {0} [{1}] added on: {2}", entityName, conn.Item2, conn.Item1));
-            }
-
+            this.RemoteNetwork.Initialize(this.SysConfig);
             PuppetMaster.PostEntityProcessed();
-
         }
-        #endregion
+
 
         public string GetEntityName()
         {
@@ -259,6 +218,13 @@ namespace Shared_Library
                 }
             }
         }
+        #endregion
+
+
+        //functions that take care of timedout actions with no ack
+        public abstract void ActionTimedout(DifundPublishEventProperties properties);
+        public abstract void ActionTimedout(DifundSubscribeEventProperties properties);
+
 
         private void ProcessQueue()
         {
@@ -278,5 +244,7 @@ namespace Shared_Library
         {
             Environment.Exit(0);
         }
+
+
     }
 }

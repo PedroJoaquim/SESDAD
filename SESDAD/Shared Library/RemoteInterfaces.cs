@@ -8,7 +8,7 @@ namespace Shared_Library
 {
     public interface IRemoteEntity
     {
-        void RegisterInitializationInfo(SysConfig sysConfig);
+        void RegisterInitializationInfo(SysConfig sysConfig, string siteName);
         void EstablishConnections();
         string GetEntityName();
 

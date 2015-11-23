@@ -242,9 +242,9 @@ namespace PuppetMaster
         /*
          *  Function that get all broker's urls that have a connection to this site
          */
-        public List<Tuple<String, String>> GetOutsideBrokersUrls(string ignoreCase = "")
+        public List<Connection> GetOutsideBrokersUrls(string ignoreCase = "")
         {
-            List<Tuple<String, String>> connectionURLS = new List<Tuple<String, String>>();
+            List<Connection> connectionURLS = new List<Connection>();
 
             if (this.Parent != null)
             {
@@ -259,45 +259,45 @@ namespace PuppetMaster
             return connectionURLS;
         }
 
-        public List<Tuple<string, string>> GetPublisherUrls(string ignoreCase = "")
+        public List<Connection> GetPublisherUrls(string ignoreCase = "")
         {
-            List<Tuple<string, string>> result = new List<Tuple<string, string>>();
+            List<Connection> result = new List<Connection>();
 
             foreach (KeyValuePair<string, PublisherEntity> entry in this.PublisherEntities)
             {
                 if (!entry.Value.Url.Equals(ignoreCase))
                 {
-                    result.Add(Tuple.Create(entry.Value.Url, SysConfig.PUBLISHER));
+                    result.Add(new Connection(entry.Key, entry.Value.Url, this.name, SysConfig.PUBLISHER));
                 }
             }
 
             return result;
         }
 
-        public List<Tuple<string, string>> GetSubscriberUrls(string ignoreCase = "")
+        public List<Connection> GetSubscriberUrls(string ignoreCase = "")
         {
-            List<Tuple<string, string>> result = new List<Tuple<string, string>>();
+            List<Connection> result = new List<Connection>();
 
             foreach (KeyValuePair<string, SubscriberEntity> entry in this.SubscriberEntities)
             {
                 if (!entry.Value.Url.Equals(ignoreCase))
                 {
-                    result.Add(Tuple.Create(entry.Value.Url, SysConfig.SUBSCRIBER));
+                    result.Add(new Connection(entry.Key, entry.Value.Url, this.name, SysConfig.SUBSCRIBER));
                 }
             }
 
             return result;
         }
 
-        public List<Tuple<string, string>> GetBrokerUrls(string ignoreCase = "")
+        public List<Connection> GetBrokerUrls(string ignoreCase = "")
         {
-            List<Tuple<string, string>> result = new List<Tuple<string, string>>();
+            List<Connection> result = new List<Connection>();
 
             foreach (KeyValuePair<string, BrokerEntity> entry in this.BrokerEntities)
             {
                 if (!entry.Value.Url.Equals(ignoreCase))
                 {
-                    result.Add(Tuple.Create(entry.Value.Url, SysConfig.BROKER));
+                    result.Add(new Connection(entry.Key, entry.Value.Url, this.name, SysConfig.BROKER));
                 }
             }
 
@@ -363,7 +363,7 @@ namespace PuppetMaster
             this.url = url;
         }
 
-        public abstract List<Tuple<String, String>> GetConnectionsUrl();
+        public abstract List<Connection> GetConnectionsUrl();
         public abstract String EntityType();
         public abstract IRemoteEntity GetRemoteEntity();
     }
@@ -390,9 +390,9 @@ namespace PuppetMaster
         #endregion
 
 
-        public override List<Tuple<String, String>> GetConnectionsUrl()
+        public override List<Connection> GetConnectionsUrl()
         {
-            List<Tuple<String, String>> connectionURLS = new List<Tuple<string, string>>();
+            List<Connection> connectionURLS = new List<Connection>();
 
             //brokers have connections with other brokers in other sites and all publishers and subscribers in this site
             connectionURLS.AddRange(this.Site.GetOutsideBrokersUrls(this.Url));
@@ -437,9 +437,9 @@ namespace PuppetMaster
         }
         #endregion
 
-        public override List<Tuple<String, String>> GetConnectionsUrl()
+        public override List<Connection> GetConnectionsUrl()
         {
-            List<Tuple<String, String>> connectionURLS = new List<Tuple<string, string>>();
+            List<Connection> connectionURLS = new List<Connection>();
 
             connectionURLS.AddRange(this.Site.GetBrokerUrls(this.Url));
 
@@ -480,9 +480,9 @@ namespace PuppetMaster
         #endregion
 
    
-        public override List<Tuple<String, String>> GetConnectionsUrl()
+        public override List<Connection> GetConnectionsUrl()
         {
-            List<Tuple<String, String>> connectionURLS = new List<Tuple<string, string>>();
+            List<Connection> connectionURLS = new List<Connection>();
 
             connectionURLS.AddRange(this.Site.GetBrokerUrls(this.Url));
 

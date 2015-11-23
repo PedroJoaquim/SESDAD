@@ -46,15 +46,15 @@ namespace Subscriber
             Console.WriteLine();
             Console.WriteLine(String.Format("*********************** Connections *********************** \r\n"));
 
-            foreach (KeyValuePair<string, IRemoteBroker> entry in this.Brokers)
+            foreach (KeyValuePair<string, IRemoteBroker> entry in this.RemoteNetwork.InBrokers)
             {
                 Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
             }
-            foreach (KeyValuePair<string, IRemotePublisher> entry in this.Publishers)
+            foreach (KeyValuePair<string, IRemotePublisher> entry in this.RemoteNetwork.Publishers)
             {
                 Console.WriteLine(String.Format("[PUBLISHER] {0}", entry.Key));
             }
-            foreach (KeyValuePair<string, IRemoteSubscriber> entry in this.Subscribers)
+            foreach (KeyValuePair<string, IRemoteSubscriber> entry in this.RemoteNetwork.Subscribers)
             {
                 Console.WriteLine(String.Format("[SUBSCRIBER] {0}", entry.Key));
             }
@@ -75,6 +75,16 @@ namespace Subscriber
         public void NotifyEvent(Event e)
         {
             this.Events.Produce(new NotifyEvent(e));
+        }
+
+        public override void ActionTimedout(DifundPublishEventProperties properties)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void ActionTimedout(DifundSubscribeEventProperties properties)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

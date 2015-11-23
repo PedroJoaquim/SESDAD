@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Shared_Library;
+
 namespace Broker
 {
     abstract class PublishEventManager
@@ -48,7 +49,8 @@ namespace Broker
                 result.Add(item);
             }
 
-            foreach (string item in b.Brokers.Keys.ToList())
+            //TODO CHAGE ME IM INCORRECT
+            foreach (string item in b.RemoteNetwork.GetAllOutBrokers().Keys.ToList())
             {
                 if (!result.Contains(item))
                     result.Add(item);
@@ -56,64 +58,52 @@ namespace Broker
 
             return result;
         }
-       
+
         //function to send the publish event to other brokers or subscribers
         protected void ProcessEventRouting(Broker broker, List<string> interessedEntities, Event e, string source)
         {
-            bool entityFound = false;
             bool logDone = false;
             int outNumber;
 
+            /*
+             * Distribute messages to all interessed subscribers
+             */
 
-            foreach (string entityName in interessedEntities)
+            foreach (KeyValuePair<string, IRemoteSubscriber> entry in broker.RemoteNetwork.Subscribers)
             {
-                entityFound = false;
-
-                foreach (KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
+                if (interessedEntities.Contains(entry.Key))
                 {
-                    if (entry.Key.Equals(entityName))
+                    if (!logDone && broker.SysConfig.LogLevel.Equals(SysConfig.FULL))
                     {
-                        if (!entry.Key.Equals(source))
-                        {
-
-                            if (!logDone && broker.SysConfig.LogLevel.Equals(SysConfig.FULL))
-                            {
-                                broker.PuppetMaster.LogEventForwarding(broker.Name, e.Publisher, e.Topic, e.EventNr);
-                                logDone = true;
-                            }
-
-                            outNumber = GetOutgoingSeqNumber(entry.Key, e.Publisher);
-                            new Task(() =>
-                            {
-                                entry.Value.DifundPublishEvent(e, this.MyName, outNumber);
-                            }).Start();
-                            
-                        }
-
-                        entityFound = true;
-                        break;
+                        broker.PuppetMaster.LogEventForwarding(broker.Name, e.Publisher, e.Topic, e.EventNr);
+                        logDone = true;
                     }
 
-                }
-
-                if (entityFound) continue;
-
-                foreach (KeyValuePair<string, IRemoteSubscriber> entry in broker.Subscribers)
-                {
-                    if (entry.Key.Equals(entityName))
-                    {
-                        if (!logDone && broker.SysConfig.LogLevel.Equals(SysConfig.FULL))
-                        {
-                            broker.PuppetMaster.LogEventForwarding(broker.Name, e.Publisher, e.Topic, e.EventNr);
-                            logDone = true;
-                        }
-                        entry.Value.NotifyEvent(e);
-                    }
+                    entry.Value.NotifyEvent(e);
                 }
             }
 
-        }
+            /*
+             * Now forward messages to interessed brokers (that can fail)
+             */
 
+            foreach (KeyValuePair<string, IRemoteBroker> entry in broker.RemoteNetwork.GetAllOutBrokers()) //TODO CHANGE ME
+            {
+                if (!entry.Key.Equals(source) && interessedEntities.Contains(entry.Key))
+                {
+
+                    if (!logDone && broker.SysConfig.LogLevel.Equals(SysConfig.FULL))
+                    {
+                        broker.PuppetMaster.LogEventForwarding(broker.Name, e.Publisher, e.Topic, e.EventNr);
+                        logDone = true;
+                    }
+
+                    outNumber = GetOutgoingSeqNumber(entry.Key, e.Publisher);
+
+                    broker.FManager.FMPublishEvent(e, entry.Key, outNumber);
+                }
+            }
+        }
     }
 
     class NoOrderPublishEventManager : PublishEventManager
@@ -232,6 +222,8 @@ namespace Broker
 
         public void InsertInOrder(Event e, int inSeqNumber)
         {
+            if (inSeqNumber < nextSeqNumber) return; //discard old publish events
+
             this.storedEvents.Add(new Tuple<Event, int>(e, inSeqNumber));
             storedEvents.Sort((x, y) => x.Item2.CompareTo(y.Item2));
         }

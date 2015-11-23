@@ -125,7 +125,7 @@ namespace Broker
         {
             //we only send the subscription to the brokers that we have not yet subscribed that topic to
             //if the request comes from a broker we do not subscribe that topic to him becouse thats pointless
-            foreach (KeyValuePair<string, IRemoteBroker> entry in broker.Brokers)
+            foreach (KeyValuePair<string, IRemoteBroker> entry in broker.RemoteNetwork.InBrokers) // TODO change me im incorrect
             {
                 if (!entry.Key.Equals(this.source) && !broker.ReceiveTable.IsSubscribedTo(this.topic, entry.Key))
                 {
@@ -197,9 +197,10 @@ namespace Broker
             {
                 if(broker.ReceiveTable.IsSubscribedTo(this.topic, entitiesInterested[0]))
                 {
-                    if(broker.Brokers.ContainsKey(entitiesInterested[0]))
+                    if(broker.RemoteNetwork.GetAllOutBrokers().ContainsKey(entitiesInterested[0]))
                     {
-                        broker.Brokers[entitiesInterested[0]].DifundUnSubscribeEvent(this.topic, broker.Name);
+                        //TODO CHANGE ME IM INCORRECT
+                        broker.RemoteNetwork.GetAllOutBrokers()[entitiesInterested[0]].DifundUnSubscribeEvent(this.topic, broker.Name);
                         broker.ReceiveTable.RemoveEntityFromTopic(this.topic, entitiesInterested[0]);
                     }
                 }
@@ -213,7 +214,8 @@ namespace Broker
                 {
                     if(!brokerName.Equals(this.source))
                     {
-                        broker.Brokers[brokerName].DifundUnSubscribeEvent(this.topic, broker.Name);
+                        //TODO CHANGEME IM INCORRECT
+                        broker.RemoteNetwork.GetAllOutBrokers()[brokerName].DifundUnSubscribeEvent(this.topic, broker.Name);
                     }
                 }
 

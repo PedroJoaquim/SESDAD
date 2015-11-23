@@ -424,7 +424,7 @@ namespace PuppetMaster
             bEntity.RemoteEntity = newBroker;
             SysConfig config = this.network.SystemConfig.cloneConfig();
             config.Connections = bEntity.GetConnectionsUrl();
-            newBroker.RegisterInitializationInfo(config);
+            newBroker.RegisterInitializationInfo(config, bEntity.Site.Name);
             PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Broker: {0} connected on url: {1}", name, url));
@@ -437,7 +437,7 @@ namespace PuppetMaster
             pEntity.RemoteEntity = newPublisher;
             SysConfig config = this.network.SystemConfig.cloneConfig();
             config.Connections = pEntity.GetConnectionsUrl();
-            newPublisher.RegisterInitializationInfo(config);
+            newPublisher.RegisterInitializationInfo(config, pEntity.Site.Name);
             PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Publisher: {0} connected on url: {1}", name, url));
@@ -450,7 +450,7 @@ namespace PuppetMaster
             sEntity.RemoteEntity = newSubscriber;
             SysConfig config = this.network.SystemConfig.cloneConfig();
             config.Connections = sEntity.GetConnectionsUrl();
-            newSubscriber.RegisterInitializationInfo(config);
+            newSubscriber.RegisterInitializationInfo(config, sEntity.Site.Name);
             PostEntityProcessed();
 
             Console.WriteLine(String.Format("[INFO] Subscriber: {0} connected on url: {1}", name, url));

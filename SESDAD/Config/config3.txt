@@ -1,4 +1,0 @@
-Distributed 192.168.1.100
-Site site0 Parent none
-Process broker0 Is broker On site0 URL tcp://192.168.1.100:3333/broker
-Process broker1 Is broker On site0 URL tcp://192.168.1.104:3334/broker

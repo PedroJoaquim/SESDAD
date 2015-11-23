@@ -53,7 +53,7 @@ namespace Publisher
             {
                 Event newEvent = new Event(this.Name, topic, new DateTime().Ticks, this.CurrentEventNr);
                 this.PuppetMaster.LogEventPublication(this.Name, newEvent.Topic, newEvent.EventNr); //remote call
-                this.Brokers.ElementAt(0).Value.DifundPublishEvent(newEvent, this.Name, newEvent.EventNr); // remote call
+                this.RemoteNetwork.GetAllOutBrokers().ElementAt(0).Value.DifundPublishEvent(newEvent, this.Name, newEvent.EventNr); // remote call TODO CHANGEME
                 Console.WriteLine("[EVENT] - #" + this.CurrentEventNr);
                 this.CurrentEventNr++;
             } 
@@ -81,15 +81,15 @@ namespace Publisher
             Console.WriteLine();
             Console.WriteLine(String.Format("*********************** Connections *********************** \r\n"));
 
-            foreach (KeyValuePair<string, IRemoteBroker> entry in this.Brokers)
+            foreach (KeyValuePair<string, IRemoteBroker> entry in this.RemoteNetwork.InBrokers)
             {
                 Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
             }
-            foreach (KeyValuePair<string, IRemotePublisher> entry in this.Publishers)
+            foreach (KeyValuePair<string, IRemotePublisher> entry in this.RemoteNetwork.Publishers)
             {
                 Console.WriteLine(String.Format("[PUBLISHER] {0}", entry.Key));
             }
-            foreach (KeyValuePair<string, IRemoteSubscriber> entry in this.Subscribers)
+            foreach (KeyValuePair<string, IRemoteSubscriber> entry in this.RemoteNetwork.Subscribers)
             {
                 Console.WriteLine(String.Format("[SUBSCRIBER] {0}", entry.Key));
             }
@@ -100,6 +100,16 @@ namespace Publisher
         public void Publish(string topic, int nrEvents, int ms)
         {
             this.Events.Produce(new PublishCommand(topic, nrEvents, ms));
+        }
+
+        public override void ActionTimedout(DifundPublishEventProperties properties)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void ActionTimedout(DifundSubscribeEventProperties properties)
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }
