@@ -76,17 +76,6 @@ namespace Subscriber
         {
             this.Events.Produce(new NotifyEvent(e));
         }
-
-        public override void ActionTimedout(DifundPublishEventProperties properties)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void ActionTimedout(DifundSubscribeEventProperties properties)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
     }
 }

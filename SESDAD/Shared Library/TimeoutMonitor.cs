@@ -7,45 +7,52 @@ using System.Threading.Tasks;
 
 namespace Shared_Library
 {
+    
+    public interface ITimeoutListener
+    {
+        void ActionTimedout(DifundPublishEventProperties properties);
+        void ActionACKReceived(int actionID);
+    }
 
     public class TimeoutMonitor
     {
         private const int SLEEP_TIME = 3000; //miliseconds
         private const int TIMEOUT = 1000; //miliseconds
 
-        private RemoteEntity mainEntity;
+        private ITimeoutListener mainEntity;
         private int actionsID;
 
         //actions that the mainEntity performed and is waiting confirmation
         private Dictionary<int, ActionProperties> performedActions = new Dictionary<int, ActionProperties>();
 
-        public TimeoutMonitor(RemoteEntity mainEntity)
+        public ITimeoutListener MainEntity
         {
-            this.mainEntity = mainEntity;
+            get
+            {
+                return mainEntity;
+            }
+
+            set
+            {
+                mainEntity = value;
+            }
+        }
+
+        public TimeoutMonitor(ITimeoutListener mainEntity)
+        {
+            this.MainEntity = mainEntity;
             this.actionsID = 1;
             Thread t = new Thread(MonitorizeTimeOuts);
             t.Start();
         }
 
-        public int NewActionPerformed(Event e, int outSeqNumber, string targetEntity)
+        public int NewActionPerformed(Event e, int outSeqNumber, string targetSite)
         {
             int newActionId = IncActionID();
 
             lock(this)
             {
-                this.performedActions.Add(newActionId, new DifundPublishEventProperties(newActionId, targetEntity, e, outSeqNumber));
-            }
-
-            return newActionId;
-        }
-
-        public int NewActionPerformed(string targetEntity, string topic, bool unsubscribe)
-        {
-            int newActionId = IncActionID();
-
-            lock (this)
-            {
-                this.performedActions.Add(newActionId, new DifundSubscribeEventProperties(newActionId, targetEntity, topic, unsubscribe));
+                this.performedActions.Add(newActionId, new DifundPublishEventProperties(newActionId, targetSite, e, outSeqNumber));
             }
 
             return newActionId;
@@ -58,6 +65,8 @@ namespace Shared_Library
                 if (this.performedActions.ContainsKey(actionID))
                     this.performedActions.Remove(actionID);
             }
+
+            MainEntity.ActionACKReceived(actionID);
         }
 
         private void MonitorizeTimeOuts()
@@ -96,9 +105,8 @@ namespace Shared_Library
         {
             //horrible hack
             if (ap.GetType() == typeof(DifundPublishEventProperties))
-                this.mainEntity.ActionTimedout((DifundPublishEventProperties) ap);
-            else
-                this.mainEntity.ActionTimedout((DifundSubscribeEventProperties) ap);
+                this.MainEntity.ActionTimedout((DifundPublishEventProperties) ap);
+
         }
 
         private int IncActionID()
@@ -115,7 +123,7 @@ namespace Shared_Library
     public abstract class ActionProperties
     {
         private DateTime creationTime;
-        private String targetEntity;
+        private string targetSite;
         private int id;
 
         #region "properties"
@@ -131,13 +139,39 @@ namespace Shared_Library
                 creationTime = value;
             }
         }
+
+        public string TargetSite
+        {
+            get
+            {
+                return targetSite;
+            }
+
+            set
+            {
+                targetSite = value;
+            }
+        }
+
+        public int Id
+        {
+            get
+            {
+                return id;
+            }
+
+            set
+            {
+                id = value;
+            }
+        }
         #endregion
 
-        public ActionProperties(int id, String targetEntity)
+        public ActionProperties(int id, string targetSite)
         {
-            this.id = id;
+            this.Id = id;
             this.creationTime = DateTime.Now;
-            this.targetEntity = targetEntity;
+            this.TargetSite = targetSite;
         }
     }
 
@@ -174,50 +208,10 @@ namespace Shared_Library
         }
         #endregion
 
-        public DifundPublishEventProperties(int id, string targetEntity, Event e, int outSeqNumber) : base(id, targetEntity)
+        public DifundPublishEventProperties(int id, string targetSite, Event e, int outSeqNumber) : base(id, targetSite)
         {
             this.E = e;
             this.OutSeqNumber = outSeqNumber;
-        }
-    }
-
-    public class DifundSubscribeEventProperties : ActionProperties
-    {
-        private bool unsubscribe;
-        private string topic;
-
-        #region "Properties"
-        public bool Unsubscribe
-        {
-            get
-            {
-                return unsubscribe;
-            }
-
-            set
-            {
-                unsubscribe = value;
-            }
-        }
-
-        public string Topic
-        {
-            get
-            {
-                return topic;
-            }
-
-            set
-            {
-                topic = value;
-            }
-        }
-        #endregion
-
-        public DifundSubscribeEventProperties(int id, string targetEntity, string topic, bool unsubscribe) : base(id, targetEntity)
-        {
-            this.Topic = topic;
-            this.Unsubscribe = unsubscribe;
         }
     }
 }

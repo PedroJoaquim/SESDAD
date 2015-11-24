@@ -17,11 +17,13 @@ namespace Shared_Library
         void Freeze();
         void Unfreeze();
         void Disconnect();
+
+        void SendACK(int timeoutID);
     }
 
     public interface IRemoteBroker : IRemoteEntity
     {
-        void DifundPublishEvent(Event e, string source, int seqNumber);
+        void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID);
         void DifundSubscribeEvent(string topic, string source);
         void DifundUnSubscribeEvent(string topic, string source);
     }

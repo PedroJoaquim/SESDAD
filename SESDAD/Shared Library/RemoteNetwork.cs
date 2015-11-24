@@ -9,7 +9,8 @@ namespace Shared_Library
     public class RemoteNetwork
     {
         private string siteName;
-        private Dictionary<string, Dictionary<string, IRemoteBroker>> outBrokers = new Dictionary<string, Dictionary<string, IRemoteBroker>>();
+        private Dictionary<string, IRemoteBroker> outBrokersNames = new Dictionary<string, IRemoteBroker>();
+        private Dictionary<string, List<IRemoteBroker>> outBrokers = new Dictionary<string, List<IRemoteBroker>>();
         private Dictionary<string, IRemoteBroker> inBrokers = new Dictionary<string, IRemoteBroker>();
         private Dictionary<string, IRemotePublisher> publishers = new Dictionary<string, IRemotePublisher>();
         private Dictionary<string, IRemoteSubscriber> subscribers = new Dictionary<string, IRemoteSubscriber>();
@@ -67,7 +68,7 @@ namespace Shared_Library
             }
         }
 
-        public Dictionary<string, Dictionary<string, IRemoteBroker>> OutBrokers
+        public Dictionary<string, List<IRemoteBroker>> OutBrokers
         {
             get
             {
@@ -80,28 +81,21 @@ namespace Shared_Library
             }
         }
 
-        public Dictionary<string, IRemoteBroker> GetOutBrokers(string siteName)
+        public Dictionary<string, IRemoteBroker> OutBrokersNames
         {
-            if (OutBrokers.ContainsKey(siteName))
-                return OutBrokers[siteName];
-            else
-                return null;
-        }
-
-        public Dictionary<string, IRemoteBroker> GetAllOutBrokers()
-        {
-            Dictionary<string, IRemoteBroker> result = new Dictionary<string, IRemoteBroker>();
-
-            foreach (KeyValuePair<string, Dictionary<string, IRemoteBroker>> entry in OutBrokers)
+            get
             {
-                foreach (KeyValuePair<string, IRemoteBroker> entry2 in entry.Value)
-                {
-                    result.Add(entry2.Key, entry2.Value);
-                }
+                return outBrokersNames;
             }
 
-            return result;
+            set
+            {
+                outBrokersNames = value;
+            }
         }
+
+
+
         #endregion
 
         public void Initialize(SysConfig sysConfig)
@@ -129,6 +123,28 @@ namespace Shared_Library
             }
         }
 
+        public IRemoteBroker ChooseBroker(string site, string publisher, bool retransmission)
+        {
+            List<IRemoteBroker> brokers = site.Equals(siteName) ? InBrokers.Values.ToList() : OutBrokers[site];
+            int index = Utils.CalcBrokerForwardIndex(brokers.Count, publisher, retransmission);
+
+            return brokers[index];
+        }
+
+
+        public List<string> GetAllOutSites()
+        {
+            List<string> result = new List<string>();
+
+            foreach (KeyValuePair<string, List<IRemoteBroker>> item in outBrokers)
+            {
+                result.Add(item.Key);
+            }
+
+            return result;
+        }
+
+
         private void AddNewBrokerConnection(Connection conn)
         {
             IRemoteBroker newBroker = (IRemoteBroker)Activator.GetObject(typeof(IRemoteBroker), conn.EntityURL);
@@ -137,15 +153,17 @@ namespace Shared_Library
             {
                 if (!OutBrokers.ContainsKey(conn.EntitySite))
                 {
-                    OutBrokers.Add(conn.EntitySite, new Dictionary<string, IRemoteBroker>());
+                    OutBrokers.Add(conn.EntitySite, new List<IRemoteBroker>());
                 }
 
-                OutBrokers[conn.EntitySite].Add(conn.EntityName, newBroker);
+                OutBrokers[conn.EntitySite].Add(newBroker);
+                OutBrokersNames[conn.EntityName] = newBroker;
             }
             else //inside broker
             {
                 InBrokers.Add(conn.EntityName, newBroker);
             }
+
         }
     }
 }

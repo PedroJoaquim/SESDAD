@@ -306,16 +306,32 @@ namespace Shared_Library
             return result;
         }
 
-        public static int CalcBrokerForwardIndex(int numBrokers, String sourcePublisherName)
+        public static int CalcBrokerForwardIndex(int numBrokers, string sourcePublisherName, bool retransmission)
         {
             int hashCode = sourcePublisherName.GetHashCode();
-            return hashCode % numBrokers;
+            return retransmission ? (hashCode + 1) % numBrokers : hashCode % numBrokers;
         }
     }
 
     public abstract class Command
     {
         public abstract void Execute(RemoteEntity entity);
+    }
+
+    public class Pair<T, U>
+    {
+        public Pair()
+        {
+        }
+
+        public Pair(T first, U second)
+        {
+            this.First = first;
+            this.Second = second;
+        }
+
+        public T First { get; set; }
+        public U Second { get; set; }
     }
 
     [Serializable()]

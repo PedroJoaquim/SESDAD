@@ -10,60 +10,28 @@ namespace Broker
 {
     abstract class PublishEventManager
     {
-        private string myName;
-        
-        public string MyName
-        {
-            get
-            {
-                return myName;
-            }
 
-            set
-            {
-                myName = value;
-            }
-        }
-
-        public PublishEventManager(string sourceName)
-        {
-            this.MyName = sourceName;
-        }
-
-        public abstract void ExecuteDistribution(Broker b, string source, Event e, int seqNumber);
+        public abstract void ExecuteDistribution(Broker b, string sourceSite, Event e, int seqNumber);
         protected abstract int GetOutgoingSeqNumber(string brokerName, string pName);
 
         //function that gets the interessed entities depending on the routing policy
         protected List<string> GetInteressedEntities(Broker b, Event e, bool filter)
         {
-            List<string> result = new List<string>();
-            List<string> interessed = b.ForwardingTable.GetAllInterestedEntities(e.Topic);
-
             if (filter)
             {
-                return interessed;
+                return b.ForwardingTable.GetAllInterestedEntities(e.Topic);
             }
-
-            foreach (string item in interessed)
+            else
             {
-                result.Add(item);
+                return b.RemoteNetwork.GetAllOutSites();
             }
 
-            //TODO CHAGE ME IM INCORRECT
-            foreach (string item in b.RemoteNetwork.GetAllOutBrokers().Keys.ToList())
-            {
-                if (!result.Contains(item))
-                    result.Add(item);
-            }
-
-            return result;
         }
 
         //function to send the publish event to other brokers or subscribers
-        protected void ProcessEventRouting(Broker broker, List<string> interessedEntities, Event e, string source)
+        protected void ProcessEventRouting(Broker broker, List<string> interessedEntities, Event e, string sourceSite)
         {
             bool logDone = false;
-            int outNumber;
 
             /*
              * Distribute messages to all interessed subscribers
@@ -87,36 +55,40 @@ namespace Broker
              * Now forward messages to interessed brokers (that can fail)
              */
 
-            foreach (KeyValuePair<string, IRemoteBroker> entry in broker.RemoteNetwork.GetAllOutBrokers()) //TODO CHANGE ME
-            {
-                if (!entry.Key.Equals(source) && interessedEntities.Contains(entry.Key))
-                {
+            List<Tuple<string, int>> interessedSitesInfo = new List<Tuple<string, int>>();
 
+            foreach (string site in broker.RemoteNetwork.GetAllOutSites()) //TODO CHANGE ME
+            {
+                if (!site.Equals(sourceSite) && interessedEntities.Contains(site))
+                {
                     if (!logDone && broker.SysConfig.LogLevel.Equals(SysConfig.FULL))
                     {
                         broker.PuppetMaster.LogEventForwarding(broker.Name, e.Publisher, e.Topic, e.EventNr);
                         logDone = true;
                     }
 
-                    outNumber = GetOutgoingSeqNumber(entry.Key, e.Publisher);
-
-                    broker.FManager.FMPublishEvent(e, entry.Key, outNumber);
+                    interessedSitesInfo.Add(new Tuple<string, int>(site, GetOutgoingSeqNumber(site, e.Publisher)));
                 }
+            }
+
+            if(interessedSitesInfo.Count > 0)
+            {
+                int actionID = broker.FManager.FMMultiplePublishEvent(e, interessedSitesInfo); //send to all
+                broker.FManager.WaitEventDistribution(actionID); //wait that events are forwarded
             }
         }
     }
 
     class NoOrderPublishEventManager : PublishEventManager
     {
-        public NoOrderPublishEventManager(string myName) : base(myName) { }
-
-        public override void ExecuteDistribution(Broker b, string source, Event e, int seqNumber)
+        
+        public override void ExecuteDistribution(Broker b, string sourceSite, Event e, int seqNumber)
         {
             List<string> interessedEntities = GetInteressedEntities(b, e, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
-            ProcessEventRouting(b, interessedEntities, e, source);
+            ProcessEventRouting(b, interessedEntities, e, sourceSite);
         }
 
-        protected override int GetOutgoingSeqNumber(string brokerName, string pName)
+        protected override int GetOutgoingSeqNumber(string siteName, string pName)
         {
             return 1; //irrelevant for no order
         }
@@ -124,18 +96,16 @@ namespace Broker
 
     class FIFOPublishEventManager : PublishEventManager
     {
-        //1 string = source remote entity name       2 - string publisher name
+        //1 string = source remote site name       2 string = publisher name
         private Dictionary<string, Dictionary<string, PublishEventsStorage>> inTable = new Dictionary<string, Dictionary<string, PublishEventsStorage>>();
         private Dictionary<string, Dictionary<string, int>> outTable = new Dictionary<string, Dictionary<string, int>>();
 
-        public FIFOPublishEventManager(string myName) : base(myName) { }
 
-
-        public override void ExecuteDistribution(Broker b, string source, Event e, int seqNumber)
+        public override void ExecuteDistribution(Broker b, string sourceSite, Event e, int seqNumber)
         {
             List<string> interessedEntities;
             Event outgoingEvent;
-            PublishEventsStorage storedEvents = GetCreateEventOrder(source, e.Publisher);
+            PublishEventsStorage storedEvents = GetCreateEventOrder(sourceSite, e.Publisher);
 
             lock(storedEvents)
             {
@@ -145,7 +115,7 @@ namespace Broker
                 {
                     outgoingEvent = storedEvents.GetFirstEvent();
                     interessedEntities = GetInteressedEntities(b, outgoingEvent, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
-                    ProcessEventRouting(b, interessedEntities, outgoingEvent, source);
+                    ProcessEventRouting(b, interessedEntities, outgoingEvent, sourceSite);
                     storedEvents.FirstEventSend();
                 }
             }
@@ -171,22 +141,22 @@ namespace Broker
             return result;
         }
 
-        protected override int GetOutgoingSeqNumber(string brokerName, string pName)
+        protected override int GetOutgoingSeqNumber(string siteName, string pName)
         {
-            string cleanBrokerName = brokerName.ToLower();
+            string cleanSiteName = siteName.ToLower();
             string cleanPName = pName.ToLower();
             int result;
 
             lock (this.outTable)
             {
-                if (!this.outTable.ContainsKey(cleanBrokerName))
-                    this.outTable[cleanBrokerName] = new Dictionary<string, int>();
+                if (!this.outTable.ContainsKey(cleanSiteName))
+                    this.outTable[cleanSiteName] = new Dictionary<string, int>();
 
-                if (!this.outTable[cleanBrokerName].ContainsKey(cleanPName))
-                    this.outTable[cleanBrokerName][cleanPName] = 1;
+                if (!this.outTable[cleanSiteName].ContainsKey(cleanPName))
+                    this.outTable[cleanSiteName][cleanPName] = 1;
 
-                result = this.outTable[cleanBrokerName][cleanPName];
-                this.outTable[cleanBrokerName][cleanPName] = result + 1;
+                result = this.outTable[cleanSiteName][cleanPName];
+                this.outTable[cleanSiteName][cleanPName] = result + 1;
             }
 
             return result;
@@ -197,8 +167,7 @@ namespace Broker
 
     class TotalOrderPublishEventManager : PublishEventManager
     {
-        public TotalOrderPublishEventManager(string myName) : base(myName) {  }
-
+ 
         public override void ExecuteDistribution(Broker b, string source, Event e, int seqNumber)
         {
             throw new NotImplementedException();
@@ -243,7 +212,5 @@ namespace Broker
             this.storedEvents.RemoveAt(0);
             this.nextSeqNumber++;
         }
-
-
     }
 }

@@ -11,7 +11,8 @@ namespace Broker
     {
         #region "Properties"
         private Event e;
-        private string source;
+        private string sourceSite;
+        private string sourceEntity;
         private int inSeqNumber;
 
         public Event E
@@ -26,20 +27,7 @@ namespace Broker
                 e = value;
             }
         }
-
-        public string Source
-        {
-            get
-            {
-                return source;
-            }
-
-            set
-            {
-                source = value;
-            }
-        }
-
+    
         public int InSeqNumber
         {
             get
@@ -53,19 +41,46 @@ namespace Broker
             }
         }
 
+        public string SourceSite
+        {
+            get
+            {
+                return sourceSite;
+            }
+
+            set
+            {
+                sourceSite = value;
+            }
+        }
+
+        public string SourceEntity
+        {
+            get
+            {
+                return sourceEntity;
+            }
+
+            set
+            {
+                sourceEntity = value;
+            }
+        }
+
         #endregion
 
-        public DifundPublishEventCommand(Event e, string source, int inSeqNumber)
+        public DifundPublishEventCommand(Event e, string sourceSite, int inSeqNumber)
         {
             this.E = e;
-            this.Source = source;
+            this.SourceSite = sourceSite;
             this.InSeqNumber = inSeqNumber;
         }
 
         public override void Execute(RemoteEntity entity)
         {
             Broker b = (Broker) entity;
-            b.PEventManager.ExecuteDistribution(b, this.source, this.E, this.InSeqNumber);
+            b.PEventManager.ExecuteDistribution(b, this.sourceSite, this.E, this.InSeqNumber);
+            //TODO - fazer replicacao passiva para o outro broker
         }
 
     }
@@ -197,10 +212,10 @@ namespace Broker
             {
                 if(broker.ReceiveTable.IsSubscribedTo(this.topic, entitiesInterested[0]))
                 {
-                    if(broker.RemoteNetwork.GetAllOutBrokers().ContainsKey(entitiesInterested[0]))
+                    if(broker.RemoteNetwork.Brokers.ContainsKey(entitiesInterested[0]))
                     {
                         //TODO CHANGE ME IM INCORRECT
-                        broker.RemoteNetwork.GetAllOutBrokers()[entitiesInterested[0]].DifundUnSubscribeEvent(this.topic, broker.Name);
+                        broker.RemoteNetwork.Brokers[entitiesInterested[0]].DifundUnSubscribeEvent(this.topic, broker.Name);
                         broker.ReceiveTable.RemoveEntityFromTopic(this.topic, entitiesInterested[0]);
                     }
                 }
@@ -215,7 +230,7 @@ namespace Broker
                     if(!brokerName.Equals(this.source))
                     {
                         //TODO CHANGEME IM INCORRECT
-                        broker.RemoteNetwork.GetAllOutBrokers()[brokerName].DifundUnSubscribeEvent(this.topic, broker.Name);
+                        broker.RemoteNetwork.Brokers[brokerName].DifundUnSubscribeEvent(this.topic, broker.Name);
                     }
                 }
 

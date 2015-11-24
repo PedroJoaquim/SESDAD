@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Shared_Library
 {
 
-    public abstract class RemoteEntity : MarshalByRefObject, IRemoteEntity
+    public abstract class RemoteEntity : MarshalByRefObject, IRemoteEntity, ITimeoutListener
     {
         #region "Attributes"
         private String name;
@@ -220,12 +220,6 @@ namespace Shared_Library
         }
         #endregion
 
-
-        //functions that take care of timedout actions with no ack
-        public abstract void ActionTimedout(DifundPublishEventProperties properties);
-        public abstract void ActionTimedout(DifundSubscribeEventProperties properties);
-
-
         private void ProcessQueue()
         {
             Command command;
@@ -245,6 +239,16 @@ namespace Shared_Library
             Environment.Exit(0);
         }
 
+        public void SendACK(int timeoutID)
+        {
+            this.tMonitor.PostACK(timeoutID);
+        }
 
+        public abstract void ActionTimedout(DifundPublishEventProperties properties);
+
+        public void ActionACKReceived(int actionID)
+        {
+            //subscribers and publishers can ingore
+        }
     }
 }

@@ -53,7 +53,7 @@ namespace Publisher
             {
                 Event newEvent = new Event(this.Name, topic, new DateTime().Ticks, this.CurrentEventNr);
                 this.PuppetMaster.LogEventPublication(this.Name, newEvent.Topic, newEvent.EventNr); //remote call
-                this.RemoteNetwork.GetAllOutBrokers().ElementAt(0).Value.DifundPublishEvent(newEvent, this.Name, newEvent.EventNr); // remote call TODO CHANGEME
+                this.RemoteNetwork.ChooseBroker(RemoteNetwork.SiteName, Name, false).DifundPublishEvent(newEvent, RemoteNetwork.SiteName, this.Name, newEvent.EventNr, -1); // remote call TODO CHANGEME
                 Console.WriteLine("[EVENT] - #" + this.CurrentEventNr);
                 this.CurrentEventNr++;
             } 
@@ -104,12 +104,7 @@ namespace Publisher
 
         public override void ActionTimedout(DifundPublishEventProperties properties)
         {
-            throw new NotImplementedException();
-        }
-
-        public override void ActionTimedout(DifundSubscribeEventProperties properties)
-        {
-            throw new NotImplementedException();
+            
         }
         #endregion
     }

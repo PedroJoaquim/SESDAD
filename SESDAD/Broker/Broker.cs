@@ -88,13 +88,13 @@ namespace Broker
             this.PuppetMaster = pm;
 
             if (this.SysConfig.Ordering.Equals(SysConfig.FIFO))
-                this.PEventManager = new FIFOPublishEventManager(this.Name);
+                this.PEventManager = new FIFOPublishEventManager();
 
             if (this.SysConfig.Ordering.Equals(SysConfig.NO_ORDER))
-                this.PEventManager = new NoOrderPublishEventManager(this.Name);
+                this.PEventManager = new NoOrderPublishEventManager();
 
             if (this.SysConfig.Ordering.Equals(SysConfig.TOTAL))
-                this.PEventManager = new TotalOrderPublishEventManager(this.Name);
+                this.PEventManager = new TotalOrderPublishEventManager();
 
             this.FManager = new FaultManager(this);
         }
@@ -110,12 +110,10 @@ namespace Broker
             {
                 Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
             }
-            foreach (KeyValuePair<string, Dictionary<string, IRemoteBroker>> entry in this.RemoteNetwork.OutBrokers)
+
+            foreach (KeyValuePair<string, List<IRemoteBroker>> entry in this.RemoteNetwork.OutBrokers)
             {
-                foreach (KeyValuePair<string, IRemoteBroker> entry2 in entry.Value)
-                {
-                    Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
-                }
+                Console.WriteLine(String.Format("[BROKER] {0}", entry.Key));
             }
             foreach (KeyValuePair<string, IRemotePublisher> entry in this.RemoteNetwork.Publishers)
             {
@@ -136,9 +134,10 @@ namespace Broker
         }
 
         #region "interface methods"
-        public void DifundPublishEvent(Event e, string source, int seqNumber)
+        public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
-            this.Events.Produce(new DifundPublishEventCommand(e, source, seqNumber));
+            this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber));
+            this.RemoteNetwork.OutBrokersNames[sourceEntity].SendACK(timeoutID);
         }
 
         public void DifundSubscribeEvent(string topic, string source)
@@ -152,22 +151,17 @@ namespace Broker
         }
         #endregion
 
-        public override void ActionTimedout(DifundPublishEventProperties p)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void ActionTimedout(DifundSubscribeEventProperties p)
-        {
-            throw new NotImplementedException();
-        }
-
         static void Main(string[] args)
         {
             if (args.Length < 3) return;
 
             Broker b = new Broker(args[0], args[1], args[2]);
             b.Start();
+        }
+
+        public override void ActionTimedout(DifundPublishEventProperties properties)
+        {
+            //ignore faultManager will handle this
         }
     }
 }
