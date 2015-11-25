@@ -137,7 +137,15 @@ namespace Broker
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
             this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber));
-            this.RemoteNetwork.OutBrokersNames[sourceEntity].SendACK(timeoutID);
+            SendACK(sourceSite, sourceEntity, timeoutID);
+        }
+
+        private void SendACK(string sourceSite, string sourceEntity, int timeoutID)
+        {
+            if (sourceSite.Equals(RemoteNetwork.SiteName))
+                this.RemoteNetwork.Publishers[sourceEntity].SendACK(timeoutID);
+            else
+                this.RemoteNetwork.OutBrokersNames[sourceEntity].SendACK(timeoutID);
         }
 
         public void DifundSubscribeEvent(string topic, string source)

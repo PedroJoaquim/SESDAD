@@ -28,21 +28,36 @@ namespace Broker
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void AddEntity(string topicName, string entityName)
+        public bool TryAddEntity(string topicName, string entityName)
         {
+            if (AlreadySubscribed(topicName, entityName))
+                return false;
+
             GetCreateTopic(topicName).AddRemoteEntity(entityName);
+
+            return true;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void RemoveEntity(string topicName, string entityName)
+        public bool TryRemoveEntity(string topicName, string entityName)
         {
+            if (!AlreadySubscribed(topicName, entityName))
+                return false;
+
             GetCreateTopic(topicName).RemoveRemoteEntity(entityName);
+
+            return true;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public List<string> GetInterestedEntities(string topicName)
         {
             return GetCreateTopic(topicName).Subscribers;
+        }
+
+        private bool AlreadySubscribed(string topicName, string entity)
+        {
+            return GetCreateTopic(topicName).Subscribers.Contains(entity);
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]

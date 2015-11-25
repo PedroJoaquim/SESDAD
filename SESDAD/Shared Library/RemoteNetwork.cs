@@ -12,6 +12,7 @@ namespace Shared_Library
         private Dictionary<string, IRemoteBroker> outBrokersNames = new Dictionary<string, IRemoteBroker>();
         private Dictionary<string, List<IRemoteBroker>> outBrokers = new Dictionary<string, List<IRemoteBroker>>();
         private Dictionary<string, IRemoteBroker> inBrokers = new Dictionary<string, IRemoteBroker>();
+        private List<IRemoteBroker> inBrokersList = new List<IRemoteBroker>();
         private Dictionary<string, IRemotePublisher> publishers = new Dictionary<string, IRemotePublisher>();
         private Dictionary<string, IRemoteSubscriber> subscribers = new Dictionary<string, IRemoteSubscriber>();
 
@@ -94,6 +95,19 @@ namespace Shared_Library
             }
         }
 
+        public List<IRemoteBroker> InBrokersList
+        {
+            get
+            {
+                return inBrokersList;
+            }
+
+            set
+            {
+                inBrokersList = value;
+            }
+        }
+
 
 
         #endregion
@@ -121,11 +135,23 @@ namespace Shared_Library
 
                 Console.WriteLine(String.Format("[INFO] {0} [{1}] added on: {2}", conn.EntityName, conn.EntityType, conn.EntityURL));
             }
+
+            OrderBrokers();
+        }
+
+        private void OrderBrokers()
+        {
+            inBrokersList.Sort((x, y) => string.Compare(x.GetEntityName(), y.GetEntityName()));
+
+            foreach (KeyValuePair<string, List<IRemoteBroker>> entry in outBrokers)
+            {
+                entry.Value.Sort((x, y) => string.Compare(x.GetEntityName(), y.GetEntityName()));
+            }
         }
 
         public IRemoteBroker ChooseBroker(string site, string publisher, bool retransmission)
         {
-            List<IRemoteBroker> brokers = site.Equals(siteName) ? InBrokers.Values.ToList() : OutBrokers[site];
+            List<IRemoteBroker> brokers = site.Equals(siteName) ? InBrokersList : OutBrokers[site];
             int index = Utils.CalcBrokerForwardIndex(brokers.Count, publisher, retransmission);
 
             return brokers[index];
@@ -162,8 +188,8 @@ namespace Shared_Library
             else //inside broker
             {
                 InBrokers.Add(conn.EntityName, newBroker);
+                InBrokersList.Add(newBroker);
             }
-
         }
     }
 }

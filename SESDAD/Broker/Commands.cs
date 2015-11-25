@@ -127,10 +127,13 @@ namespace Broker
         public override void Execute(RemoteEntity entity)
         {
             Broker broker = (Broker) entity;
-            
-            broker.ForwardingTable.AddEntity(this.topic, this.source);
 
-            //if the routing policy is flooding we do not need to send the sub event to other brokers
+            if (!broker.ForwardingTable.TryAddEntity(this.topic, this.source))
+                return; //already processed 
+
+            ;
+
+            //if the rout policy is flooding we do not need to send the sub event to other brokers
             if (entity.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER))
                 ProcessFilteredDelivery(broker);
 
@@ -140,12 +143,19 @@ namespace Broker
         {
             //we only send the subscription to the brokers that we have not yet subscribed that topic to
             //if the request comes from a broker we do not subscribe that topic to him becouse thats pointless
-            foreach (KeyValuePair<string, IRemoteBroker> entry in broker.RemoteNetwork.InBrokers) // TODO change me im incorrect
+
+            string sourceSite = broker.RemoteNetwork.SiteName;
+
+            foreach (KeyValuePair<string, List<IRemoteBroker>> entry in broker.RemoteNetwork.OutBrokers)
             {
                 if (!entry.Key.Equals(this.source) && !broker.ReceiveTable.IsSubscribedTo(this.topic, entry.Key))
                 {
                     broker.ReceiveTable.AddTopic(this.Topic, entry.Key.ToLower());
-                    entry.Value.DifundSubscribeEvent(this.Topic, broker.GetEntityName());
+
+                    foreach (IRemoteBroker remoteBroker in entry.Value)
+                    {
+                        remoteBroker.DifundSubscribeEvent(this.Topic, sourceSite);
+                    }
                 }
             }
         }
@@ -193,8 +203,11 @@ namespace Broker
         public override void Execute(RemoteEntity entity)
         {
             Broker broker = (Broker)entity;
-           
-            broker.ForwardingTable.RemoveEntity(this.topic, this.source);
+
+            if (!broker.ForwardingTable.TryRemoveEntity(this.topic, this.source))
+                return; //already processed 
+
+            
 
             //if the routing policy is flooding we do not need to send the unsub event to other brokers
             if (entity.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER))
@@ -206,16 +219,23 @@ namespace Broker
         {
             List<string> entitiesInterested = broker.ForwardingTable.GetInterestedEntities(this.TopicName);
             int entitiesInterestedCount = entitiesInterested.Count;
+            string sourceSite = broker.RemoteNetwork.SiteName;
 
-            //if the single interested entity is a broker and we subscribed that topic to him we have to unsubscribe it
+            //corner case
+            //if the single interested entity is a site and we subscribed that topic to him we have to unsubscribe it
+            //because they would forward the event to us and we back to them again
+
             if (entitiesInterestedCount == 1)
             {
                 if(broker.ReceiveTable.IsSubscribedTo(this.topic, entitiesInterested[0]))
                 {
-                    if(broker.RemoteNetwork.Brokers.ContainsKey(entitiesInterested[0]))
+                    if(broker.RemoteNetwork.GetAllOutSites().Contains(entitiesInterested[0]))
                     {
-                        //TODO CHANGE ME IM INCORRECT
-                        broker.RemoteNetwork.Brokers[entitiesInterested[0]].DifundUnSubscribeEvent(this.topic, broker.Name);
+                        foreach (IRemoteBroker remoteBroker in broker.RemoteNetwork.OutBrokers[entitiesInterested[0]])
+                        {
+                            remoteBroker.DifundUnSubscribeEvent(this.topic, sourceSite);
+                        }
+                        
                         broker.ReceiveTable.RemoveEntityFromTopic(this.topic, entitiesInterested[0]);
                     }
                 }
@@ -223,14 +243,17 @@ namespace Broker
             }
 
             //check if we still have someone interested in that topic
+            //if not send unsubscribe event to all sites forwarding that event to us
             if (broker.ForwardingTable.GetInterestedEntities(this.TopicName).Count == 0)
             {
-                foreach (string brokerName in broker.ReceiveTable.GetCreateTopicList(this.topic))
+                foreach (string siteName in broker.ReceiveTable.GetCreateTopicList(this.topic))
                 {
-                    if(!brokerName.Equals(this.source))
+                    if(!siteName.Equals(this.source))
                     {
-                        //TODO CHANGEME IM INCORRECT
-                        broker.RemoteNetwork.Brokers[brokerName].DifundUnSubscribeEvent(this.topic, broker.Name);
+                        foreach (IRemoteBroker remoteBroker in broker.RemoteNetwork.OutBrokers[entitiesInterested[0]])
+                        {
+                            remoteBroker.DifundUnSubscribeEvent(this.topic, sourceSite);
+                        }
                     }
                 }
 

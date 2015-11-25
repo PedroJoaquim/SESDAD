@@ -33,8 +33,10 @@ namespace Subscriber
 
         public override void Execute(RemoteEntity entity)
         {
-            IRemoteBroker broker = entity.RemoteNetwork.InBrokers.ElementAt(0).Value; //first broker TODO CHANGE ME
-            broker.DifundSubscribeEvent(topic, entity.Name); //remote call
+            foreach (KeyValuePair<string, IRemoteBroker> entry in entity.RemoteNetwork.InBrokers)
+            {
+                entry.Value.DifundSubscribeEvent(topic, entity.Name); //remote call
+            }
         }
     }
 
@@ -65,8 +67,10 @@ namespace Subscriber
 
         public override void Execute(RemoteEntity entity)
         {
-            IRemoteBroker broker = entity.RemoteNetwork.InBrokers.ElementAt(0).Value; //first broker TODO CHANGE ME
-            broker.DifundUnSubscribeEvent(this.topic, entity.Name); //remote call
+            foreach (KeyValuePair<string, IRemoteBroker> entry in entity.RemoteNetwork.InBrokers)
+            {
+                entry.Value.DifundUnSubscribeEvent(this.topic, entity.Name);
+            }
         }
     }
 

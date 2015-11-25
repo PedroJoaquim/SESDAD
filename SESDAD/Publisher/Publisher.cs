@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Shared_Library;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels;
@@ -102,9 +99,12 @@ namespace Publisher
             this.Events.Produce(new PublishCommand(topic, nrEvents, ms));
         }
 
-        public override void ActionTimedout(DifundPublishEventProperties properties)
+        public override void ActionTimedout(DifundPublishEventProperties p)
         {
-            
+            CheckFreeze();
+
+            this.RemoteNetwork.ChooseBroker(RemoteNetwork.SiteName, Name, true).DifundPublishEvent(p.E, RemoteNetwork.SiteName, this.Name, p.E.EventNr, -1);
+            Console.WriteLine("[EVENT] - #" + p.E.EventNr + " RETRANSMITED ");
         }
         #endregion
     }

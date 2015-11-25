@@ -50,8 +50,12 @@ namespace Broker
             int timeoutID;
             int actionID = NextActionID();
 
-            waitingEvents[actionID] = new Dictionary<int, bool>();
-            waitingRooms[actionID] = new Pair<int, bool>(actionID, false);
+            lock(this)
+            {
+                waitingEvents[actionID] = new Dictionary<int, bool>();
+                waitingRooms[actionID] = new Pair<int, bool>(actionID, false);
+            }
+
 
             lock (waitingRooms[actionID])//do not allow acks before we send them all
             {
@@ -61,9 +65,15 @@ namespace Broker
                     int outSeqNumber = entry.Item2;
 
                     timeoutID = timeoutMonitor.NewActionPerformed(e, outSeqNumber, site);
-                    waitingEvents[actionID][timeoutID] = false;
-                    timeoutActionMap[timeoutID] = actionID;
-                    mainEntity.RemoteNetwork.ChooseBroker(site, e.Publisher, false).DifundPublishEvent(e, mainEntity.RemoteNetwork.SiteName, mainEntity.Name, outSeqNumber, timeoutID);
+
+                    lock(this)
+                    {
+                        waitingEvents[actionID][timeoutID] = false;
+                        timeoutActionMap[timeoutID] = actionID;
+                    }
+
+
+                    new Task(() => { ExecuteEventTransmission(e, site, outSeqNumber, timeoutID, false); }).Start();
                 }
             }
 
@@ -77,17 +87,31 @@ namespace Broker
         {
             lock (waitingRooms[actionID])
             {
-                if (waitingEvents[actionID][oldTimeoutID])
-                    return; //acked already received, possible desync
 
-                waitingEvents[actionID].Remove(oldTimeoutID);
-                timeoutActionMap.Remove(oldTimeoutID);
+                lock (this)
+                {
+                    if (waitingEvents[actionID][oldTimeoutID])
+                        return; //acked already received, possible desync
+
+                    waitingEvents[actionID].Remove(oldTimeoutID);
+                    timeoutActionMap.Remove(oldTimeoutID);
+                }
 
                 int newTimeoutID = timeoutMonitor.NewActionPerformed(e, outSeqNumber, targetSite);
-                waitingEvents[actionID][newTimeoutID] = false;
-                timeoutActionMap[newTimeoutID] = actionID;
-                mainEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, true).DifundPublishEvent(e, mainEntity.RemoteNetwork.SiteName, mainEntity.Name, outSeqNumber, newTimeoutID);
+
+                lock(this)
+                {
+                    waitingEvents[actionID][newTimeoutID] = false;
+                    timeoutActionMap[newTimeoutID] = actionID;
+                }
+
+                new Task(() => { ExecuteEventTransmission(e, targetSite, outSeqNumber, newTimeoutID, true); }).Start();
             }
+        }
+
+        private void ExecuteEventTransmission(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
+        {
+            mainEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, retransmission).DifundPublishEvent(e, mainEntity.RemoteNetwork.SiteName, mainEntity.Name, outSeqNumber, timeoutID);
         }
 
         /*
@@ -104,6 +128,31 @@ namespace Broker
                 {
                     Monitor.Wait(waiting);
                 }
+
+                RemoveElements(actionID); //remove elements associated with actionID
+
+            }
+        }
+
+        private void RemoveElements(int actionID)
+        {
+            lock(this)
+            {
+                waitingRooms.Remove(actionID);
+                waitingEvents.Remove(actionID);
+
+                List<int> toBeRemoved = new List<int>();
+
+                foreach (KeyValuePair<int, int> item in timeoutActionMap)
+                {
+                    if (item.Value == actionID)
+                        toBeRemoved.Add(item.Key);
+                }
+
+                foreach(int key in toBeRemoved)
+                {
+                    timeoutActionMap.Remove(key);
+                }
             }
         }
 
@@ -114,15 +163,18 @@ namespace Broker
         public void ActionTimedout(DifundPublishEventProperties p)
         {
             int actionID = timeoutActionMap[p.Id];
+
             FMPublishEventRetransmission(p.E, p.TargetSite, p.OutSeqNumber, actionID, p.Id);
         }
 
 
         public void ActionACKReceived(int timeoutID)
         {
+        
             int actionID = timeoutActionMap[timeoutID];
+
             Pair <int, bool> waiting = waitingRooms[actionID];
-            
+
             lock (waiting)
             {
                 waitingEvents[actionID][timeoutID] = true;

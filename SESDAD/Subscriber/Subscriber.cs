@@ -76,6 +76,11 @@ namespace Subscriber
         {
             this.Events.Produce(new NotifyEvent(e));
         }
+
+        public override void ActionTimedout(DifundPublishEventProperties properties)
+        {
+            //ignore
+        }
         #endregion
     }
 }

@@ -309,6 +309,10 @@ namespace Shared_Library
         public static int CalcBrokerForwardIndex(int numBrokers, string sourcePublisherName, bool retransmission)
         {
             int hashCode = sourcePublisherName.GetHashCode();
+
+            if (hashCode < 0)
+                hashCode = hashCode * -1;
+
             return retransmission ? (hashCode + 1) % numBrokers : hashCode % numBrokers;
         }
     }

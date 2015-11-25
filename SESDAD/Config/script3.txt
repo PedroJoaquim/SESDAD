@@ -1,0 +1,13 @@
+subscriber sub01 subscribe /testtopic
+subscriber sub02 subscribe /testtopic
+subscriber sub03 subscribe /testtopic
+subscriber sub04 subscribe /testtopic
+subscriber sub01 subscribe /testtopic2
+subscriber sub02 subscribe /testtopic2
+subscriber sub03 subscribe /testtopic2
+subscriber sub04 subscribe /testtopic2
+wait 3000
+publisher pub01 publish 500 Ontopic /testtopic Interval 0
+publisher pub11 publish 500 Ontopic /testtopic Interval 0
+publisher pub02 publish 500 Ontopic /testtopic2 Interval 0
+publisher pub03 publish 500 Ontopic /testtopic2 Interval 0

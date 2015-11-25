@@ -23,7 +23,7 @@ namespace Broker
             }
             else
             {
-                return b.RemoteNetwork.GetAllOutSites();
+                return Utils.MergeListsNoRepetitions(b.RemoteNetwork.GetAllOutSites(), b.ForwardingTable.GetAllInterestedEntities(e.Topic));
             }
 
         }
