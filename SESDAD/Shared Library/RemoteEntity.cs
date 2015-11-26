@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Shared_Library
 {
 
-    public abstract class RemoteEntity : MarshalByRefObject, IRemoteEntity, ITimeoutListener
+    public abstract class RemoteEntity : MarshalByRefObject, IRemoteEntity
     {
         #region "Attributes"
         private String name;
@@ -21,7 +21,6 @@ namespace Shared_Library
         private SysConfig sysConfig;
         private RemoteNetwork remoteNetwork;
         private EventQueue events;
-        private TimeoutMonitor tMonitor;
 
         private static bool freeze = false;
        
@@ -118,19 +117,6 @@ namespace Shared_Library
                 remoteNetwork = value;
             }
         }
-
-        public TimeoutMonitor TMonitor
-        {
-            get
-            {
-                return tMonitor;
-            }
-
-            set
-            {
-                tMonitor = value;
-            }
-        }
         #endregion
 
         public RemoteEntity(String name, String url, String pmUrl, int queueSize, int numThreads)
@@ -140,7 +126,6 @@ namespace Shared_Library
             this.PmURL = pmUrl;
             this.events = new EventQueue(queueSize);
             this.RemoteNetwork = new RemoteNetwork();
-            this.tMonitor = new TimeoutMonitor(this);
             this.numThreads = numThreads;
         }
 
@@ -192,6 +177,7 @@ namespace Shared_Library
 
         public void Freeze()
         {
+
             lock (this)
             {
                 freeze = true;
@@ -208,7 +194,7 @@ namespace Shared_Library
             }
         }
 
-        protected void CheckFreeze()
+        public void CheckFreeze()
         {
             lock(this)
             {
@@ -239,16 +225,6 @@ namespace Shared_Library
             Environment.Exit(0);
         }
 
-        public void SendACK(int timeoutID)
-        {
-            this.tMonitor.PostACK(timeoutID);
-        }
-
-        public abstract void ActionTimedout(DifundPublishEventProperties properties);
-
-        public void ActionACKReceived(int actionID)
-        {
-            //subscribers and publishers can ingore
-        }
+        public abstract void ReceiveACK(int timeoutID);
     }
 }

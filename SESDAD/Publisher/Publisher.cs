@@ -26,6 +26,7 @@ namespace Publisher
                 currentEventNr = value;
             }
         }
+
         #endregion
 
         static void Main(string[] args)
@@ -39,21 +40,7 @@ namespace Publisher
         public Publisher(String name, String url, String pmUrl) : base(name, url, pmUrl, 10, 10)
         {
             this.CurrentEventNr = 1;
-        }
-
-
-        public void ExecuteEventPublication(string topic)
-        {
-            CheckFreeze();
-
-            lock(this)
-            {
-                Event newEvent = new Event(this.Name, topic, new DateTime().Ticks, this.CurrentEventNr);
-                this.PuppetMaster.LogEventPublication(this.Name, newEvent.Topic, newEvent.EventNr); //remote call
-                this.RemoteNetwork.ChooseBroker(RemoteNetwork.SiteName, Name, false).DifundPublishEvent(newEvent, RemoteNetwork.SiteName, this.Name, newEvent.EventNr, -1); // remote call TODO CHANGEME
-                Console.WriteLine("[EVENT] " + topic + " #" + this.CurrentEventNr);
-                this.CurrentEventNr++;
-            } 
+            //TODO
         }
 
 
@@ -99,12 +86,18 @@ namespace Publisher
             this.Events.Produce(new PublishCommand(topic, nrEvents, ms));
         }
 
+        /*
         public override void ActionTimedout(DifundPublishEventProperties p)
         {
             CheckFreeze();
 
             this.RemoteNetwork.ChooseBroker(RemoteNetwork.SiteName, Name, true).DifundPublishEvent(p.E, RemoteNetwork.SiteName, this.Name, p.E.EventNr, -1);
             Console.WriteLine("[EVENT] - #" + p.E.EventNr + " RETRANSMITED ");
+        }*/ //CHANGE TO FAULT MANAGER
+
+        public override void ReceiveACK(int timeoutID)
+        {
+            //TODO
         }
         #endregion
     }

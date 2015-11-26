@@ -1,3 +1,5 @@
 freeze broker00
 Wait 5000
-Publisher publisher00 Publish 1 Ontopic /p00-0 Interval 1
+Publisher publisher00 Publish 100 Ontopic /p00-0 Interval 1
+Wait 5000
+unfreeze broker00

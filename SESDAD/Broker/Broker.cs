@@ -16,7 +16,7 @@ namespace Broker
         private ForwardingTable forwardingTable = new ForwardingTable();
         private ReceiveTable receiveTable = new ReceiveTable();
         private PublishEventManager pEventManager;
-        private FaultManager fManager;
+        private BrokerFaultManager fManager;
 
         #region "properties"
         public ForwardingTable ForwardingTable
@@ -58,7 +58,7 @@ namespace Broker
             }
         }
 
-        internal FaultManager FManager
+        public BrokerFaultManager FManager
         {
             get
             {
@@ -72,7 +72,10 @@ namespace Broker
         }
         #endregion
 
-        public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, 300, 20) { }
+        public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, 300, 20)
+        {
+            this.FManager = new BrokerFaultManager(this);
+        }
 
         public override void Register()
         {
@@ -96,7 +99,6 @@ namespace Broker
             if (this.SysConfig.Ordering.Equals(SysConfig.TOTAL))
                 this.PEventManager = new TotalOrderPublishEventManager();
 
-            this.FManager = new FaultManager(this);
         }
 
         public override void Status()
@@ -136,19 +138,8 @@ namespace Broker
         #region "interface methods"
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
-            new Task(() => { SendACK(sourceSite, sourceEntity, timeoutID); }).Start(); //send ack
-            Console.WriteLine("RECEIVED EVENT: " + e.EventNr);
+            FManager.SendACK(timeoutID, sourceEntity, sourceSite);
             this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber));
-        }
-
-        private void SendACK(string sourceSite, string sourceEntity, int timeoutID)
-        {
-            CheckFreeze();
-
-            if (sourceSite.Equals(RemoteNetwork.SiteName))
-                this.RemoteNetwork.Publishers[sourceEntity].SendACK(timeoutID);
-            else
-                this.RemoteNetwork.OutBrokersNames[sourceEntity].SendACK(timeoutID);
         }
 
         public void DifundSubscribeEvent(string topic, string source)
@@ -170,9 +161,9 @@ namespace Broker
             b.Start();
         }
 
-        public override void ActionTimedout(DifundPublishEventProperties properties)
+        public override void ReceiveACK(int timeoutID)
         {
-            //ignore faultManager will handle this
+            this.FManager.TMonitor.PostACK(timeoutID);
         }
     }
 }

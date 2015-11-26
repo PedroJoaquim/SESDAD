@@ -77,9 +77,9 @@ namespace Subscriber
             this.Events.Produce(new NotifyEvent(e));
         }
 
-        public override void ActionTimedout(DifundPublishEventProperties properties)
+        public override void ReceiveACK(int timeoutID)
         {
-            //ignore
+            //TODO
         }
         #endregion
     }

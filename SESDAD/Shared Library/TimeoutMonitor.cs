@@ -16,7 +16,7 @@ namespace Shared_Library
 
     public class TimeoutMonitor
     {
-        private const int SLEEP_TIME = 30000; //miliseconds
+        private const int SLEEP_TIME = 3000; //miliseconds
         private const int TIMEOUT = 1000; //miliseconds
 
         private ITimeoutListener mainEntity;
@@ -104,6 +104,8 @@ namespace Shared_Library
 
         private void PerformTimeoutAlert(ActionProperties ap)
         {
+            Console.WriteLine("[TIMEOUT]");
+
             //horrible hack
             if (ap.GetType() == typeof(DifundPublishEventProperties))
                 this.MainEntity.ActionTimedout((DifundPublishEventProperties) ap);

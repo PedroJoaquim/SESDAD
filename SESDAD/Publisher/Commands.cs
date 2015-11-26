@@ -83,7 +83,7 @@ namespace Publisher
 
             for (int i = 0; i < this.nrEvents; i++)
             {
-               publisher.ExecuteEventPublication(this.Topic);
+               //publisher.ExecuteEventPublication(this.Topic); TODO
                Thread.Sleep(this.Ms);
             }
 

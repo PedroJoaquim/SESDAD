@@ -77,22 +77,17 @@ namespace Broker
     }
 
 
-    class FaultManager : ITimeoutListener
+    class BrokerFaultManager : FaultManager
     {
         private int actionID;
-        private RemoteEntity mainEntity;
-        private TimeoutMonitor timeoutMonitor;
         private Dictionary<int, EventInfo> waitingEvents;
         private Dictionary<int, int> timeoutIDMap; //maps timeoutids for actionsID
 
         private Object actionIDObject; //lock for actionID 
     
-        public FaultManager(RemoteEntity re)
+        public BrokerFaultManager(RemoteEntity re) : base(re)
         {
             actionID = 1;
-            this.mainEntity = re;
-            this.timeoutMonitor = re.TMonitor;
-            this.timeoutMonitor.MainEntity = this; //different for brokers
             this.actionIDObject = new Object();
             this.waitingEvents = new Dictionary<int, EventInfo>();
             this.timeoutIDMap = new Dictionary<int, int>();
@@ -132,7 +127,7 @@ namespace Broker
                 int outSeqNumber = entry.Item2;
 
 
-                int timeoutID = timeoutMonitor.NewActionPerformed(e, outSeqNumber, site);
+                int timeoutID = TMonitor.NewActionPerformed(e, outSeqNumber, site);
                 eventInfo.AddNewTimeout(timeoutID);
 
                 lock(timeoutIDMap)
@@ -162,7 +157,7 @@ namespace Broker
                 return; //acked already received, possible desync
 
             eventInfo.RemoveTimeoutID(oldTimeoutID);
-            newTimeoutID = timeoutMonitor.NewActionPerformed(e, outSeqNumber, targetSite);
+            newTimeoutID = TMonitor.NewActionPerformed(e, outSeqNumber, targetSite);
             eventInfo.AddNewTimeout(newTimeoutID);
 
             lock (timeoutIDMap)
@@ -177,7 +172,7 @@ namespace Broker
 
         private void ExecuteEventTransmission(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
         {
-            mainEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, retransmission).DifundPublishEvent(e, mainEntity.RemoteNetwork.SiteName, mainEntity.Name, outSeqNumber, timeoutID);
+            RemoteEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, retransmission).DifundPublishEvent(e, RemoteEntity.RemoteNetwork.SiteName, RemoteEntity.Name, outSeqNumber, timeoutID);
         }
 
         /*
@@ -238,7 +233,7 @@ namespace Broker
          * ITimeoutListener Interface Implementation
          */
 
-        public void ActionTimedout(DifundPublishEventProperties p)
+        public override void ActionTimedout(DifundPublishEventProperties p)
         {
             int actionID;
             
@@ -248,7 +243,7 @@ namespace Broker
         }
 
 
-        public void ActionACKReceived(int timeoutID)
+        public override void ActionACKReceived(int timeoutID)
         {
             int actionID;
             EventInfo eventInfo;
@@ -258,6 +253,20 @@ namespace Broker
             eventInfo.PostACK(timeoutID);
         }
 
+        public void SendACK(int timeoutID, string sourceEntity, string sourceSite)
+        {
+            new Task(() => { SendACKNewThread(sourceSite, sourceEntity, timeoutID); }).Start(); //send ack
+        }
+
+        private void SendACKNewThread(string sourceSite, string sourceEntity, int timeoutID)
+        {
+            RemoteEntity.CheckFreeze();
+
+            if (sourceSite.Equals(RemoteEntity.RemoteNetwork.SiteName))
+                RemoteEntity.RemoteNetwork.Publishers[sourceEntity].ReceiveACK(timeoutID);
+            else
+                RemoteEntity.RemoteNetwork.OutBrokersNames[sourceEntity].ReceiveACK(timeoutID);
+        }
 
     }
 }

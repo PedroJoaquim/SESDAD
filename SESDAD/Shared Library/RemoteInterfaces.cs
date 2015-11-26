@@ -18,7 +18,7 @@ namespace Shared_Library
         void Unfreeze();
         void Disconnect();
 
-        void SendACK(int timeoutID);
+        void ReceiveACK(int timeoutID);
     }
 
     public interface IRemoteBroker : IRemoteEntity
