@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Shared_Library;
 
 namespace Broker
@@ -36,7 +33,6 @@ namespace Broker
             /*
              * Distribute messages to all interessed subscribers
              */
-
             foreach (KeyValuePair<string, IRemoteSubscriber> entry in broker.RemoteNetwork.Subscribers)
             {
                 if (interessedEntities.Contains(entry.Key))
@@ -50,14 +46,13 @@ namespace Broker
                     entry.Value.NotifyEvent(e);
                 }
             }
-
             /*
              * Now forward messages to interessed brokers (that can fail)
              */
 
             List<Tuple<string, int>> interessedSitesInfo = new List<Tuple<string, int>>();
 
-            foreach (string site in broker.RemoteNetwork.GetAllOutSites()) //TODO CHANGE ME
+            foreach (string site in broker.RemoteNetwork.GetAllOutSites())
             {
                 if (!site.Equals(sourceSite) && interessedEntities.Contains(site))
                 {
@@ -71,8 +66,9 @@ namespace Broker
                 }
             }
 
-            if(interessedSitesInfo.Count > 0)
+            if (interessedSitesInfo.Count > 0)
             {
+                Console.WriteLine("interessed entities: " + interessedSitesInfo.Count);
                 int actionID = broker.FManager.FMMultiplePublishEvent(e, interessedSitesInfo); //send to all
                 broker.FManager.WaitEventDistribution(actionID); //wait that events are forwarded
             }
@@ -107,7 +103,7 @@ namespace Broker
             Event outgoingEvent;
             PublishEventsStorage storedEvents = GetCreateEventOrder(sourceSite, e.Publisher);
 
-            lock(storedEvents)
+            lock (storedEvents)
             {
                 storedEvents.InsertInOrder(e, seqNumber);
                 

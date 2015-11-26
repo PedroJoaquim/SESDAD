@@ -51,7 +51,7 @@ namespace Publisher
                 Event newEvent = new Event(this.Name, topic, new DateTime().Ticks, this.CurrentEventNr);
                 this.PuppetMaster.LogEventPublication(this.Name, newEvent.Topic, newEvent.EventNr); //remote call
                 this.RemoteNetwork.ChooseBroker(RemoteNetwork.SiteName, Name, false).DifundPublishEvent(newEvent, RemoteNetwork.SiteName, this.Name, newEvent.EventNr, -1); // remote call TODO CHANGEME
-                Console.WriteLine("[EVENT] - #" + this.CurrentEventNr);
+                Console.WriteLine("[EVENT] " + topic + " #" + this.CurrentEventNr);
                 this.CurrentEventNr++;
             } 
         }

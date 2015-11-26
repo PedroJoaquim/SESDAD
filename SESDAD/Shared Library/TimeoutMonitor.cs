@@ -16,7 +16,7 @@ namespace Shared_Library
 
     public class TimeoutMonitor
     {
-        private const int SLEEP_TIME = 3000; //miliseconds
+        private const int SLEEP_TIME = 30000; //miliseconds
         private const int TIMEOUT = 1000; //miliseconds
 
         private ITimeoutListener mainEntity;
@@ -60,10 +60,10 @@ namespace Shared_Library
 
         public void PostACK(int actionID)
         {
+
             lock(this)
             {
-                if (this.performedActions.ContainsKey(actionID))
-                    this.performedActions.Remove(actionID);
+                this.performedActions.Remove(actionID);
             }
 
             MainEntity.ActionACKReceived(actionID);
@@ -84,10 +84,11 @@ namespace Shared_Library
                         DateTime now = DateTime.Now;
                         DateTime creation = entry.Value.CreationTime;
                         int diff = (int) ((TimeSpan)(now - creation)).TotalMilliseconds;
-                  
+                        ActionProperties value = entry.Value;
+
                         if (diff > TIMEOUT)
                         {
-                            Thread t = new Thread(() => PerformTimeoutAlert(entry.Value));
+                            Thread t = new Thread(() => PerformTimeoutAlert(value));
                             t.Start();
                             toBeRemoved.Add(entry.Key);
                         }

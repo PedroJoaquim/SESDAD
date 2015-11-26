@@ -244,13 +244,13 @@ namespace Broker
 
             //check if we still have someone interested in that topic
             //if not send unsubscribe event to all sites forwarding that event to us
-            if (broker.ForwardingTable.GetInterestedEntities(this.TopicName).Count == 0)
+            if (entitiesInterestedCount == 0)
             {
                 foreach (string siteName in broker.ReceiveTable.GetCreateTopicList(this.topic))
                 {
                     if(!siteName.Equals(this.source))
                     {
-                        foreach (IRemoteBroker remoteBroker in broker.RemoteNetwork.OutBrokers[entitiesInterested[0]])
+                        foreach (IRemoteBroker remoteBroker in broker.RemoteNetwork.OutBrokers[siteName])
                         {
                             remoteBroker.DifundUnSubscribeEvent(this.topic, sourceSite);
                         }

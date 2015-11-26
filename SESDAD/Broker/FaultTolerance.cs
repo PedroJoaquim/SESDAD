@@ -8,14 +8,84 @@ using System.Threading;
 
 namespace Broker
 {
+    class EventInfo
+    {
+        private int actionID;
+        private int totalACKs;
+        private int receivedACKs;
+        private Dictionary<int, bool> timeoutIDs;
+
+        public EventInfo(int actionID, int totalACKs)
+        {
+            this.actionID = actionID;
+            this.totalACKs = totalACKs;
+            this.receivedACKs = 0;
+            this.timeoutIDs = new Dictionary<int, bool>();
+        }
+
+        public void AddNewTimeout(int timeoutID)
+        {
+            lock(timeoutIDs)
+            {
+                timeoutIDs[timeoutID] = false;
+            }
+        }
+
+        public bool AlreadyReceivedACK(int timeoutID)
+        {
+            lock (timeoutIDs)
+            {
+                return timeoutIDs.ContainsKey(timeoutID) && timeoutIDs[timeoutID];
+            }
+        }
+
+        public void RemoveTimeoutID(int timeoutID)
+        {
+            lock (timeoutIDs)
+            {
+                timeoutIDs.Remove(timeoutID);
+            }
+        }
+
+        public void WaitAll()
+        {
+            lock(timeoutIDs)
+            {
+                while (totalACKs < receivedACKs)
+                {
+                    Monitor.Wait(timeoutIDs);
+                }
+            }
+        }
+
+        public void PostACK(int timeoutID)
+        {
+            lock (timeoutIDs)
+            {
+                if (timeoutIDs[timeoutID])
+                    return; //duplicated ACK
+
+                timeoutIDs[timeoutID] = true;
+                receivedACKs++;
+
+                if (receivedACKs >= totalACKs)
+                    Monitor.PulseAll(timeoutIDs);
+            }
+
+
+        }
+    }
+
+
     class FaultManager : ITimeoutListener
     {
         private int actionID;
         private RemoteEntity mainEntity;
         private TimeoutMonitor timeoutMonitor;
-        private Dictionary<int, Dictionary<int, bool>> waitingEvents;
-        private Dictionary<int, Pair<int, bool>> waitingRooms;
-        private Dictionary<int, int> timeoutActionMap;
+        private Dictionary<int, EventInfo> waitingEvents;
+        private Dictionary<int, int> timeoutIDMap; //maps timeoutids for actionsID
+
+        private Object actionIDObject; //lock for actionID 
     
         public FaultManager(RemoteEntity re)
         {
@@ -23,9 +93,9 @@ namespace Broker
             this.mainEntity = re;
             this.timeoutMonitor = re.TMonitor;
             this.timeoutMonitor.MainEntity = this; //different for brokers
-            waitingEvents = new Dictionary<int, Dictionary<int, bool>>();
-            waitingRooms = new Dictionary<int, Pair<int, bool>>();
-            timeoutActionMap = new Dictionary<int, int>();
+            this.actionIDObject = new Object();
+            this.waitingEvents = new Dictionary<int, EventInfo>();
+            this.timeoutIDMap = new Dictionary<int, int>();
         }
 
         /*
@@ -33,7 +103,7 @@ namespace Broker
          */
         public int NextActionID()
         {
-            lock(this)
+            lock(actionIDObject)
             {
                 int newID = actionID;
                 this.actionID++;
@@ -47,35 +117,33 @@ namespace Broker
 
         public int FMMultiplePublishEvent(Event e, List<Tuple<string, int>> targetSites)
         {
-            int timeoutID;
             int actionID = NextActionID();
+            EventInfo eventInfo = new EventInfo(actionID, targetSites.Count);
 
             lock(this)
             {
-                waitingEvents[actionID] = new Dictionary<int, bool>();
-                waitingRooms[actionID] = new Pair<int, bool>(actionID, false);
+                waitingEvents[actionID] = eventInfo;
             }
 
 
-            lock (waitingRooms[actionID])//do not allow acks before we send them all
+            foreach (Tuple<string, int> entry in targetSites)
             {
-                foreach (Tuple<string, int> entry in targetSites)
+                string site = entry.Item1;
+                int outSeqNumber = entry.Item2;
+
+
+                int timeoutID = timeoutMonitor.NewActionPerformed(e, outSeqNumber, site);
+                eventInfo.AddNewTimeout(timeoutID);
+
+                lock(timeoutIDMap)
                 {
-                    string site = entry.Item1;
-                    int outSeqNumber = entry.Item2;
-
-                    timeoutID = timeoutMonitor.NewActionPerformed(e, outSeqNumber, site);
-
-                    lock(this)
-                    {
-                        waitingEvents[actionID][timeoutID] = false;
-                        timeoutActionMap[timeoutID] = actionID;
-                    }
-
-
-                    new Task(() => { ExecuteEventTransmission(e, site, outSeqNumber, timeoutID, false); }).Start();
+                    timeoutIDMap[timeoutID] = actionID;
                 }
+
+                
+                new Task(() => { ExecuteEventTransmission(e, site, outSeqNumber, timeoutID, false); }).Start();
             }
+
 
             return actionID;
         }
@@ -85,28 +153,26 @@ namespace Broker
          */
         private void FMPublishEventRetransmission(Event e, string targetSite, int outSeqNumber, int actionID, int oldTimeoutID)
         {
-            lock (waitingRooms[actionID])
+            EventInfo eventInfo;
+            int newTimeoutID;
+
+            eventInfo = GetEventInfoTS(actionID);
+
+            if (eventInfo.AlreadyReceivedACK(oldTimeoutID))
+                return; //acked already received, possible desync
+
+            eventInfo.RemoveTimeoutID(oldTimeoutID);
+            newTimeoutID = timeoutMonitor.NewActionPerformed(e, outSeqNumber, targetSite);
+            eventInfo.AddNewTimeout(newTimeoutID);
+
+            lock (timeoutIDMap)
             {
-
-                lock (this)
-                {
-                    if (waitingEvents[actionID][oldTimeoutID])
-                        return; //acked already received, possible desync
-
-                    waitingEvents[actionID].Remove(oldTimeoutID);
-                    timeoutActionMap.Remove(oldTimeoutID);
-                }
-
-                int newTimeoutID = timeoutMonitor.NewActionPerformed(e, outSeqNumber, targetSite);
-
-                lock(this)
-                {
-                    waitingEvents[actionID][newTimeoutID] = false;
-                    timeoutActionMap[newTimeoutID] = actionID;
-                }
-
-                new Task(() => { ExecuteEventTransmission(e, targetSite, outSeqNumber, newTimeoutID, true); }).Start();
+                timeoutIDMap.Remove(oldTimeoutID);
+                timeoutIDMap[newTimeoutID] = actionID;
             }
+
+            new Task(() => { ExecuteEventTransmission(e, targetSite, outSeqNumber, newTimeoutID, true); }).Start();
+            
         }
 
         private void ExecuteEventTransmission(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
@@ -120,49 +186,63 @@ namespace Broker
 
         public void WaitEventDistribution(int actionID)
         {
-            Pair<int, bool> waiting = waitingRooms[actionID];
+            EventInfo eventInfo;
 
-            lock(waiting)
-            {
-                while (!waiting.Second) 
-                {
-                    Monitor.Wait(waiting);
-                }
+            eventInfo = GetEventInfoTS(actionID);
 
-                RemoveElements(actionID); //remove elements associated with actionID
+            eventInfo.WaitAll();
+            RemoveElements(actionID); 
 
-            }
         }
 
         private void RemoveElements(int actionID)
         {
             lock(this)
             {
-                waitingRooms.Remove(actionID);
                 waitingEvents.Remove(actionID);
+            }
 
+            lock(timeoutIDMap)
+            {
                 List<int> toBeRemoved = new List<int>();
 
-                foreach (KeyValuePair<int, int> item in timeoutActionMap)
+                foreach (KeyValuePair<int, int> item in timeoutIDMap)
                 {
                     if (item.Value == actionID)
                         toBeRemoved.Add(item.Key);
                 }
 
-                foreach(int key in toBeRemoved)
+                foreach (int key in toBeRemoved)
                 {
-                    timeoutActionMap.Remove(key);
+                    timeoutIDMap.Remove(key);
                 }
             }
         }
 
+        private EventInfo GetEventInfoTS(int actionID)
+        {
+            lock(this)
+            {
+                return waitingEvents[actionID];
+            }
+        }
+
+        private int GetActionIDTS(int timeoutID)
+        {
+            lock(timeoutIDMap)
+            {
+                return timeoutIDMap[timeoutID];
+            }
+        }
         /*
          * ITimeoutListener Interface Implementation
          */
 
         public void ActionTimedout(DifundPublishEventProperties p)
         {
-            int actionID = timeoutActionMap[p.Id];
+            int actionID;
+            
+            actionID = GetActionIDTS(p.Id);
 
             FMPublishEventRetransmission(p.E, p.TargetSite, p.OutSeqNumber, actionID, p.Id);
         }
@@ -170,31 +250,14 @@ namespace Broker
 
         public void ActionACKReceived(int timeoutID)
         {
-        
-            int actionID = timeoutActionMap[timeoutID];
+            int actionID;
+            EventInfo eventInfo;
 
-            Pair <int, bool> waiting = waitingRooms[actionID];
-
-            lock (waiting)
-            {
-                waitingEvents[actionID][timeoutID] = true;
-                bool allAcksReceived = true;
-
-                foreach (KeyValuePair<int, bool> entry in waitingEvents[actionID])
-                {
-                    if (!entry.Value)
-                    {
-                        allAcksReceived = false;
-                        break;
-                    }
-                }
-
-                if(allAcksReceived)
-                {
-                    waiting.Second = true;
-                    Monitor.PulseAll(waiting);
-                }
-            }
+            actionID = GetActionIDTS(timeoutID);
+            eventInfo = GetEventInfoTS(actionID);
+            eventInfo.PostACK(timeoutID);
         }
+
+
     }
 }
