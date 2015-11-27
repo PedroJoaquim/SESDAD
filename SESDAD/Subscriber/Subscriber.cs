@@ -13,14 +13,20 @@ namespace Subscriber
     class Subscriber : RemoteEntity, IRemoteSubscriber
     {
 
-        static void Main(string[] args)
+        private Dictionary<string, List<int>> receivedEvents = new Dictionary<string, List<int>>();
+
+        public Dictionary<string, List<int>> ReceivedEvents
         {
-            if (args.Length < 3) return;
+            get
+            {
+                return receivedEvents;
+            }
 
-            Subscriber s = new Subscriber(args[0], args[1], args[2]);
-            s.Start();
+            set
+            {
+                receivedEvents = value;
+            }
         }
-
 
         public Subscriber(String name, String url, String pmUrl) : base(name, url, pmUrl, 100, 1) { }
 
@@ -77,10 +83,43 @@ namespace Subscriber
             this.Events.Produce(new NotifyEvent(e));
         }
 
-        public override void ReceiveACK(int timeoutID)
+        internal bool ValidEvent(Event e)
         {
-            //TODO
+            lock(this)
+            {
+                if(!ReceivedEvents.ContainsKey(e.Publisher))
+                {
+                    ReceivedEvents[e.Publisher] = new List<int>();
+                    ReceivedEvents[e.Publisher].Add(e.EventNr);
+                    return true;
+                }
+                else
+                {
+                    if (ReceivedEvents[e.Publisher].Contains(e.EventNr))
+                        return false;
+                    else
+                    {
+                        ReceivedEvents[e.Publisher].Add(e.EventNr);
+                        return true;
+                    }
+                }
+            }
         }
+
+        public override void ReceiveACK(int timeoutID, string entityName)
+        {
+            //IGNORE
+        }
+
         #endregion
+
+
+        static void Main(string[] args)
+        {
+            if (args.Length < 3) return;
+
+            Subscriber s = new Subscriber(args[0], args[1], args[2]);
+            s.Start();
+        }
     }
 }

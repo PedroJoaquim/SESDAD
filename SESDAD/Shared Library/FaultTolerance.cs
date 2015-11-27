@@ -6,12 +6,73 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shared_Library
-{
+{   
     
     public interface ITimeoutListener
     {
         void ActionTimedout(DifundPublishEventProperties properties);
-        void ActionACKReceived(int actionID);
+    }
+
+
+
+    public abstract class FaultManager : ITimeoutListener
+    {
+        private TimeoutMonitor tMonitor;
+        private RemoteEntity remoteEntity;
+
+        public TimeoutMonitor TMonitor
+        {
+            get
+            {
+                return tMonitor;
+            }
+
+            set
+            {
+                tMonitor = value;
+            }
+        }
+
+        public RemoteEntity RemoteEntity
+        {
+            get
+            {
+                return remoteEntity;
+            }
+
+            set
+            {
+                remoteEntity = value;
+            }
+        }
+
+        public FaultManager(RemoteEntity re)
+        {
+            this.TMonitor = new TimeoutMonitor(this);
+            this.RemoteEntity = re;
+        }
+
+        public abstract void ActionACKReceived(int actionID, string entityName);
+
+        public abstract void ActionTimedout(DifundPublishEventProperties properties);
+
+        protected void ExecuteEventTransmissionAsync(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
+        {
+            new Task(() => { SendEvent (e, targetSite, outSeqNumber, timeoutID, retransmission); }).Start();
+        }
+
+        private void SendEvent(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
+        {
+            try
+            {
+                RemoteEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, retransmission).DifundPublishEvent(e, RemoteEntity.RemoteNetwork.SiteName, RemoteEntity.Name, outSeqNumber, timeoutID);
+            }
+            catch(Exception)
+            {
+                //ignore 
+            }
+            
+        }
     }
 
     public class TimeoutMonitor
@@ -60,13 +121,10 @@ namespace Shared_Library
 
         public void PostACK(int actionID)
         {
-
             lock(this)
             {
                 this.performedActions.Remove(actionID);
             }
-
-            MainEntity.ActionACKReceived(actionID);
         }
 
         private void MonitorizeTimeOuts()
@@ -104,11 +162,12 @@ namespace Shared_Library
 
         private void PerformTimeoutAlert(ActionProperties ap)
         {
-            Console.WriteLine("[TIMEOUT]");
-
-            //horrible hack
             if (ap.GetType() == typeof(DifundPublishEventProperties))
-                this.MainEntity.ActionTimedout((DifundPublishEventProperties) ap);
+            {
+                DifundPublishEventProperties dp = (DifundPublishEventProperties)ap;
+                Console.WriteLine("[TIMEOUT] Event: " + dp.E.Publisher + " #" + dp.E.EventNr);
+                this.MainEntity.ActionTimedout(dp);
+            }
 
         }
 

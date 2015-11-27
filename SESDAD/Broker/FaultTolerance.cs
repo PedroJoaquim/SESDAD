@@ -76,21 +76,36 @@ namespace Broker
         }
     }
 
-
     class BrokerFaultManager : FaultManager
     {
         private int actionID;
         private Dictionary<int, EventInfo> waitingEvents;
         private Dictionary<int, int> timeoutIDMap; //maps timeoutids for actionsID
+        private ReplicationStorage repStorage;
 
         private Object actionIDObject; //lock for actionID 
-    
+
+
+        public ReplicationStorage RepStorage
+        {
+            get
+            {
+                return repStorage;
+            }
+
+            set
+            {
+                repStorage = value;
+            }
+        }
+
         public BrokerFaultManager(RemoteEntity re) : base(re)
         {
             actionID = 1;
             this.actionIDObject = new Object();
             this.waitingEvents = new Dictionary<int, EventInfo>();
             this.timeoutIDMap = new Dictionary<int, int>();
+            this.RepStorage = new ReplicationStorage();
         }
 
         /*
@@ -106,9 +121,29 @@ namespace Broker
             }
         }
 
-        /*
-         * First call to every broker, we have to send all before we begin accpeting acks
-         */
+        public void NewEventArrived(Event e, int timeoutID, string sourceEntity, string sourceSite)
+        {
+            new Task(() => { SendNewEventToPassiveServer(e, timeoutID, sourceEntity, sourceSite); }).Start();
+        }
+
+        private void SendNewEventToPassiveServer(Event e, int timeoutID, string sourceEntity, string sourceSite)
+        {
+            IPassiveServer passiveServer = GetPassiveServer(e.Publisher);
+            passiveServer.StoreNewEvent(e);
+
+            SendACK(sourceSite, sourceEntity, timeoutID); //Now that the event has been replicated to the passive server we can send ACK
+        }
+
+        private void SendACK(string sourceSite, string sourceEntity, int timeoutID)
+        {
+            RemoteEntity.CheckFreeze();
+
+            if (sourceSite.Equals(RemoteEntity.RemoteNetwork.SiteName))
+                RemoteEntity.RemoteNetwork.Publishers[sourceEntity].ReceiveACK(timeoutID, RemoteEntity.Name);
+            else
+                RemoteEntity.RemoteNetwork.OutBrokersNames[sourceEntity].ReceiveACK(timeoutID, RemoteEntity.Name);
+        }
+
 
         public int FMMultiplePublishEvent(Event e, List<Tuple<string, int>> targetSites)
         {
@@ -136,7 +171,7 @@ namespace Broker
                 }
 
                 
-                new Task(() => { ExecuteEventTransmission(e, site, outSeqNumber, timeoutID, false); }).Start();
+                ExecuteEventTransmissionAsync(e, site, outSeqNumber, timeoutID, false);
             }
 
 
@@ -166,18 +201,31 @@ namespace Broker
                 timeoutIDMap[newTimeoutID] = actionID;
             }
 
-            new Task(() => { ExecuteEventTransmission(e, targetSite, outSeqNumber, newTimeoutID, true); }).Start();
-            
+            ExecuteEventTransmissionAsync(e, targetSite, outSeqNumber, newTimeoutID, true);
         }
 
-        private void ExecuteEventTransmission(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
+        /*
+         * Passive redundancy -- store the new event
+         */
+
+        internal void StoreNewEvent(Event e)
         {
-            RemoteEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, retransmission).DifundPublishEvent(e, RemoteEntity.RemoteNetwork.SiteName, RemoteEntity.Name, outSeqNumber, timeoutID);
+            this.RepStorage.StoreNewEvent(e);
+        }
+
+
+        /*
+         * Passive redundancy -- event dispacted
+         */
+
+        internal void EventDispatched(int eventNr, string publisher)
+        {
+            this.RepStorage.EventDispatched(eventNr, publisher);
         }
 
         /*
          * Wait untill all publish events are acked
-         */ 
+         */
 
         public void WaitEventDistribution(int actionID)
         {
@@ -243,30 +291,154 @@ namespace Broker
         }
 
 
-        public override void ActionACKReceived(int timeoutID)
+        public override void ActionACKReceived(int timeoutID, string entityName)
         {
             int actionID;
             EventInfo eventInfo;
 
+            TMonitor.PostACK(timeoutID);
             actionID = GetActionIDTS(timeoutID);
             eventInfo = GetEventInfoTS(actionID);
             eventInfo.PostACK(timeoutID);
         }
 
-        public void SendACK(int timeoutID, string sourceEntity, string sourceSite)
+        private IPassiveServer GetPassiveServer(string publisher)
         {
-            new Task(() => { SendACKNewThread(sourceSite, sourceEntity, timeoutID); }).Start(); //send ack
+            return RemoteEntity.RemoteNetwork.ChooseBroker(RemoteEntity.RemoteNetwork.SiteName, publisher, true);
+        }
+    }
+
+    public class ReplicationStorage
+    {
+
+        Dictionary<string, StoredEvents> storedEvents;
+
+        public ReplicationStorage()
+        {
+            this.storedEvents = new Dictionary<string, StoredEvents>();
         }
 
-        private void SendACKNewThread(string sourceSite, string sourceEntity, int timeoutID)
+        public void StoreNewEvent(Event e)
         {
-            RemoteEntity.CheckFreeze();
 
-            if (sourceSite.Equals(RemoteEntity.RemoteNetwork.SiteName))
-                RemoteEntity.RemoteNetwork.Publishers[sourceEntity].ReceiveACK(timeoutID);
-            else
-                RemoteEntity.RemoteNetwork.OutBrokersNames[sourceEntity].ReceiveACK(timeoutID);
+            StoredEvents se;
+            string publisher = e.Publisher;
+
+            lock (this)
+            {
+                if (!storedEvents.ContainsKey(publisher))
+                    storedEvents[publisher] = new StoredEvents();
+
+                se = storedEvents[publisher];
+            }
+
+            se.StoreNewEvent(e);
         }
 
+        public void EventDispatched(int eventNr, string publisher)
+        {
+            StoredEvents se;
+
+            lock (this)
+            {
+                se = storedEvents[publisher];
+            }
+
+            se.EventDispatched(eventNr);
+        }
+
+
+        public bool HasPreviousEventsToSend(int eventNr, string publisher)
+        {
+            StoredEvents se;
+
+            lock (this)
+            {
+                se = storedEvents[publisher];
+            }
+
+            return se.HasPreviousEventsToSend(eventNr);
+        }
+
+        public List<Event> GetPendindEvents(bool all, string publisher)
+        {
+            StoredEvents se;
+
+            lock (this)
+            {
+                se = storedEvents[publisher];
+            }
+
+            return se.GetPendindEvents(all);
+        }
+
+    }
+
+    public class StoredEvents
+    {
+        private Dictionary<int , bool> storedEventsDelivered;   
+        private Dictionary<int, Event> storedEvents;
+        private List<int> storedEventsIndex;
+
+        public StoredEvents()
+        {
+            storedEventsDelivered = new Dictionary<int, bool>();
+            storedEvents = new Dictionary<int, Event>();
+            storedEventsIndex = new List<int>();
+            
+        }
+
+        public void StoreNewEvent(Event e)
+        {
+            lock(this)
+            {
+                storedEvents[e.EventNr] = e;
+                storedEventsDelivered[e.EventNr] = false;
+                storedEventsIndex.Add(e.EventNr);
+                storedEventsIndex.Sort((x, y) => x.CompareTo(y));
+            }
+        }
+
+        public void EventDispatched(int eventNr)
+        {
+            lock (this)
+            {
+                storedEvents.Remove(eventNr); //discard event
+                storedEventsDelivered[eventNr] = true;
+            }
+        }
+
+
+        public bool HasPreviousEventsToSend(int eventNr)
+        {
+            lock(this)
+            {
+                int i = storedEventsIndex.Count - 1;
+                return storedEventsIndex.Count > 0 && storedEventsIndex[i] == eventNr - 1 && !storedEventsDelivered[storedEventsIndex[i]];
+            }
+        }
+
+        public List<Event> GetPendindEvents(bool all)
+        {
+            List<Event> result = new List<Event>();
+
+            for(int i = storedEventsIndex.Count - 1; i >= 0; i--)
+            {
+                if (!storedEventsDelivered[storedEventsIndex[i]])
+                {
+                    result.Add(storedEvents[storedEventsIndex[i]]);
+                    storedEvents.Remove(storedEventsIndex[i]);
+                    storedEventsDelivered[storedEventsIndex[i]] = true;
+                }
+                else
+                {
+                    if (!all)
+                        break;
+                } 
+
+            }
+
+            return result;
+        }
     }
 }

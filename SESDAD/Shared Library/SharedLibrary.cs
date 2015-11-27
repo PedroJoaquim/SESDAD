@@ -248,47 +248,6 @@ namespace Shared_Library
         }
     }
 
-    public abstract class FaultManager : ITimeoutListener
-    {
-        private TimeoutMonitor tMonitor;
-        private RemoteEntity remoteEntity;
-
-        public TimeoutMonitor TMonitor
-        {
-            get
-            {
-                return tMonitor;
-            }
-
-            set
-            {
-                tMonitor = value;
-            }
-        }
-
-        public RemoteEntity RemoteEntity
-        {
-            get
-            {
-                return remoteEntity;
-            }
-
-            set
-            {
-                remoteEntity = value;
-            }
-        }
-
-        public FaultManager(RemoteEntity re)
-        {
-            this.TMonitor = new TimeoutMonitor(this);
-            this.RemoteEntity = re;
-        }
-
-        public abstract void ActionACKReceived(int actionID);
-
-        public abstract void ActionTimedout(DifundPublishEventProperties properties);
-    }
 
     public class Utils
     {

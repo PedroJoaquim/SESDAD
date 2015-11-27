@@ -138,8 +138,8 @@ namespace Broker
         #region "interface methods"
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
-            FManager.SendACK(timeoutID, sourceEntity, sourceSite);
-            this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber));
+            FManager.NewEventArrived(e, timeoutID, sourceEntity, sourceSite); //passive redundancy
+            this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber, timeoutID));
         }
 
         public void DifundSubscribeEvent(string topic, string source)
@@ -161,9 +161,19 @@ namespace Broker
             b.Start();
         }
 
-        public override void ReceiveACK(int timeoutID)
+        public override void ReceiveACK(int timeoutID, string entityName)
         {
-            this.FManager.TMonitor.PostACK(timeoutID);
+            this.FManager.ActionACKReceived(timeoutID, entityName);
+        }
+
+        public void StoreNewEvent(Event e)
+        {
+            this.FManager.StoreNewEvent(e);
+        }
+
+        public void EventDispatched(int eventNr, string publisher)
+        {
+            this.FManager.EventDispatched(eventNr, publisher);
         }
     }
 }

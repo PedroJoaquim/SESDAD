@@ -14,6 +14,7 @@ namespace Broker
         private string sourceSite;
         private string sourceEntity;
         private int inSeqNumber;
+        private int timeoutID;
 
         public Event E
         {
@@ -69,11 +70,12 @@ namespace Broker
 
         #endregion
 
-        public DifundPublishEventCommand(Event e, string sourceSite, int inSeqNumber)
+        public DifundPublishEventCommand(Event e, string sourceSite, int inSeqNumber, int timeoutID)
         {
             this.E = e;
             this.SourceSite = sourceSite;
             this.InSeqNumber = inSeqNumber;
+            this.timeoutID = timeoutID;
         }
 
         public override void Execute(RemoteEntity entity)

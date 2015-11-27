@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventQueue.cs" />
-    <Compile Include="TimeoutMonitor.cs" />
+    <Compile Include="FaultTolerance.cs" />
     <Compile Include="RemoteEntity.cs" />
     <Compile Include="RemoteInterfaces.cs" />
     <Compile Include="RemoteNetwork.cs" />

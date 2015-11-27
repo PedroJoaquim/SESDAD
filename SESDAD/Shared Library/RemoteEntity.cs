@@ -177,7 +177,7 @@ namespace Shared_Library
 
         public void Freeze()
         {
-
+            Console.WriteLine("freezed");
             lock (this)
             {
                 freeze = true;
@@ -213,8 +213,8 @@ namespace Shared_Library
 
             while (true)
             {
-                CheckFreeze();
                 command = events.Consume();
+                CheckFreeze();
                 command.Execute(this); 
             }
 
@@ -225,6 +225,6 @@ namespace Shared_Library
             Environment.Exit(0);
         }
 
-        public abstract void ReceiveACK(int timeoutID);
+        public abstract void ReceiveACK(int timeoutID, string entityName);
     }
 }

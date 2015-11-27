@@ -9,38 +9,25 @@ namespace Publisher
 {
     class Publisher : RemoteEntity, IRemotePublisher
     {
-        #region "Properties"
-        private int currentEventNr;
-        private Dictionary<string, int> topicRelativeNr = new Dictionary<string, int>();
 
+        private PublisherFaultManager fManager;
 
-        public int CurrentEventNr
+        public PublisherFaultManager FManager
         {
             get
             {
-                return currentEventNr;
+                return fManager;
             }
 
             set
             {
-                currentEventNr = value;
+                fManager = value;
             }
-        }
-
-        #endregion
-
-        static void Main(string[] args)
-        {
-            if (args.Length < 3) return;
-
-            Publisher p = new Publisher(args[0], args[1], args[2]);
-            p.Start();
         }
 
         public Publisher(String name, String url, String pmUrl) : base(name, url, pmUrl, 10, 10)
         {
-            this.CurrentEventNr = 1;
-            //TODO
+            this.FManager = new PublisherFaultManager(this);
         }
 
 
@@ -80,25 +67,23 @@ namespace Publisher
             Console.WriteLine(String.Format("###########################################################"));
         }
 
-        #region "interface methods"
         public void Publish(string topic, int nrEvents, int ms)
         {
             this.Events.Produce(new PublishCommand(topic, nrEvents, ms));
         }
 
-        /*
-        public override void ActionTimedout(DifundPublishEventProperties p)
-        {
-            CheckFreeze();
 
-            this.RemoteNetwork.ChooseBroker(RemoteNetwork.SiteName, Name, true).DifundPublishEvent(p.E, RemoteNetwork.SiteName, this.Name, p.E.EventNr, -1);
-            Console.WriteLine("[EVENT] - #" + p.E.EventNr + " RETRANSMITED ");
-        }*/ //CHANGE TO FAULT MANAGER
-
-        public override void ReceiveACK(int timeoutID)
+        public override void ReceiveACK(int timeoutID, string entityName)
         {
-            //TODO
+            this.FManager.ActionACKReceived(timeoutID, entityName);
         }
-        #endregion
+
+        static void Main(string[] args)
+        {
+            if (args.Length < 3) return;
+
+            Publisher p = new Publisher(args[0], args[1], args[2]);
+            p.Start();
+        }
     }
 }

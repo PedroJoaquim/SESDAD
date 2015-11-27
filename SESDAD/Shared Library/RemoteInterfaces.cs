@@ -18,10 +18,16 @@ namespace Shared_Library
         void Unfreeze();
         void Disconnect();
 
-        void ReceiveACK(int timeoutID);
+        void ReceiveACK(int timeoutID, string entityName);
     }
 
-    public interface IRemoteBroker : IRemoteEntity
+    public interface IPassiveServer
+    {
+        void StoreNewEvent(Event e);
+        void EventDispatched(int eventNr, string publisher);
+    }
+
+    public interface IRemoteBroker : IRemoteEntity, IPassiveServer
     {
         void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID);
         void DifundSubscribeEvent(string topic, string source);

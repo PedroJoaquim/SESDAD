@@ -78,15 +78,14 @@ namespace Publisher
 
         public override void Execute(RemoteEntity entity)
         {
-          
             Publisher publisher = (Publisher) entity;
 
             for (int i = 0; i < this.nrEvents; i++)
             {
-               //publisher.ExecuteEventPublication(this.Topic); TODO
-               Thread.Sleep(this.Ms);
+                publisher.CheckFreeze();
+                publisher.FManager.ExecuteEventPublication(this.topic);
+                Thread.Sleep(this.Ms);
             }
-
         }
     }
 }

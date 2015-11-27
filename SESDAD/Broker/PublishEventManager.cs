@@ -68,7 +68,6 @@ namespace Broker
 
             if (interessedSitesInfo.Count > 0)
             {
-                Console.WriteLine("interessed entities: " + interessedSitesInfo.Count);
                 int actionID = broker.FManager.FMMultiplePublishEvent(e, interessedSitesInfo); //send to all
                 broker.FManager.WaitEventDistribution(actionID); //wait that events are forwarded
             }
@@ -82,6 +81,7 @@ namespace Broker
         {
             List<string> interessedEntities = GetInteressedEntities(b, e, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
             ProcessEventRouting(b, interessedEntities, e, sourceSite);
+            b.FManager.EventDispatched(e.EventNr, e.Publisher);
         }
 
         protected override int GetOutgoingSeqNumber(string siteName, string pName)
@@ -112,6 +112,7 @@ namespace Broker
                     outgoingEvent = storedEvents.GetFirstEvent();
                     interessedEntities = GetInteressedEntities(b, outgoingEvent, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
                     ProcessEventRouting(b, interessedEntities, outgoingEvent, sourceSite);
+                    b.FManager.EventDispatched(outgoingEvent.EventNr, outgoingEvent.Publisher);
                     storedEvents.FirstEventSend();
                 }
             }

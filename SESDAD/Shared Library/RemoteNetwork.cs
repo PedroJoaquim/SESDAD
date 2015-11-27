@@ -153,7 +153,6 @@ namespace Shared_Library
         {
             List<IRemoteBroker> brokers = site.Equals(siteName) ? InBrokersList : OutBrokers[site];
             int index = Utils.CalcBrokerForwardIndex(brokers.Count, publisher, retransmission);
-
             return brokers[index];
         }
 
