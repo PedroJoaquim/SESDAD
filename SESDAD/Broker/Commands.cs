@@ -76,7 +76,8 @@ namespace Broker
 
                     foreach (IRemoteBroker remoteBroker in entry.Value)
                     {
-                        remoteBroker.DifundSubscribeEvent(this.topic, sourceSite);
+                        try{ remoteBroker.DifundSubscribeEvent(this.topic, sourceSite); }
+                        catch(Exception) { /*ignore*/}
                     }
                 }
             }
@@ -129,7 +130,8 @@ namespace Broker
                     {
                         foreach (IRemoteBroker remoteBroker in broker.RemoteNetwork.OutBrokers[entitiesInterested[0]])
                         {
-                            remoteBroker.DifundUnSubscribeEvent(this.topic, sourceSite);
+                            try { remoteBroker.DifundUnSubscribeEvent(this.topic, sourceSite); } 
+                            catch { /*ignore*/}
                         }
                         
                         broker.ReceiveTable.RemoveEntityFromTopic(this.topic, entitiesInterested[0]);
@@ -148,7 +150,9 @@ namespace Broker
                     {
                         foreach (IRemoteBroker remoteBroker in broker.RemoteNetwork.OutBrokers[siteName])
                         {
-                            remoteBroker.DifundUnSubscribeEvent(this.topic, sourceSite);
+                            try { remoteBroker.DifundUnSubscribeEvent(this.topic, sourceSite); } 
+                            catch { /*ignore*/}
+  
                         }
                     }
                 }
@@ -211,5 +215,72 @@ namespace Broker
         }
 
 
+    }
+
+    class ForwardEventCommand : Command
+    {
+        private Event e;
+        private string targetSite;
+        private int outSeqNumber;
+        private int actionID;
+
+        public ForwardEventCommand(Event e, string targetSite, int outSeqNumber, int actionID)
+        {
+            this.e = e;
+            this.targetSite = targetSite;
+            this.outSeqNumber = outSeqNumber;
+            this.actionID = actionID;
+        }
+
+
+        public override void Execute(RemoteEntity entity)
+        {
+            Broker bEntity = (Broker)entity;
+            BrokerFaultManager fManager = bEntity.FManager;
+            TimeoutMonitor tMonitor = fManager.TMonitor;
+            IRemoteBroker broker = fManager.ChooseBroker(this.targetSite, this.e.Publisher);
+            string brokerName = bEntity.RemoteNetwork.GetBrokerName(broker);
+            int timeoutID = tMonitor.NewActionPerformed(e, outSeqNumber, targetSite, brokerName);
+
+            fManager.RegisterNewTimeoutID(timeoutID, actionID);
+
+            try { broker.DifundPublishEvent(e, entity.RemoteNetwork.SiteName, entity.Name, outSeqNumber, timeoutID);} 
+            catch (Exception){ /*ignore*/ }
+
+            Console.WriteLine(String.Format("[FORWARD EVENT] Topic: {0} Publisher: {1} EventNr: {2} To: {3}", e.Topic, e.Publisher, e.EventNr, entity.RemoteNetwork.GetBrokerName(broker)));
+        }
+    }
+
+    class ForwardEventRetransmissionCommand : Command
+    {
+        private Event e;
+        private string targetSite;
+        private int outSeqNumber;
+        private int oldTimeoutID;
+
+        public ForwardEventRetransmissionCommand(Event e, string targetSite, int outSeqNumber, int oldTimeoutID)
+        {
+            this.e = e;
+            this.targetSite = targetSite;
+            this.outSeqNumber = outSeqNumber;
+            this.oldTimeoutID = oldTimeoutID;
+        }
+
+
+        public override void Execute(RemoteEntity entity)
+        {
+            Broker bEntity = (Broker)entity;
+            BrokerFaultManager fManager = bEntity.FManager;
+            TimeoutMonitor tMonitor = fManager.TMonitor;
+            IRemoteBroker broker = fManager.ChooseBroker(this.targetSite, this.e.Publisher);
+            string brokerName = bEntity.RemoteNetwork.GetBrokerName(broker);
+
+            tMonitor.NewActionPerformed(e, outSeqNumber, targetSite, brokerName, oldTimeoutID);
+
+            try { broker.DifundPublishEvent(e, entity.RemoteNetwork.SiteName, entity.Name, outSeqNumber, oldTimeoutID); } 
+            catch (Exception) { /*ignore*/ }
+
+            Console.WriteLine(String.Format("[FORWARD EVENT RETRANSMISSION] Topic: {0} Publisher: {1} EventNr: {2} To: {3}", e.Topic, e.Publisher, e.EventNr, entity.RemoteNetwork.GetBrokerName(broker)));
+        }
     }
 }

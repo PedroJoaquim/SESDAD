@@ -146,7 +146,7 @@ namespace Broker
         #region "interface methods"
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
-            Console.WriteLine(String.Format("[EVENT] {0}  FROM: {1} #{2}", e.Topic, e.Publisher, e.EventNr));
+            Console.WriteLine(String.Format("[EVENT RECEIVED] {0}  FROM: {1} #{2}", e.Topic, e.Publisher, e.EventNr));
             FManager.NewEventArrived(e, timeoutID, sourceEntity, sourceSite); //passive redundancy
             this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber, timeoutID));
         }
@@ -185,11 +185,6 @@ namespace Broker
         {
             CheckFreeze();
             this.FManager.EventDispatched(eventNr, publisher);
-        }
-
-        public override FaultManager GetFaultManager()
-        {
-            return this.FManager;
         }
     }
 }

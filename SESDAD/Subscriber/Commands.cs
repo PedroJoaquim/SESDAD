@@ -37,7 +37,8 @@ namespace Subscriber
             {
                 try
                 {
-                    entry.Value.DifundSubscribeEvent(topic, entity.Name); //remote call
+                    try { entry.Value.DifundSubscribeEvent(topic, entity.Name); } 
+                    catch (Exception) { /*ignore*/}
                 }
                 catch(Exception)
                 {
@@ -78,7 +79,9 @@ namespace Subscriber
             {
                 try
                 {
-                    entry.Value.DifundUnSubscribeEvent(this.topic, entity.Name);
+                    try { entry.Value.DifundUnSubscribeEvent(this.topic, entity.Name); } 
+                    catch { /*ignore*/}
+                  
                 } catch (Exception)
                 {
                     //ignore

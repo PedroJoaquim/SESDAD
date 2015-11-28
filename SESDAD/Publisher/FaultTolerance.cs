@@ -28,11 +28,8 @@ namespace Publisher
                 Event newEvent = new Event(RemoteEntity.Name, topic, new DateTime().Ticks, eventNr);
 
                 RemoteEntity.PuppetMaster.LogEventPublication(RemoteEntity.Name, newEvent.Topic, newEvent.EventNr); //remote call
-
-                int timeoutID = this.TMonitor.NewActionPerformed(newEvent, newEvent.EventNr, RemoteEntity.RemoteNetwork.SiteName);
-                bool retr = HasMissedMaxACKs(RemoteEntity.RemoteNetwork.SiteName);
-                ExecuteEventTransmissionAsync(newEvent, RemoteEntity.RemoteNetwork.SiteName, newEvent.EventNr, timeoutID, retr);
-
+                this.Events.Produce(new ForwardPublishCommand(newEvent, RemoteEntity.RemoteNetwork.SiteName, eventNr));
+                Console.WriteLine(String.Format("[PUBLISH EVENT] Topic: {0} EventNr: {1}", newEvent.Topic, newEvent.EventNr));
                 this.currentEventNr++;
             }
         }
@@ -43,18 +40,16 @@ namespace Publisher
 
         public override void ActionACKReceived(int timeoutID, string entityName, string entitySite)
         {
+            Console.WriteLine("[ACK RECEIVED] entityName: " + entityName + " sourceSite: " + entitySite);
             TMonitor.PostACK(timeoutID);
-            ResetMissedACKs(RemoteEntity.RemoteNetwork.SiteName);
+            ResetMissedACKs(entitySite, entityName);
         }
 
         public override void ActionTimedout(DifundPublishEventProperties p)
         {
-            int timeoutID = this.TMonitor.NewActionPerformed(p.E, p.E.EventNr, RemoteEntity.RemoteNetwork.SiteName, p.Id);
-            bool retr = HasMissedMaxACKs(RemoteEntity.RemoteNetwork.SiteName);
-
-            IncMissedACKs(RemoteEntity.RemoteNetwork.SiteName);
-
-            ExecuteEventTransmissionAsync(p.E, p.TargetSite, p.E.EventNr, timeoutID, retr);
+            IncMissedACKs(p.TargetSite, p.TargetEntity);
+            Console.WriteLine("[>>>>>>>>>>>>>>>>>>>ACK MISSED<<<<<<<<<<<<<<<<]");
+            this.Events.Produce(new ForwardPublishCommand(p.E, RemoteEntity.RemoteNetwork.SiteName, p.E.EventNr));
         } 
     }
 }

@@ -14,11 +14,13 @@ namespace Shared_Library
 
     public abstract class FaultManager : ITimeoutListener
     {
-        private const int MAX_MISSED_ACKS = 5;
+        private const int MAX_MISSED_ACKS = 3;
+        private const int MIN_TIME_BETWEEN_ACKS = 2100;
+
         private TimeoutMonitor tMonitor;
         private EventQueue events;
         private RemoteEntity remoteEntity;
-        private Dictionary<string, Dictionary <string, int>> missedACKs;
+        private Dictionary<string, Dictionary <string, Pair<DateTime, int>>> missedACKs;
 
         public TimeoutMonitor TMonitor
         {
@@ -63,7 +65,7 @@ namespace Shared_Library
         {
             this.TMonitor = new TimeoutMonitor(this);
             this.RemoteEntity = re;
-            this.missedACKs = new Dictionary<string, Dictionary<string, int>>();
+            this.missedACKs = new Dictionary<string, Dictionary<string, Pair<DateTime, int>>>();
             this.Events = new EventQueue(queueSize);
 
             for (int i = 0; i < numThreads; i++)
@@ -72,6 +74,10 @@ namespace Shared_Library
                 t.Start();
             }
         }
+
+        public abstract void ActionACKReceived(int actionID, string entityName, string entitySite);
+        public abstract void ActionTimedout(DifundPublishEventProperties properties);
+
 
         private void ProcessQueue()
         {
@@ -85,22 +91,13 @@ namespace Shared_Library
             }
         }
 
-        public abstract void ActionACKReceived(int actionID, string entityName, string entitySite);
-
-        public abstract void ActionTimedout(DifundPublishEventProperties properties);
-
-        protected void ExecuteEventTransmissionAsync(Event e, string targetSite, int outSeqNumber, int timeoutID)
-        {
-            this.Events.Produce(new ForwardEventCommand(e, targetSite, outSeqNumber, timeoutID));
-        }
-
         public bool HasMissedMaxACKs(string siteName, string entityName)
         {
             lock(missedACKs)
             {
-                return missedACKs.ContainsKey(siteName)                      &&
-                       missedACKs[siteName].ContainsKey(entityName)          &&
-                       missedACKs[siteName][entityName] >= MAX_MISSED_ACKS;
+                return missedACKs.ContainsKey(siteName)                           &&
+                       missedACKs[siteName].ContainsKey(entityName)               &&
+                       missedACKs[siteName][entityName].Second >= MAX_MISSED_ACKS;
             }
         }
 
@@ -109,31 +106,44 @@ namespace Shared_Library
             lock (missedACKs)
             {
                 if (!missedACKs.ContainsKey(siteName))
-                    missedACKs[siteName] = new Dictionary<string, int>();
-                if (!missedACKs[siteName].ContainsKey(entityName))
-                    missedACKs[siteName][entityName] = 0;
+                {
+                    missedACKs[siteName] = new Dictionary<string, Pair<DateTime, int>>();
+                    missedACKs[siteName][entityName] = new Pair<DateTime, int>(DateTime.Now, 1);
 
-                missedACKs[siteName][entityName] = missedACKs[siteName][entityName] + 1;
-            }
+                }
+                else if (!missedACKs[siteName].ContainsKey(entityName))
+                {
+                    missedACKs[siteName][entityName] = new Pair<DateTime, int>(DateTime.Now, 1);
+                }
+                else
+                {
+                    Pair<DateTime, int> pair = missedACKs[siteName][entityName];
+                    DateTime now = DateTime.Now;
+                    DateTime lastACK = pair.First;
+                    int diff = (int)((TimeSpan)(now - lastACK)).TotalMilliseconds;
+
+                    if(diff > MIN_TIME_BETWEEN_ACKS)
+                    {
+                        missedACKs[siteName][entityName] = new Pair<DateTime, int>(DateTime.Now, pair.Second+1);
+                    }
+                }    
+            } 
         }
 
         protected void ResetMissedACKs(string siteName, string entityName)
         {
             lock (missedACKs)
             {
-                if(!missedACKs.ContainsKey(siteName))
+                if (!missedACKs.ContainsKey(siteName))
+                    return;
+
+                if (!missedACKs[siteName].ContainsKey(entityName))
+                    return;
+
+                if (missedACKs[siteName][entityName].Second < MAX_MISSED_ACKS)
                 {
-                    missedACKs[siteName] = new Dictionary<string, int>();
-                    missedACKs[siteName][entityName] = 0;
+                    missedACKs[siteName][entityName].Second = 0;
                 }
-                else if (!missedACKs[siteName].ContainsKey(entityName))
-                {
-                    missedACKs[siteName][entityName] = 0;
-                }
-                else if (missedACKs[siteName][entityName] < MAX_MISSED_ACKS)
-                {
-                    missedACKs[siteName][entityName] = 0;
-                }    
             }
         }
 
@@ -156,8 +166,8 @@ namespace Shared_Library
 
     public class TimeoutMonitor
     {
-        private const int SLEEP_TIME = 1000; //miliseconds
-        private const int TIMEOUT = 3000; //miliseconds
+        private const int SLEEP_TIME = 500; //miliseconds
+        private const int TIMEOUT = 1500; //miliseconds
 
         private ITimeoutListener mainEntity;
         private int actionsID;
@@ -186,18 +196,18 @@ namespace Shared_Library
             t.Start();
         }
 
-        public int NewActionPerformed(Event e, int outSeqNumber, string targetSite)
+        public int NewActionPerformed(Event e, int outSeqNumber, string targetSite, string targetEntity)
         {
             int newActionId = IncActionID();
 
-            return NewActionPerformed(e, outSeqNumber, targetSite, newActionId);
+            return NewActionPerformed(e, outSeqNumber, targetSite, targetEntity, newActionId);
         }
 
-        public int NewActionPerformed(Event e, int outSeqNumber, string targetSite, int timeoutID)
+        public int NewActionPerformed(Event e, int outSeqNumber, string targetSite, string targetEntity, int timeoutID)
         {
             lock (this)
             {
-                this.performedActions.Add(timeoutID, new DifundPublishEventProperties(timeoutID, targetSite, e, outSeqNumber));
+                this.performedActions.Add(timeoutID, new DifundPublishEventProperties(timeoutID, targetSite, targetEntity, e, outSeqNumber));
             }
 
             return timeoutID;
@@ -271,6 +281,7 @@ namespace Shared_Library
     {
         private DateTime creationTime;
         private string targetSite;
+        private string targetEntity;
         private int id;
 
         #region "properties"
@@ -312,13 +323,27 @@ namespace Shared_Library
                 id = value;
             }
         }
+
+        public string TargetEntity
+        {
+            get
+            {
+                return targetEntity;
+            }
+
+            set
+            {
+                targetEntity = value;
+            }
+        }
         #endregion
 
-        public ActionProperties(int id, string targetSite)
+        public ActionProperties(int id, string targetSite, string targetEntity)
         {
             this.Id = id;
             this.creationTime = DateTime.Now;
             this.TargetSite = targetSite;
+            this.TargetEntity = targetEntity;
         }
     }
 
@@ -355,7 +380,7 @@ namespace Shared_Library
         }
         #endregion
 
-        public DifundPublishEventProperties(int id, string targetSite, Event e, int outSeqNumber) : base(id, targetSite)
+        public DifundPublishEventProperties(int id, string targetSite, string targetEntity, Event e, int outSeqNumber) : base(id, targetSite, targetEntity)
         {
             this.E = e;
             this.OutSeqNumber = outSeqNumber;

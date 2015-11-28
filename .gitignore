@@ -13,3 +13,6 @@
 /SESDAD/Subscriber/bin
 /SESDAD/Subscriber/obj
 /SESDAD/Build
+SESDAD/Log/SESDAD.log
+SESDAD/Log/SESDAD.log
+*.log
