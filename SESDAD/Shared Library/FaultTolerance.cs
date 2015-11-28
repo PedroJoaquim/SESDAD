@@ -198,7 +198,9 @@ namespace Shared_Library
             {
                 DifundPublishEventProperties dp = (DifundPublishEventProperties)ap;
                 Console.WriteLine("[TIMEOUT] Event: " + dp.E.Publisher + " #" + dp.E.EventNr);
+
                 this.MainEntity.ActionTimedout(dp);
+
             }
 
         }

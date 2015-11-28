@@ -141,7 +141,6 @@ namespace Broker
             if (AlreadyProcessedEvent(sourceSite, seqNumber))
                 return;
 
-
             lock (storedEvents)
             {
                 storedEvents.InsertInOrder(e, seqNumber);

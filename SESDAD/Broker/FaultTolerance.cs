@@ -39,19 +39,11 @@ namespace Broker
             }
         }
 
-        public void RemoveTimeoutID(int timeoutID)
-        {
-            lock (timeoutIDs)
-            {
-                timeoutIDs.Remove(timeoutID);
-            }
-        }
-
         public void WaitAll()
         {
             lock(timeoutIDs)
             {
-                while (totalACKs < receivedACKs)
+                while (receivedACKs < totalACKs)
                 {
                     Monitor.Wait(timeoutIDs);
                 }
@@ -77,8 +69,8 @@ namespace Broker
     class BrokerFaultManager : FaultManager
     {
         private int actionID;
-        private Dictionary<int, EventInfo> waitingEvents;
-        private Dictionary<int, int> timeoutIDMap; //maps timeoutids for actionsID
+        private IDictionary<int, EventInfo> waitingEvents;
+        private IDictionary<int, int> timeoutIDMap; //maps timeoutids for actionsID
         private ReplicationStorage repStorage;
 
         private Object actionIDObject; //lock for actionID 
@@ -162,7 +154,7 @@ namespace Broker
                 }
 
                 string brokerName = ExecuteEventTransmissionAsync(e, site, outSeqNumber, timeoutID, HasMissedMaxACKs(site));
-                Console.WriteLine(String.Format("[SENT EVENT] {0} FROM {1} #{2}  TO: {3}", e.Topic, e.Publisher, e.EventNr, brokerName));
+                Console.WriteLine(String.Format("[FORWARD EVENT] {0} FROM {1} #{2}  TO: {3}", e.Topic, e.Publisher, e.EventNr, brokerName));
             }
 
 
@@ -181,10 +173,10 @@ namespace Broker
             if (eventInfo.AlreadyReceivedACK(oldTimeoutID))
                 return; //acked already received, possible desync
 
-            eventInfo.RemoveTimeoutID(oldTimeoutID);
             TMonitor.NewActionPerformed(e, outSeqNumber, targetSite, oldTimeoutID);
 
-            ExecuteEventTransmissionAsync(e, targetSite, outSeqNumber, oldTimeoutID, HasMissedMaxACKs(targetSite));
+            string brokerName = ExecuteEventTransmissionAsync(e, targetSite, outSeqNumber, oldTimeoutID, HasMissedMaxACKs(targetSite));
+            Console.WriteLine(String.Format("[FORWARD EVENT] {0} FROM {1} #{2}  TO: {3}", e.Topic, e.Publisher, e.EventNr, brokerName));
         }
 
         /*
@@ -264,7 +256,7 @@ namespace Broker
 
         private int GetActionIDTS(int timeoutID)
         {
-            lock(timeoutIDMap)
+            lock (timeoutIDMap)
             {
                 return timeoutIDMap[timeoutID];
             }
@@ -277,10 +269,7 @@ namespace Broker
         {
             int actionID;
 
-            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ENTER");
             actionID = GetActionIDTS(p.Id);
-            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  LEAVE");
-
             IncMissedACKs(p.TargetSite);
             FMPublishEventRetransmission(p.E, p.TargetSite, p.OutSeqNumber, actionID, p.Id);
         }
@@ -302,7 +291,7 @@ namespace Broker
     public class ReplicationStorage
     {
 
-        Dictionary<string, StoredEvents> storedEvents;
+        IDictionary<string, StoredEvents> storedEvents;
 
         public ReplicationStorage()
         {
@@ -367,8 +356,8 @@ namespace Broker
 
     public class StoredEvents
     {
-        private Dictionary<int , bool> storedEventsDelivered;   
-        private Dictionary<int, Event> storedEvents;
+        private IDictionary<int , bool> storedEventsDelivered;   
+        private IDictionary<int, Event> storedEvents;
         private List<int> storedEventsIndex;
 
         public StoredEvents()

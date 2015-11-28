@@ -1,5 +1,5 @@
 RoutingPolicy flooding
-Ordering FIFO
+Ordering NO
 Site site0 Parent none
 Site site1 Parent site0
 Process broker0 is broker On site0 URL tcp://localhost:3330/broker
