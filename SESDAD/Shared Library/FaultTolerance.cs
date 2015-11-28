@@ -12,15 +12,13 @@ namespace Shared_Library
         void ActionTimedout(DifundPublishEventProperties properties);
     }
 
-
-
     public abstract class FaultManager : ITimeoutListener
     {
         private const int MAX_MISSED_ACKS = 5;
-
         private TimeoutMonitor tMonitor;
+        private EventQueue events;
         private RemoteEntity remoteEntity;
-        private Dictionary<string, int> missedACKs;
+        private Dictionary<string, Dictionary <string, int>> missedACKs;
 
         public TimeoutMonitor TMonitor
         {
@@ -48,58 +46,111 @@ namespace Shared_Library
             }
         }
 
-        public FaultManager(RemoteEntity re)
+        public EventQueue Events
+        {
+            get
+            {
+                return events;
+            }
+
+            set
+            {
+                events = value;
+            }
+        }
+
+        public FaultManager(RemoteEntity re, int queueSize, int numThreads)
         {
             this.TMonitor = new TimeoutMonitor(this);
             this.RemoteEntity = re;
-            this.missedACKs = new Dictionary<string, int>();
+            this.missedACKs = new Dictionary<string, Dictionary<string, int>>();
+            this.Events = new EventQueue(queueSize);
+
+            for (int i = 0; i < numThreads; i++)
+            {
+                Thread t = new Thread(ProcessQueue);
+                t.Start();
+            }
+        }
+
+        private void ProcessQueue()
+        {
+            Command command;
+
+            while (true)
+            {
+                command = Events.Consume();
+                RemoteEntity.CheckFreeze();
+                command.Execute(RemoteEntity);
+            }
         }
 
         public abstract void ActionACKReceived(int actionID, string entityName, string entitySite);
 
         public abstract void ActionTimedout(DifundPublishEventProperties properties);
 
-        protected string ExecuteEventTransmissionAsync(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
+        protected void ExecuteEventTransmissionAsync(Event e, string targetSite, int outSeqNumber, int timeoutID)
         {
-            IRemoteBroker targetBroker = RemoteEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, retransmission);
-            RemoteEntity.Events.Produce(new ForwardEventCommand(e, targetSite, outSeqNumber, timeoutID, targetBroker));
-            return RemoteEntity.RemoteNetwork.GetBrokerName(targetBroker);
+            this.Events.Produce(new ForwardEventCommand(e, targetSite, outSeqNumber, timeoutID));
         }
 
-        protected bool HasMissedMaxACKs(string siteName)
+        public bool HasMissedMaxACKs(string siteName, string entityName)
         {
             lock(missedACKs)
             {
-                if (!missedACKs.ContainsKey(siteName))
-                    return false;
-                else
-                    return missedACKs[siteName] >= MAX_MISSED_ACKS;
+                return missedACKs.ContainsKey(siteName)                      &&
+                       missedACKs[siteName].ContainsKey(entityName)          &&
+                       missedACKs[siteName][entityName] >= MAX_MISSED_ACKS;
             }
         }
 
-        protected void IncMissedACKs(string siteName)
+        protected void IncMissedACKs(string siteName, string entityName)
         {
             lock (missedACKs)
             {
                 if (!missedACKs.ContainsKey(siteName))
-                    missedACKs[siteName] = 0;
+                    missedACKs[siteName] = new Dictionary<string, int>();
+                if (!missedACKs[siteName].ContainsKey(entityName))
+                    missedACKs[siteName][entityName] = 0;
 
-                missedACKs[siteName] = missedACKs[siteName] + 1;
+                missedACKs[siteName][entityName] = missedACKs[siteName][entityName] + 1;
             }
         }
 
-        protected void ResetMissedACKs(string siteName)
+        protected void ResetMissedACKs(string siteName, string entityName)
         {
             lock (missedACKs)
             {
                 if(!missedACKs.ContainsKey(siteName))
-                    missedACKs[siteName] = 0;
-                else
                 {
-                    if(!(missedACKs[siteName] >= MAX_MISSED_ACKS))
-                        missedACKs[siteName] = 0;
+                    missedACKs[siteName] = new Dictionary<string, int>();
+                    missedACKs[siteName][entityName] = 0;
                 }
+                else if (!missedACKs[siteName].ContainsKey(entityName))
+                {
+                    missedACKs[siteName][entityName] = 0;
+                }
+                else if (missedACKs[siteName][entityName] < MAX_MISSED_ACKS)
+                {
+                    missedACKs[siteName][entityName] = 0;
+                }    
             }
+        }
+
+
+        public IRemoteBroker ChooseBroker(string site, string publisher)
+        {
+            RemoteNetwork rn = RemoteEntity.RemoteNetwork;
+            List<IRemoteBroker> brokers = site.Equals(rn.SiteName) ? rn.InBrokersList : rn.OutBrokers[site];
+            int firstIndex = Utils.CalcBrokerForwardIndex(brokers.Count, publisher, false);
+            int secondIndex = Utils.CalcBrokerForwardIndex(brokers.Count, publisher, true);
+            string firstBrokerName = rn.GetBrokerName(brokers[firstIndex]);
+
+            if (HasMissedMaxACKs(site, firstBrokerName))
+                return brokers[secondIndex];
+            else
+                return brokers[firstIndex];
+
         }
     }
 
@@ -197,7 +248,7 @@ namespace Shared_Library
             if (ap.GetType() == typeof(DifundPublishEventProperties))
             {
                 DifundPublishEventProperties dp = (DifundPublishEventProperties)ap;
-                Console.WriteLine("[TIMEOUT] Event: " + dp.E.Publisher + " #" + dp.E.EventNr);
+                //Console.WriteLine("[TIMEOUT] Event: " + dp.E.Publisher + " #" + dp.E.EventNr);
 
                 this.MainEntity.ActionTimedout(dp);
 

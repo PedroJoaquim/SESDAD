@@ -10,6 +10,8 @@ namespace Publisher
 {
     class Publisher : RemoteEntity, IRemotePublisher
     {
+        private const int NUM_THREADS = 10;
+        private const int QUEUE_SIZE = 10;
 
         private PublisherFaultManager fManager;
 
@@ -26,7 +28,7 @@ namespace Publisher
             }
         }
 
-        public Publisher(String name, String url, String pmUrl) : base(name, url, pmUrl, 10, 10)
+        public Publisher(String name, String url, String pmUrl) : base(name, url, pmUrl, QUEUE_SIZE, NUM_THREADS)
         {
             this.FManager = new PublisherFaultManager(this);
         }
@@ -91,6 +93,11 @@ namespace Publisher
 
             Publisher p = new Publisher(args[0], args[1], args[2]);
             p.Start();
+        }
+
+        public override FaultManager GetFaultManager()
+        {
+            return this.FManager;
         }
     }
 }

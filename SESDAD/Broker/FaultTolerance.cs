@@ -68,6 +68,9 @@ namespace Broker
 
     class BrokerFaultManager : FaultManager
     {
+        private const int NUM_THREADS = 25;
+        private const int QUEUE_SIZE = 200;
+
         private int actionID;
         private IDictionary<int, EventInfo> waitingEvents;
         private IDictionary<int, int> timeoutIDMap; //maps timeoutids for actionsID
@@ -89,7 +92,7 @@ namespace Broker
             }
         }
 
-        public BrokerFaultManager(RemoteEntity re) : base(re)
+        public BrokerFaultManager(RemoteEntity re) : base(re, QUEUE_SIZE, NUM_THREADS)
         {
             actionID = 1;
             this.actionIDObject = new Object();
@@ -122,10 +125,10 @@ namespace Broker
             {
                 passiveServer.StoreNewEvent(e);
             }
-            catch(Exception) { /* ignore */ }
+            catch(Exception) { /*ignore*/ }
 
             //Now that the event has been replicated to the passive server we can send ACK (async)
-            RemoteEntity.Events.Produce(new SendACKCommand(timeoutID, sourceEntity, sourceSite));
+            this.Events.Produce(new SendACKCommand(timeoutID, sourceEntity, sourceSite));
         }
 
         public int FMMultiplePublishEvent(Event e, List<Tuple<string, int>> targetSites)
@@ -137,7 +140,6 @@ namespace Broker
             {
                 waitingEvents[actionID] = eventInfo;
             }
-
 
             foreach (Tuple<string, int> entry in targetSites)
             {
@@ -153,8 +155,7 @@ namespace Broker
                     timeoutIDMap[timeoutID] = actionID;
                 }
 
-                string brokerName = ExecuteEventTransmissionAsync(e, site, outSeqNumber, timeoutID, HasMissedMaxACKs(site));
-                Console.WriteLine(String.Format("[FORWARD EVENT] {0} FROM {1} #{2}  TO: {3}", e.Topic, e.Publisher, e.EventNr, brokerName));
+                ExecuteEventTransmissionAsync(e, site, outSeqNumber, timeoutID);
             }
 
 
@@ -175,8 +176,7 @@ namespace Broker
 
             TMonitor.NewActionPerformed(e, outSeqNumber, targetSite, oldTimeoutID);
 
-            string brokerName = ExecuteEventTransmissionAsync(e, targetSite, outSeqNumber, oldTimeoutID, HasMissedMaxACKs(targetSite));
-            Console.WriteLine(String.Format("[FORWARD EVENT] {0} FROM {1} #{2}  TO: {3}", e.Topic, e.Publisher, e.EventNr, brokerName));
+            ExecuteEventTransmissionAsync(e, targetSite, outSeqNumber, oldTimeoutID, HasMissedMaxACKs(targetSite));
         }
 
         /*
@@ -198,9 +198,13 @@ namespace Broker
             this.RepStorage.EventDispatched(eventNr, publisher);
         }
 
+        /*
+         * Passive redundancy -- send to the passive server
+         */
+
         public void SendEventDispatchedAsync(int eventNr, string publisher)
         {
-            RemoteEntity.Events.Produce(new EventDispatchedCommand(eventNr, publisher, GetPassiveServer(publisher)));
+            this.Events.Produce(new EventDispatchedCommand(eventNr, publisher, GetPassiveServer(publisher)));
         }
 
         private IPassiveServer GetPassiveServer(string publisher)

@@ -187,6 +187,7 @@ namespace Shared_Library
 
         public void Unfreeze()
         {
+            Console.WriteLine("Unfreezed");
             lock (this)
             {
                 freeze = false;
@@ -209,7 +210,6 @@ namespace Shared_Library
         private void ProcessQueue()
         {
             Command command;
-            Random rnd = new Random();
 
             while (true)
             {
@@ -226,5 +226,7 @@ namespace Shared_Library
         }
 
         public abstract void ReceiveACK(int timeoutID, string entityName, string entitySite);
+
+        public abstract FaultManager GetFaultManager();
     }
 }

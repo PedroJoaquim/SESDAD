@@ -35,6 +35,7 @@ namespace Broker
             /*
              * Distribute messages to all interessed subscribers
              */
+
             foreach (KeyValuePair<string, IRemoteSubscriber> entry in broker.RemoteNetwork.Subscribers)
             {
                 if (interessedEntities.Contains(entry.Key))
@@ -75,9 +76,11 @@ namespace Broker
             }
         }
 
-        protected bool AlreadyProcessedEvent(string source, int seqNumber)
+        protected bool AlreadyProcessedEvent(Event e)
         {
             List<int> targetEvents;
+            string source = e.Publisher;
+            int seqNumber = e.EventNr;
 
             lock(receivedEvents)
             {
@@ -111,7 +114,7 @@ namespace Broker
         
         public override void ExecuteDistribution(Broker b, string sourceSite, Event e, int seqNumber)
         {
-            if (AlreadyProcessedEvent(sourceSite, seqNumber))
+            if (AlreadyProcessedEvent(e))
                 return;
 
             List<string> interessedEntities = GetInteressedEntities(b, e, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
@@ -138,21 +141,23 @@ namespace Broker
             Event outgoingEvent;
             PublishEventsStorage storedEvents = GetCreateEventOrder(sourceSite, e.Publisher);
 
-            if (AlreadyProcessedEvent(sourceSite, seqNumber))
+            if (AlreadyProcessedEvent(e))
                 return;
 
             lock (storedEvents)
             {
                 storedEvents.InsertInOrder(e, seqNumber);
-                
+
                 while(storedEvents.CanSendEvent())
                 {
+                    
                     outgoingEvent = storedEvents.GetFirstEvent();
                     interessedEntities = GetInteressedEntities(b, outgoingEvent, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
                     ProcessEventRouting(b, interessedEntities, outgoingEvent, sourceSite);
                     b.FManager.SendEventDispatchedAsync(outgoingEvent.EventNr, outgoingEvent.Publisher);
                     storedEvents.FirstEventSend();
                 }
+                
             }
         }
 

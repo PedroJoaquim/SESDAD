@@ -1,12 +1,9 @@
 RoutingPolicy flooding
-Ordering NO
+Ordering FIFO
 Site site0 Parent none
 Site site1 Parent site0
 Process broker0 is broker On site0 URL tcp://localhost:3330/broker
 Process broker00 is broker On site0 URL tcp://localhost:7330/broker
 Process broker01 is broker On site0 URL tcp://localhost:7331/broker
 Process publisher00 is publisher On site0 URL tcp://localhost:2220/pub
-Process broker1 is broker On site1 URL tcp://localhost:4330/broker
-Process broker10 is broker On site1 URL tcp://localhost:5330/broker
-Process broker11 is broker On site1 URL tcp://localhost:4331/broker
-Process sub00 is subscriber On site1 URL tcp://localhost:3220/sub
+Process sub00 is subscriber On site0 URL tcp://localhost:3220/sub

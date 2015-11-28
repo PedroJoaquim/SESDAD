@@ -149,13 +149,6 @@ namespace Shared_Library
             }
         }
 
-        public IRemoteBroker ChooseBroker(string site, string publisher, bool retransmission)
-        {
-            List<IRemoteBroker> brokers = site.Equals(siteName) ? InBrokersList : OutBrokers[site];
-            int index = Utils.CalcBrokerForwardIndex(brokers.Count, publisher, retransmission);
-            return brokers[index];
-        }
-
         public string GetBrokerName(IRemoteBroker broker)
         {
             foreach (KeyValuePair<string, IRemoteBroker> item in InBrokers)

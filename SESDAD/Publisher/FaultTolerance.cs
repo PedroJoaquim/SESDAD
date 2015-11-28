@@ -9,9 +9,12 @@ namespace Publisher
 {
     class PublisherFaultManager : FaultManager
     {
+        private const int NUM_THREADS = 15;
+        private const int QUEUE_SIZE = 100;
+
         private int currentEventNr;
 
-        public PublisherFaultManager(Publisher entity) : base(entity)
+        public PublisherFaultManager(Publisher entity) : base(entity, QUEUE_SIZE, NUM_THREADS)
         {
             currentEventNr = 1;
         }
@@ -28,9 +31,8 @@ namespace Publisher
 
                 int timeoutID = this.TMonitor.NewActionPerformed(newEvent, newEvent.EventNr, RemoteEntity.RemoteNetwork.SiteName);
                 bool retr = HasMissedMaxACKs(RemoteEntity.RemoteNetwork.SiteName);
-                string brokerName = ExecuteEventTransmissionAsync(newEvent, RemoteEntity.RemoteNetwork.SiteName, newEvent.EventNr, timeoutID, retr);
+                ExecuteEventTransmissionAsync(newEvent, RemoteEntity.RemoteNetwork.SiteName, newEvent.EventNr, timeoutID, retr);
 
-                Console.WriteLine("[EVENT] " + topic + " #" + this.currentEventNr + " SENT TO: " + brokerName);
                 this.currentEventNr++;
             }
         }
@@ -47,14 +49,12 @@ namespace Publisher
 
         public override void ActionTimedout(DifundPublishEventProperties p)
         {
-            RemoteEntity.CheckFreeze();
-
             int timeoutID = this.TMonitor.NewActionPerformed(p.E, p.E.EventNr, RemoteEntity.RemoteNetwork.SiteName, p.Id);
             bool retr = HasMissedMaxACKs(RemoteEntity.RemoteNetwork.SiteName);
+
             IncMissedACKs(RemoteEntity.RemoteNetwork.SiteName);
 
-            string brokerName = ExecuteEventTransmissionAsync(p.E, p.TargetSite, p.E.EventNr, timeoutID, retr);
-            Console.WriteLine("[EVENT] - #" + p.E.EventNr + " RETRANSMITED TO: " + brokerName);
+            ExecuteEventTransmissionAsync(p.E, p.TargetSite, p.E.EventNr, timeoutID, retr);
         } 
     }
 }

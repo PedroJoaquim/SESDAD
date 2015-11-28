@@ -13,6 +13,8 @@ namespace Subscriber
 {
     class Subscriber : RemoteEntity, IRemoteSubscriber
     {
+        private const int NUM_THREADS = 1;
+        private const int QUEUE_SIZE = 100;
 
         private Dictionary<string, List<int>> receivedEvents = new Dictionary<string, List<int>>();
 
@@ -29,7 +31,7 @@ namespace Subscriber
             }
         }
 
-        public Subscriber(String name, String url, String pmUrl) : base(name, url, pmUrl, 100, 1) { }
+        public Subscriber(String name, String url, String pmUrl) : base(name, url, pmUrl, QUEUE_SIZE, NUM_THREADS) { }
 
 
         public override void Register()
@@ -126,6 +128,11 @@ namespace Subscriber
 
             Subscriber s = new Subscriber(args[0], args[1], args[2]);
             s.Start();
+        }
+
+        public override FaultManager GetFaultManager()
+        {
+            throw new NotImplementedException();
         }
     }
 }

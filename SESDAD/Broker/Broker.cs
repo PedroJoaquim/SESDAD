@@ -13,6 +13,8 @@ namespace Broker
 {
     class Broker : RemoteEntity, IRemoteBroker
     {
+        private const int QUEUE_SIZE = 200;
+        private const int NUM_THREADS = 25;
 
         private ForwardingTable forwardingTable = new ForwardingTable();
         private ReceiveTable receiveTable = new ReceiveTable();
@@ -73,7 +75,7 @@ namespace Broker
         }
         #endregion
 
-        public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, 300, 20)
+        public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, QUEUE_SIZE, NUM_THREADS)
         {
             this.FManager = new BrokerFaultManager(this);
         }
@@ -175,12 +177,19 @@ namespace Broker
 
         public void StoreNewEvent(Event e)
         {
+            CheckFreeze();
             this.FManager.StoreNewEvent(e);
         }
 
         public void EventDispatched(int eventNr, string publisher)
         {
+            CheckFreeze();
             this.FManager.EventDispatched(eventNr, publisher);
+        }
+
+        public override FaultManager GetFaultManager()
+        {
+            return this.FManager;
         }
     }
 }

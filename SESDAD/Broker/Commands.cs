@@ -12,76 +12,22 @@ namespace Broker
         #region "Properties"
         private Event e;
         private string sourceSite;
-        private string sourceEntity;
         private int inSeqNumber;
         private int timeoutID;
-
-        public Event E
-        {
-            get
-            {
-                return e;
-            }
-
-            set
-            {
-                e = value;
-            }
-        }
-    
-        public int InSeqNumber
-        {
-            get
-            {
-                return inSeqNumber;
-            }
-
-            set
-            {
-                inSeqNumber = value;
-            }
-        }
-
-        public string SourceSite
-        {
-            get
-            {
-                return sourceSite;
-            }
-
-            set
-            {
-                sourceSite = value;
-            }
-        }
-
-        public string SourceEntity
-        {
-            get
-            {
-                return sourceEntity;
-            }
-
-            set
-            {
-                sourceEntity = value;
-            }
-        }
-
         #endregion
 
         public DifundPublishEventCommand(Event e, string sourceSite, int inSeqNumber, int timeoutID)
         {
-            this.E = e;
-            this.SourceSite = sourceSite;
-            this.InSeqNumber = inSeqNumber;
+            this.e = e;
+            this.sourceSite = sourceSite;
+            this.inSeqNumber = inSeqNumber;
             this.timeoutID = timeoutID;
         }
 
         public override void Execute(RemoteEntity entity)
         {
             Broker b = (Broker) entity;
-            b.PEventManager.ExecuteDistribution(b, this.sourceSite, this.E, this.InSeqNumber);
+            b.PEventManager.ExecuteDistribution(b, this.sourceSite, this.e, this.inSeqNumber);
             //TODO - fazer replicacao passiva para o outro broker
         }
 
@@ -92,38 +38,12 @@ namespace Broker
         #region "Properties"
         private String topic;
         private string source;
-
-        public string Topic
-        {
-            get
-            {
-                return topic;
-            }
-
-            set
-            {
-                topic = value;
-            }
-        }
-
-        public string Source
-        {
-            get
-            {
-                return source;
-            }
-
-            set
-            {
-                source = value;
-            }
-        }
         #endregion
 
         public DifundSubscribeEventCommand(String topic, string source)
         {
-            this.Topic = topic;
-            this.Source = source;
+            this.topic = topic;
+            this.source = source;
         }
 
         public override void Execute(RemoteEntity entity)
@@ -152,11 +72,11 @@ namespace Broker
             {
                 if (!entry.Key.Equals(this.source) && !broker.ReceiveTable.IsSubscribedTo(this.topic, entry.Key))
                 {
-                    broker.ReceiveTable.AddTopic(this.Topic, entry.Key.ToLower());
+                    broker.ReceiveTable.AddTopic(this.topic, entry.Key.ToLower());
 
                     foreach (IRemoteBroker remoteBroker in entry.Value)
                     {
-                        remoteBroker.DifundSubscribeEvent(this.Topic, sourceSite);
+                        remoteBroker.DifundSubscribeEvent(this.topic, sourceSite);
                     }
                 }
             }
@@ -168,37 +88,11 @@ namespace Broker
         #region "Properties"
         private String topic;
         private string source;
-
-        public string TopicName
-        {
-            get
-            {
-                return topic;
-            }
-
-            set
-            {
-                topic = value;
-            }
-        }
-
-        public string Source
-        {
-            get
-            {
-                return source;
-            }
-
-            set
-            {
-                source = value;
-            }
-        }
         #endregion
 
         public DifundUnSubscribeEventCommand(String topic, string source)
         {
-            this.TopicName = topic;
+            this.topic = topic;
             this.source = source;
         }
 
@@ -219,7 +113,7 @@ namespace Broker
 
         public void ProcessFilteredDelivery(Broker broker)
         {
-            List<string> entitiesInterested = broker.ForwardingTable.GetInterestedEntities(this.TopicName);
+            List<string> entitiesInterested = broker.ForwardingTable.GetInterestedEntities(this.topic);
             int entitiesInterestedCount = entitiesInterested.Count;
             string sourceSite = broker.RemoteNetwork.SiteName;
 
