@@ -8,6 +8,8 @@ namespace Broker
     abstract class PublishEventManager
     {
 
+        private Dictionary<string, List<int>> receivedEvents = new Dictionary<string, List<int>>();
+
         public abstract void ExecuteDistribution(Broker b, string sourceSite, Event e, int seqNumber);
         protected abstract int GetOutgoingSeqNumber(string brokerName, string pName);
 
@@ -72,6 +74,36 @@ namespace Broker
                 broker.FManager.WaitEventDistribution(actionID); //wait that events are forwarded
             }
         }
+
+        protected bool AlreadyProcessedEvent(string source, int seqNumber)
+        {
+            List<int> targetEvents;
+
+            lock(receivedEvents)
+            {
+                if(!receivedEvents.ContainsKey(source))
+                {
+                    receivedEvents[source] = new List<int>();
+                    receivedEvents[source].Add(seqNumber);
+                    return false;
+                }
+                else
+                {
+                    targetEvents = receivedEvents[source];
+                }
+            }
+
+            lock(targetEvents)
+            {
+                if (targetEvents.Contains(seqNumber))
+                    return true;
+                else
+                {
+                    targetEvents.Add(seqNumber);
+                    return false;
+                }
+            }
+        }
     }
 
     class NoOrderPublishEventManager : PublishEventManager
@@ -79,9 +111,12 @@ namespace Broker
         
         public override void ExecuteDistribution(Broker b, string sourceSite, Event e, int seqNumber)
         {
+            if (AlreadyProcessedEvent(sourceSite, seqNumber))
+                return;
+
             List<string> interessedEntities = GetInteressedEntities(b, e, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
             ProcessEventRouting(b, interessedEntities, e, sourceSite);
-            b.FManager.EventDispatched(e.EventNr, e.Publisher);
+            b.FManager.SendEventDispatchedAsync(e.EventNr, e.Publisher);
         }
 
         protected override int GetOutgoingSeqNumber(string siteName, string pName)
@@ -103,6 +138,10 @@ namespace Broker
             Event outgoingEvent;
             PublishEventsStorage storedEvents = GetCreateEventOrder(sourceSite, e.Publisher);
 
+            if (AlreadyProcessedEvent(sourceSite, seqNumber))
+                return;
+
+
             lock (storedEvents)
             {
                 storedEvents.InsertInOrder(e, seqNumber);
@@ -112,7 +151,7 @@ namespace Broker
                     outgoingEvent = storedEvents.GetFirstEvent();
                     interessedEntities = GetInteressedEntities(b, outgoingEvent, b.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
                     ProcessEventRouting(b, interessedEntities, outgoingEvent, sourceSite);
-                    b.FManager.EventDispatched(outgoingEvent.EventNr, outgoingEvent.Publisher);
+                    b.FManager.SendEventDispatchedAsync(outgoingEvent.EventNr, outgoingEvent.Publisher);
                     storedEvents.FirstEventSend();
                 }
             }
@@ -188,8 +227,9 @@ namespace Broker
 
         public void InsertInOrder(Event e, int inSeqNumber)
         {
-            if (inSeqNumber < nextSeqNumber) return; //discard old publish events
-
+            if (inSeqNumber < nextSeqNumber)
+                return; //discard old publish events
+            
             this.storedEvents.Add(new Tuple<Event, int>(e, inSeqNumber));
             storedEvents.Sort((x, y) => x.Item2.CompareTo(y.Item2));
         }

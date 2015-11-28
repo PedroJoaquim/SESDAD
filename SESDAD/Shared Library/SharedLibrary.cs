@@ -17,6 +17,7 @@ namespace Shared_Library
     {
         public const int PM_PORT = 30000;
         public const int PM_SLAVE_PORT = 30000;
+        public const int REMOTE_CALL_TIMEOUT = 5000;
         public const String PM_NAME = "puppet";
         public const String PM_SLAVE_NAME = "puppet";
         public const String BROKER = "broker";
@@ -316,11 +317,6 @@ namespace Shared_Library
 
             return retransmission ? (hashCode + 1) % numBrokers : hashCode % numBrokers;
         }
-    }
-
-    public abstract class Command
-    {
-        public abstract void Execute(RemoteEntity entity);
     }
 
     public class Pair<T, U>

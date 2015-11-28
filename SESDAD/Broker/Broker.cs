@@ -7,6 +7,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Text;
 using System.Threading.Tasks;
 using Shared_Library;
+using System.Collections;
 
 namespace Broker 
 {
@@ -81,8 +82,13 @@ namespace Broker
         {
             int port = Int32.Parse(Utils.GetIPPort(this.Url));
             string objName = Utils.GetObjName(this.Url);
+            BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
 
-            TcpChannel Channel = new TcpChannel(port);
+            IDictionary props = new Hashtable();
+            props["port"] = port;
+            props["timeout"] = SysConfig.REMOTE_CALL_TIMEOUT;
+
+            TcpChannel Channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(Channel, false);
             RemotingServices.Marshal(this, objName, typeof(IRemoteBroker));
 
@@ -138,6 +144,7 @@ namespace Broker
         #region "interface methods"
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
+            Console.WriteLine(String.Format("[EVENT] {0}  FROM: {1} #{2}", e.Topic, e.Publisher, e.EventNr));
             FManager.NewEventArrived(e, timeoutID, sourceEntity, sourceSite); //passive redundancy
             this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber, timeoutID));
         }
@@ -161,9 +168,9 @@ namespace Broker
             b.Start();
         }
 
-        public override void ReceiveACK(int timeoutID, string entityName)
+        public override void ReceiveACK(int timeoutID, string entityName, string entitySite)
         {
-            this.FManager.ActionACKReceived(timeoutID, entityName);
+            this.FManager.ActionACKReceived(timeoutID, entityName, entitySite);
         }
 
         public void StoreNewEvent(Event e)

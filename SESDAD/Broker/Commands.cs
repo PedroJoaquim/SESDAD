@@ -264,4 +264,58 @@ namespace Broker
         }
 
     }
+
+    class SendACKCommand : Command
+    {
+        private int timeoutID;
+        private string sourceEntity;
+        private string sourceSite;
+
+        public SendACKCommand(int timeoutID, string sourceEntity, string sourceSite)
+        {
+            this.timeoutID = timeoutID;
+            this.sourceEntity = sourceEntity;
+            this.sourceSite = sourceSite;
+        }
+
+        public override void Execute(RemoteEntity entity)
+        {
+            IRemoteEntity source;
+
+            if (sourceSite.Equals(entity.RemoteNetwork.SiteName))
+                source = entity.RemoteNetwork.Publishers[sourceEntity];
+            else
+                source = entity.RemoteNetwork.OutBrokersNames[sourceEntity];
+
+            try
+            {
+                source.ReceiveACK(timeoutID, entity.Name, entity.RemoteNetwork.SiteName);
+            } catch (Exception) {/*ignore*/}
+        }
+    }
+
+    class EventDispatchedCommand : Command
+    {
+
+        private int eventNr;
+        private string publisher;
+        private IPassiveServer passiveServer;
+
+        public EventDispatchedCommand(int eventNr, string publisher, IPassiveServer passiveServer)
+        {
+            this.eventNr = eventNr;
+            this.publisher = publisher;
+            this.passiveServer = passiveServer;
+        }
+
+        public override void Execute(RemoteEntity entity)
+        {
+            try
+            {
+                this.passiveServer.EventDispatched(eventNr, publisher);
+            } catch (Exception) { /* ignore */ }
+        }
+
+
+    }
 }

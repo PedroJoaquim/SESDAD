@@ -9,17 +9,11 @@ namespace Publisher
 {
     class PublisherFaultManager : FaultManager
     {
-        private const int MAX_MISSED_ACKS = 10;
-
-        private int missedACKs;
         private int currentEventNr;
-        private Object acksLock;
 
         public PublisherFaultManager(Publisher entity) : base(entity)
         {
-            missedACKs = 0;
             currentEventNr = 1;
-            acksLock = new Object();
         }
 
         public void ExecuteEventPublication(string topic)
@@ -29,17 +23,14 @@ namespace Publisher
             {
                 int eventNr = this.currentEventNr;
                 Event newEvent = new Event(RemoteEntity.Name, topic, new DateTime().Ticks, eventNr);
+
                 RemoteEntity.PuppetMaster.LogEventPublication(RemoteEntity.Name, newEvent.Topic, newEvent.EventNr); //remote call
+
                 int timeoutID = this.TMonitor.NewActionPerformed(newEvent, newEvent.EventNr, RemoteEntity.RemoteNetwork.SiteName);
-                bool retr;
+                bool retr = HasMissedMaxACKs(RemoteEntity.RemoteNetwork.SiteName);
+                string brokerName = ExecuteEventTransmissionAsync(newEvent, RemoteEntity.RemoteNetwork.SiteName, newEvent.EventNr, timeoutID, retr);
 
-                lock(acksLock)
-                {
-                    retr = missedACKs >= MAX_MISSED_ACKS;
-                }
-
-                ExecuteEventTransmissionAsync(newEvent, RemoteEntity.RemoteNetwork.SiteName, newEvent.EventNr, timeoutID, retr);
-                Console.WriteLine("[EVENT] " + topic + " #" + this.currentEventNr);
+                Console.WriteLine("[EVENT] " + topic + " #" + this.currentEventNr + " SENT TO: " + brokerName);
                 this.currentEventNr++;
             }
         }
@@ -48,31 +39,22 @@ namespace Publisher
          * Timeout related methods
          */
 
-        public override void ActionACKReceived(int timeoutID, string entityName)
+        public override void ActionACKReceived(int timeoutID, string entityName, string entitySite)
         {
-            this.TMonitor.PostACK(timeoutID);
-
-            lock(acksLock)
-            {
-                if (missedACKs > MAX_MISSED_ACKS) //ignore
-                    return;
-                else
-                    missedACKs = 0;
-            }
+            TMonitor.PostACK(timeoutID);
+            ResetMissedACKs(RemoteEntity.RemoteNetwork.SiteName);
         }
 
         public override void ActionTimedout(DifundPublishEventProperties p)
         {
             RemoteEntity.CheckFreeze();
 
-            int timeoutID = this.TMonitor.NewActionPerformed(p.E, p.E.EventNr, RemoteEntity.RemoteNetwork.SiteName);
-            ExecuteEventTransmissionAsync(p.E, p.TargetSite, p.E.EventNr, timeoutID, true);
-            Console.WriteLine("[EVENT] - #" + p.E.EventNr + " RETRANSMITED ");
+            int timeoutID = this.TMonitor.NewActionPerformed(p.E, p.E.EventNr, RemoteEntity.RemoteNetwork.SiteName, p.Id);
+            bool retr = HasMissedMaxACKs(RemoteEntity.RemoteNetwork.SiteName);
+            IncMissedACKs(RemoteEntity.RemoteNetwork.SiteName);
 
-            lock (acksLock)
-            {
-                missedACKs++;
-            }
+            string brokerName = ExecuteEventTransmissionAsync(p.E, p.TargetSite, p.E.EventNr, timeoutID, retr);
+            Console.WriteLine("[EVENT] - #" + p.E.EventNr + " RETRANSMITED TO: " + brokerName);
         } 
     }
 }

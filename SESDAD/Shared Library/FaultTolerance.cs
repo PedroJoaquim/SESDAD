@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
+using Shared_Library;
 using System.Threading.Tasks;
 
 namespace Shared_Library
@@ -17,8 +16,11 @@ namespace Shared_Library
 
     public abstract class FaultManager : ITimeoutListener
     {
+        private const int MAX_MISSED_ACKS = 5;
+
         private TimeoutMonitor tMonitor;
         private RemoteEntity remoteEntity;
+        private Dictionary<string, int> missedACKs;
 
         public TimeoutMonitor TMonitor
         {
@@ -50,35 +52,61 @@ namespace Shared_Library
         {
             this.TMonitor = new TimeoutMonitor(this);
             this.RemoteEntity = re;
+            this.missedACKs = new Dictionary<string, int>();
         }
 
-        public abstract void ActionACKReceived(int actionID, string entityName);
+        public abstract void ActionACKReceived(int actionID, string entityName, string entitySite);
 
         public abstract void ActionTimedout(DifundPublishEventProperties properties);
 
-        protected void ExecuteEventTransmissionAsync(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
+        protected string ExecuteEventTransmissionAsync(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
         {
-            new Task(() => { SendEvent (e, targetSite, outSeqNumber, timeoutID, retransmission); }).Start();
+            IRemoteBroker targetBroker = RemoteEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, retransmission);
+            RemoteEntity.Events.Produce(new ForwardEventCommand(e, targetSite, outSeqNumber, timeoutID, targetBroker));
+            return RemoteEntity.RemoteNetwork.GetBrokerName(targetBroker);
         }
 
-        private void SendEvent(Event e, string targetSite, int outSeqNumber, int timeoutID, bool retransmission)
+        protected bool HasMissedMaxACKs(string siteName)
         {
-            try
+            lock(missedACKs)
             {
-                RemoteEntity.RemoteNetwork.ChooseBroker(targetSite, e.Publisher, retransmission).DifundPublishEvent(e, RemoteEntity.RemoteNetwork.SiteName, RemoteEntity.Name, outSeqNumber, timeoutID);
+                if (!missedACKs.ContainsKey(siteName))
+                    return false;
+                else
+                    return missedACKs[siteName] >= MAX_MISSED_ACKS;
             }
-            catch(Exception)
+        }
+
+        protected void IncMissedACKs(string siteName)
+        {
+            lock (missedACKs)
             {
-                //ignore 
+                if (!missedACKs.ContainsKey(siteName))
+                    missedACKs[siteName] = 0;
+
+                missedACKs[siteName] = missedACKs[siteName] + 1;
             }
-            
+        }
+
+        protected void ResetMissedACKs(string siteName)
+        {
+            lock (missedACKs)
+            {
+                if(!missedACKs.ContainsKey(siteName))
+                    missedACKs[siteName] = 0;
+                else
+                {
+                    if(!(missedACKs[siteName] >= MAX_MISSED_ACKS))
+                        missedACKs[siteName] = 0;
+                }
+            }
         }
     }
 
     public class TimeoutMonitor
     {
-        private const int SLEEP_TIME = 3000; //miliseconds
-        private const int TIMEOUT = 1000; //miliseconds
+        private const int SLEEP_TIME = 1000; //miliseconds
+        private const int TIMEOUT = 3000; //miliseconds
 
         private ITimeoutListener mainEntity;
         private int actionsID;
@@ -111,12 +139,17 @@ namespace Shared_Library
         {
             int newActionId = IncActionID();
 
-            lock(this)
+            return NewActionPerformed(e, outSeqNumber, targetSite, newActionId);
+        }
+
+        public int NewActionPerformed(Event e, int outSeqNumber, string targetSite, int timeoutID)
+        {
+            lock (this)
             {
-                this.performedActions.Add(newActionId, new DifundPublishEventProperties(newActionId, targetSite, e, outSeqNumber));
+                this.performedActions.Add(timeoutID, new DifundPublishEventProperties(timeoutID, targetSite, e, outSeqNumber));
             }
 
-            return newActionId;
+            return timeoutID;
         }
 
         public void PostACK(int actionID)
@@ -146,8 +179,7 @@ namespace Shared_Library
 
                         if (diff > TIMEOUT)
                         {
-                            Thread t = new Thread(() => PerformTimeoutAlert(value));
-                            t.Start();
+                            new Task(() => PerformTimeoutAlert(value)).Start();
                             toBeRemoved.Add(entry.Key);
                         }
                     }

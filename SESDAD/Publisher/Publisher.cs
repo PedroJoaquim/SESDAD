@@ -4,6 +4,7 @@ using Shared_Library;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting;
+using System.Collections;
 
 namespace Publisher
 {
@@ -36,7 +37,13 @@ namespace Publisher
             int port = Int32.Parse(Utils.GetIPPort(this.Url));
             string objName = Utils.GetObjName(this.Url);
 
-            TcpChannel Channel = new TcpChannel(port);
+            BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
+
+            IDictionary props = new Hashtable();
+            props["port"] = port;
+            props["timeout"] = SysConfig.REMOTE_CALL_TIMEOUT;
+
+            TcpChannel Channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(Channel, false);
             RemotingServices.Marshal(this, objName, typeof(IRemotePublisher));
 
@@ -73,9 +80,9 @@ namespace Publisher
         }
 
 
-        public override void ReceiveACK(int timeoutID, string entityName)
+        public override void ReceiveACK(int timeoutID, string entityName, string entitySite)
         {
-            this.FManager.ActionACKReceived(timeoutID, entityName);
+            this.FManager.ActionACKReceived(timeoutID, entityName, entitySite);
         }
 
         static void Main(string[] args)

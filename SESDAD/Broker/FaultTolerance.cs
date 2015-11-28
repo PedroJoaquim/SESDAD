@@ -71,8 +71,6 @@ namespace Broker
                 if (receivedACKs >= totalACKs)
                     Monitor.PulseAll(timeoutIDs);
             }
-
-
         }
     }
 
@@ -123,27 +121,20 @@ namespace Broker
 
         public void NewEventArrived(Event e, int timeoutID, string sourceEntity, string sourceSite)
         {
-            new Task(() => { SendNewEventToPassiveServer(e, timeoutID, sourceEntity, sourceSite); }).Start();
-        }
 
-        private void SendNewEventToPassiveServer(Event e, int timeoutID, string sourceEntity, string sourceSite)
-        {
-            IPassiveServer passiveServer = GetPassiveServer(e.Publisher);
-            passiveServer.StoreNewEvent(e);
-
-            SendACK(sourceSite, sourceEntity, timeoutID); //Now that the event has been replicated to the passive server we can send ACK
-        }
-
-        private void SendACK(string sourceSite, string sourceEntity, int timeoutID)
-        {
             RemoteEntity.CheckFreeze();
 
-            if (sourceSite.Equals(RemoteEntity.RemoteNetwork.SiteName))
-                RemoteEntity.RemoteNetwork.Publishers[sourceEntity].ReceiveACK(timeoutID, RemoteEntity.Name);
-            else
-                RemoteEntity.RemoteNetwork.OutBrokersNames[sourceEntity].ReceiveACK(timeoutID, RemoteEntity.Name);
-        }
+            IPassiveServer passiveServer = GetPassiveServer(e.Publisher);
 
+            try
+            {
+                passiveServer.StoreNewEvent(e);
+            }
+            catch(Exception) { /* ignore */ }
+
+            //Now that the event has been replicated to the passive server we can send ACK (async)
+            RemoteEntity.Events.Produce(new SendACKCommand(timeoutID, sourceEntity, sourceSite));
+        }
 
         public int FMMultiplePublishEvent(Event e, List<Tuple<string, int>> targetSites)
         {
@@ -170,8 +161,8 @@ namespace Broker
                     timeoutIDMap[timeoutID] = actionID;
                 }
 
-                
-                ExecuteEventTransmissionAsync(e, site, outSeqNumber, timeoutID, false);
+                string brokerName = ExecuteEventTransmissionAsync(e, site, outSeqNumber, timeoutID, HasMissedMaxACKs(site));
+                Console.WriteLine(String.Format("[SENT EVENT] {0} FROM {1} #{2}  TO: {3}", e.Topic, e.Publisher, e.EventNr, brokerName));
             }
 
 
@@ -184,7 +175,6 @@ namespace Broker
         private void FMPublishEventRetransmission(Event e, string targetSite, int outSeqNumber, int actionID, int oldTimeoutID)
         {
             EventInfo eventInfo;
-            int newTimeoutID;
 
             eventInfo = GetEventInfoTS(actionID);
 
@@ -192,16 +182,9 @@ namespace Broker
                 return; //acked already received, possible desync
 
             eventInfo.RemoveTimeoutID(oldTimeoutID);
-            newTimeoutID = TMonitor.NewActionPerformed(e, outSeqNumber, targetSite);
-            eventInfo.AddNewTimeout(newTimeoutID);
+            TMonitor.NewActionPerformed(e, outSeqNumber, targetSite, oldTimeoutID);
 
-            lock (timeoutIDMap)
-            {
-                timeoutIDMap.Remove(oldTimeoutID);
-                timeoutIDMap[newTimeoutID] = actionID;
-            }
-
-            ExecuteEventTransmissionAsync(e, targetSite, outSeqNumber, newTimeoutID, true);
+            ExecuteEventTransmissionAsync(e, targetSite, outSeqNumber, oldTimeoutID, HasMissedMaxACKs(targetSite));
         }
 
         /*
@@ -218,9 +201,19 @@ namespace Broker
          * Passive redundancy -- event dispacted
          */
 
-        internal void EventDispatched(int eventNr, string publisher)
+        internal void EventDispatched(int eventNr, string publisher) //when we are passive server
         {
             this.RepStorage.EventDispatched(eventNr, publisher);
+        }
+
+        public void SendEventDispatchedAsync(int eventNr, string publisher)
+        {
+            RemoteEntity.Events.Produce(new EventDispatchedCommand(eventNr, publisher, GetPassiveServer(publisher)));
+        }
+
+        private IPassiveServer GetPassiveServer(string publisher)
+        {
+            return RemoteEntity.RemoteNetwork.ChooseBroker(RemoteEntity.RemoteNetwork.SiteName, publisher, true);
         }
 
         /*
@@ -235,7 +228,6 @@ namespace Broker
 
             eventInfo.WaitAll();
             RemoveElements(actionID); 
-
         }
 
         private void RemoveElements(int actionID)
@@ -284,27 +276,26 @@ namespace Broker
         public override void ActionTimedout(DifundPublishEventProperties p)
         {
             int actionID;
-            
-            actionID = GetActionIDTS(p.Id);
 
+            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ENTER");
+            actionID = GetActionIDTS(p.Id);
+            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  LEAVE");
+
+            IncMissedACKs(p.TargetSite);
             FMPublishEventRetransmission(p.E, p.TargetSite, p.OutSeqNumber, actionID, p.Id);
         }
 
 
-        public override void ActionACKReceived(int timeoutID, string entityName)
+        public override void ActionACKReceived(int timeoutID, string entityName, string entitySite)
         {
             int actionID;
             EventInfo eventInfo;
 
             TMonitor.PostACK(timeoutID);
+            ResetMissedACKs(entitySite);
             actionID = GetActionIDTS(timeoutID);
             eventInfo = GetEventInfoTS(actionID);
             eventInfo.PostACK(timeoutID);
-        }
-
-        private IPassiveServer GetPassiveServer(string publisher)
-        {
-            return RemoteEntity.RemoteNetwork.ChooseBroker(RemoteEntity.RemoteNetwork.SiteName, publisher, true);
         }
     }
 

@@ -156,6 +156,22 @@ namespace Shared_Library
             return brokers[index];
         }
 
+        public string GetBrokerName(IRemoteBroker broker)
+        {
+            foreach (KeyValuePair<string, IRemoteBroker> item in InBrokers)
+            {
+                if (item.Value == broker)
+                    return item.Key;
+            }
+
+            foreach (KeyValuePair<string, IRemoteBroker> item in outBrokersNames)
+            {
+                if (item.Value == broker)
+                    return item.Key;
+            }
+
+            return "";
+        }
 
         public List<string> GetAllOutSites()
         {

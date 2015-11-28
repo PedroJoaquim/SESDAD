@@ -225,6 +225,6 @@ namespace Shared_Library
             Environment.Exit(0);
         }
 
-        public abstract void ReceiveACK(int timeoutID, string entityName);
+        public abstract void ReceiveACK(int timeoutID, string entityName, string entitySite);
     }
 }

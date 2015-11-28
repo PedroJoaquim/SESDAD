@@ -7,6 +7,7 @@ using Shared_Library;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting;
+using System.Collections;
 
 namespace Subscriber
 {
@@ -35,8 +36,13 @@ namespace Subscriber
         {
             int port = Int32.Parse(Utils.GetIPPort(this.Url));
             string objName = Utils.GetObjName(this.Url);
+            BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
 
-            TcpChannel Channel = new TcpChannel(port);
+            IDictionary props = new Hashtable();
+            props["port"] = port;
+            props["timeout"] = SysConfig.REMOTE_CALL_TIMEOUT;
+
+            TcpChannel Channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(Channel, false);
             RemotingServices.Marshal(this, objName, typeof(IRemoteSubscriber));
 
@@ -106,7 +112,7 @@ namespace Subscriber
             }
         }
 
-        public override void ReceiveACK(int timeoutID, string entityName)
+        public override void ReceiveACK(int timeoutID, string entityName, string entitySite)
         {
             //IGNORE
         }

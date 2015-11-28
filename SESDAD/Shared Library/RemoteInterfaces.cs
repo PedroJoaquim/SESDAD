@@ -18,7 +18,7 @@ namespace Shared_Library
         void Unfreeze();
         void Disconnect();
 
-        void ReceiveACK(int timeoutID, string entityName);
+        void ReceiveACK(int timeoutID, string entityName, string entitySite);
     }
 
     public interface IPassiveServer
