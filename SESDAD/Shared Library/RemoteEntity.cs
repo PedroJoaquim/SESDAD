@@ -162,6 +162,7 @@ namespace Shared_Library
         {
             this.RemoteNetwork.Initialize(this.SysConfig);
             PuppetMaster.PostEntityProcessed();
+            ConnectionsCreated();
         }
 
 
@@ -226,5 +227,6 @@ namespace Shared_Library
         }
 
         public abstract void ReceiveACK(int timeoutID, string entityName, string entitySite);
+        public abstract void ConnectionsCreated();
     }
 }

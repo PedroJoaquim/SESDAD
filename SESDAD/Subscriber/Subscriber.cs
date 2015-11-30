@@ -129,5 +129,10 @@ namespace Subscriber
             Subscriber s = new Subscriber(args[0], args[1], args[2]);
             s.Start();
         }
+
+        public override void ConnectionsCreated()
+        {
+            //ignore
+        }
     }
 }

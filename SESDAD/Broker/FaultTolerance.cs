@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Shared_Library;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Broker
 {
@@ -70,28 +68,17 @@ namespace Broker
     {
         private const int NUM_THREADS = 25;
         private const int QUEUE_SIZE = 200;
+        private const int HEARTH_BEATS_TIME = 3500;
 
         private int actionID;
         private bool passiveDead;
         private IDictionary<int, EventInfo> waitingEvents;
         private IDictionary<int, int> timeoutIDMap; //maps timeoutids for actionsID
-        private ReplicationStorage repStorage;
+        private IRemoteBroker passiveServer;
 
         private Object actionIDObject; //lock for actionID 
 
 
-        public ReplicationStorage RepStorage
-        {
-            get
-            {
-                return repStorage;
-            }
-
-            set
-            {
-                repStorage = value;
-            }
-        }
 
         public BrokerFaultManager(RemoteEntity re) : base(re, QUEUE_SIZE, NUM_THREADS)
         {
@@ -99,10 +86,37 @@ namespace Broker
             this.actionIDObject = new Object();
             this.waitingEvents = new Dictionary<int, EventInfo>();
             this.timeoutIDMap = new Dictionary<int, int>();
-            this.RepStorage = new ReplicationStorage();
             this.passiveDead = false;
+
+            Thread t = new Thread(SendHearthBeats); //send hearth beats
+            t.Start();
         }
 
+        public IRemoteBroker PassiveServer
+        {
+            get
+            {
+                return passiveServer;
+            }
+
+            set
+            {
+                passiveServer = value;
+            }
+        }
+
+
+        private void SendHearthBeats()
+        {
+            bool replicaAlive = true;
+
+            while(replicaAlive)
+            {
+               Thread.Sleep(HEARTH_BEATS_TIME);
+               try { PassiveServer.HearthBeat(); }
+               catch(Exception) { replicaAlive = false; }
+            }
+        }
         /*
          *  Method that returns a new actionID - threadsafe
          */
@@ -116,17 +130,15 @@ namespace Broker
             }
         }
 
-        public void NewEventArrived(Event e, int timeoutID, string sourceEntity, string sourceSite)
+        public void NewEventArrived(Event e, int timeoutID, string sourceEntity, string sourceSite, int inSeqNumber)
         {
             RemoteEntity.CheckFreeze();
-
-            IRemoteBroker passiveServer = GetPassiveServer(e.Publisher);
 
             if (!passiveDead)
             {
                 try
                 {
-                    passiveServer.StoreNewEvent(e);
+                    PassiveServer.StoreNewEvent(e, sourceSite, inSeqNumber);
                 } catch (Exception) { passiveDead = true; }
             }
 
@@ -177,38 +189,12 @@ namespace Broker
         }
 
         /*
-         * Passive redundancy -- store the new event
-         */
-
-        internal void StoreNewEvent(Event e)
-        {
-            RemoteEntity.CheckFreeze();
-            this.RepStorage.StoreNewEvent(e);
-        }
-
-        /*
-         * Passive redundancy -- event dispacted
-         */
-
-        internal void EventDispatched(int eventNr, string publisher) //when we are passive server
-        {
-            RemoteEntity.CheckFreeze();
-            this.RepStorage.EventDispatched(eventNr, publisher);
-        }
-
-        /*
          * Passive redundancy -- send to the passive server
          */
 
         public void SendEventDispatchedAsync(int eventNr, string publisher)
         {
-            this.Events.Produce(new EventDispatchedCommand(eventNr, publisher, GetPassiveServer(publisher)));
-        }
-
-        private IRemoteBroker GetPassiveServer(string publisher)
-        {
-            int passiveServer = Utils.CalcBrokerForwardIndex(3, publisher, false) % 2; //mathematical property that assures that we pick the same
-            return RemoteEntity.RemoteNetwork.InBrokersList[passiveServer];
+            this.Events.Produce(new EventDispatchedCommand(eventNr, publisher, PassiveServer));
         }
 
         /*
@@ -267,9 +253,10 @@ namespace Broker
          * ITimeoutListener Interface Implementation
          */
 
-        public override void ActionTimedout(DifundPublishEventProperties p)
+        public override void ActionTimedout(ActionProperties ap)
         {
             int actionID;
+            DifundPublishEventProperties p = (DifundPublishEventProperties)ap;
 
             actionID = GetActionIDTS(p.Id);
             IncMissedACKs(p.TargetSite, p.TargetEntity);
@@ -290,137 +277,5 @@ namespace Broker
         }
     }
 
-    public class ReplicationStorage
-    {
-
-        IDictionary<string, StoredEvents> storedEvents;
-
-        public ReplicationStorage()
-        {
-            this.storedEvents = new Dictionary<string, StoredEvents>();
-        }
-
-        public void StoreNewEvent(Event e)
-        {
-
-            StoredEvents se;
-            string publisher = e.Publisher;
-
-            lock (this)
-            {
-                if (!storedEvents.ContainsKey(publisher))
-                    storedEvents[publisher] = new StoredEvents();
-
-                se = storedEvents[publisher];
-            }
-
-            se.StoreNewEvent(e);
-        }
-
-        public void EventDispatched(int eventNr, string publisher)
-        {
-            StoredEvents se;
-
-            lock (this)
-            {
-                se = storedEvents[publisher];
-            }
-
-            se.EventDispatched(eventNr);
-        }
-
-
-        public bool HasPreviousEventsToSend(int eventNr, string publisher)
-        {
-            StoredEvents se;
-
-            lock (this)
-            {
-                se = storedEvents[publisher];
-            }
-
-            return se.HasPreviousEventsToSend(eventNr);
-        }
-
-        public List<Event> GetPendindEvents(bool all, string publisher)
-        {
-            StoredEvents se;
-
-            lock (this)
-            {
-                se = storedEvents[publisher];
-            }
-
-            return se.GetPendindEvents(all);
-        }
-
-    }
-
-    public class StoredEvents
-    {
-        private IDictionary<int , bool> storedEventsDelivered;   
-        private IDictionary<int, Event> storedEvents;
-        private List<int> storedEventsIndex;
-
-        public StoredEvents()
-        {
-            storedEventsDelivered = new Dictionary<int, bool>();
-            storedEvents = new Dictionary<int, Event>();
-            storedEventsIndex = new List<int>();
-            
-        }
-
-        public void StoreNewEvent(Event e)
-        {
-            lock(this)
-            {
-                storedEvents[e.EventNr] = e;
-                storedEventsDelivered[e.EventNr] = false;
-                storedEventsIndex.Add(e.EventNr);
-                storedEventsIndex.Sort((x, y) => x.CompareTo(y));
-            }
-        }
-
-        public void EventDispatched(int eventNr)
-        {
-            lock (this)
-            {
-                storedEvents.Remove(eventNr); //discard event
-                storedEventsDelivered[eventNr] = true;
-            }
-        }
-
-
-        public bool HasPreviousEventsToSend(int eventNr)
-        {
-            lock(this)
-            {
-                int i = storedEventsIndex.Count - 1;
-                return storedEventsIndex.Count > 0 && storedEventsIndex[i] == eventNr - 1 && !storedEventsDelivered[storedEventsIndex[i]];
-            }
-        }
-
-        public List<Event> GetPendindEvents(bool all)
-        {
-            List<Event> result = new List<Event>();
-
-            for(int i = storedEventsIndex.Count - 1; i >= 0; i--)
-            {
-                if (!storedEventsDelivered[storedEventsIndex[i]])
-                {
-                    result.Add(storedEvents[storedEventsIndex[i]]);
-                    storedEvents.Remove(storedEventsIndex[i]);
-                    storedEventsDelivered[storedEventsIndex[i]] = true;
-                }
-                else
-                {
-                    if (!all)
-                        break;
-                } 
-
-            }
-
-            return result;
-        }
-    }
+    
 }

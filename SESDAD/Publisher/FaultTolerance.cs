@@ -40,15 +40,16 @@ namespace Publisher
 
         public override void ActionACKReceived(int timeoutID, string entityName, string entitySite)
         {
-            Console.WriteLine("[ACK RECEIVED] entityName: " + entityName + " sourceSite: " + entitySite);
+            Console.WriteLine("ACK RECEIVED");
             TMonitor.PostACK(timeoutID);
             ResetMissedACKs(entitySite, entityName);
         }
 
-        public override void ActionTimedout(DifundPublishEventProperties p)
+        public override void ActionTimedout(ActionProperties ap)
         {
+            DifundPublishEventProperties p = (DifundPublishEventProperties) ap;
+            Console.WriteLine("TIMEOUT");
             IncMissedACKs(p.TargetSite, p.TargetEntity);
-            Console.WriteLine("[>>>>>>>>>>>>>>>>>>>ACK MISSED<<<<<<<<<<<<<<<<]");
             this.Events.Produce(new ForwardPublishCommand(p.E, RemoteEntity.RemoteNetwork.SiteName, p.E.EventNr));
         } 
     }

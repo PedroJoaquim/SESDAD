@@ -27,7 +27,7 @@ namespace Broker
         public override void Execute(RemoteEntity entity)
         {
             Broker b = (Broker) entity;
-            b.PEventManager.ExecuteDistribution(b, this.sourceSite, this.e, this.inSeqNumber);
+            b.PEventManager.ExecuteDistribution(this.sourceSite, this.e, this.inSeqNumber);
             //TODO - fazer replicacao passiva para o outro broker
         }
 
@@ -195,22 +195,22 @@ namespace Broker
     class EventDispatchedCommand : Command
     {
 
-        private int eventNr;
+        private int eventInSeqNumber;
         private string publisher;
         private IPassiveServer passiveServer;
 
-        public EventDispatchedCommand(int eventNr, string publisher, IPassiveServer passiveServer)
+        public EventDispatchedCommand(int eventInSeqNumber, string publisher, IPassiveServer passiveServer)
         {
-            this.eventNr = eventNr;
-            this.publisher = publisher;
+            this.eventInSeqNumber = eventInSeqNumber;
             this.passiveServer = passiveServer;
+            this.publisher = publisher;
         }
 
         public override void Execute(RemoteEntity entity)
         {
             try
             {
-                this.passiveServer.EventDispatched(eventNr, publisher);
+                this.passiveServer.EventDispatched(eventInSeqNumber, publisher);
             } catch (Exception) { /* ignore */ }
         }
 

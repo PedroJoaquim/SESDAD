@@ -199,5 +199,16 @@ namespace Shared_Library
                 InBrokersList.Add(newBroker);
             }
         }
+
+        public IRemoteBroker GetBrokerByName(string passiveServer)
+        {
+            foreach (KeyValuePair<string, IRemoteBroker> item in inBrokers)
+            {
+                if (item.Key.Equals(passiveServer))
+                    return item.Value;
+            }
+
+            return null;
+        }
     }
 }

@@ -424,6 +424,7 @@ namespace PuppetMaster
             bEntity.RemoteEntity = newBroker;
             SysConfig config = this.network.SystemConfig.cloneConfig();
             config.Connections = bEntity.GetConnectionsUrl();
+            config.PassiveServer = bEntity.GetPassiveServer();
             newBroker.RegisterInitializationInfo(config, bEntity.Site.Name);
             PostEntityProcessed();
 

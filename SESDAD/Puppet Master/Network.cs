@@ -304,8 +304,19 @@ namespace PuppetMaster
             return result;
         }
 
+        internal List<string> GetOrderedBrokerEntities()
+        {
+            List<string> result = new List<string>();
 
+            foreach (KeyValuePair<string, BrokerEntity> item in this.BrokerEntities)
+            {
+                result.Add(item.Key);
+            }
 
+            result.Sort((x, y) => string.Compare(x, y));
+
+            return result;
+        }
     }
 
 
@@ -412,6 +423,20 @@ namespace PuppetMaster
         public override IRemoteEntity GetRemoteEntity()
         {
             return this.RemoteEntity;
+        }
+
+        internal string GetPassiveServer()
+        {
+            List<string> brokers = this.Site.GetOrderedBrokerEntities();
+
+            for (int i = 0; i < brokers.Count; i++)
+            {
+                if (brokers[i].Equals(this.Name))
+                    return brokers[(i + 1) % brokers.Count];
+            }
+
+            return "";
+
         }
     }
 

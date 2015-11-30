@@ -9,7 +9,7 @@ namespace Shared_Library
     
     public interface ITimeoutListener
     {
-        void ActionTimedout(DifundPublishEventProperties properties);
+        void ActionTimedout(ActionProperties properties);
     }
 
     public abstract class FaultManager : ITimeoutListener
@@ -76,7 +76,7 @@ namespace Shared_Library
         }
 
         public abstract void ActionACKReceived(int actionID, string entityName, string entitySite);
-        public abstract void ActionTimedout(DifundPublishEventProperties properties);
+        public abstract void ActionTimedout(ActionProperties properties);
 
 
         private void ProcessQueue()
@@ -126,7 +126,9 @@ namespace Shared_Library
                     {
                         missedACKs[siteName][entityName] = new Pair<DateTime, int>(DateTime.Now, pair.Second+1);
                     }
-                }    
+                }
+                
+                Console.WriteLine("MISSED-ACKS[" + entityName + "] = " + missedACKs[siteName][entityName]);
             } 
         }
 
@@ -167,7 +169,6 @@ namespace Shared_Library
     public class TimeoutMonitor
     {
         private const int SLEEP_TIME = 500; //miliseconds
-        private const int TIMEOUT = 1500; //miliseconds
 
         private ITimeoutListener mainEntity;
         private int actionsID;
@@ -213,6 +214,18 @@ namespace Shared_Library
             return timeoutID;
         }
 
+        public int HearthBeatAction()
+        {
+            int timeoutID = IncActionID();
+
+            lock (this)
+            {
+                this.performedActions.Add(timeoutID, new WaitHearthBeat(timeoutID));
+            }
+
+            return timeoutID;
+        }
+
         public void PostACK(int actionID)
         {
             lock(this)
@@ -238,7 +251,7 @@ namespace Shared_Library
                         int diff = (int) ((TimeSpan)(now - creation)).TotalMilliseconds;
                         ActionProperties value = entry.Value;
 
-                        if (diff > TIMEOUT)
+                        if (diff > value.Timeout)
                         {
                             new Task(() => PerformTimeoutAlert(value)).Start();
                             toBeRemoved.Add(entry.Key);
@@ -258,10 +271,12 @@ namespace Shared_Library
             if (ap.GetType() == typeof(DifundPublishEventProperties))
             {
                 DifundPublishEventProperties dp = (DifundPublishEventProperties)ap;
-                //Console.WriteLine("[TIMEOUT] Event: " + dp.E.Publisher + " #" + dp.E.EventNr);
-
                 this.MainEntity.ActionTimedout(dp);
-
+            }
+            else if (ap.GetType() == typeof(WaitHearthBeat))
+            {
+                WaitHearthBeat sp = (WaitHearthBeat)ap;
+                this.MainEntity.ActionTimedout(sp);
             }
 
         }
@@ -280,9 +295,8 @@ namespace Shared_Library
     public abstract class ActionProperties
     {
         private DateTime creationTime;
-        private string targetSite;
-        private string targetEntity;
         private int id;
+        private int timeout;
 
         #region "properties"
         public DateTime CreationTime
@@ -295,19 +309,6 @@ namespace Shared_Library
             set
             {
                 creationTime = value;
-            }
-        }
-
-        public string TargetSite
-        {
-            get
-            {
-                return targetSite;
-            }
-
-            set
-            {
-                targetSite = value;
             }
         }
 
@@ -324,33 +325,37 @@ namespace Shared_Library
             }
         }
 
-        public string TargetEntity
+        public int Timeout
         {
             get
             {
-                return targetEntity;
+                return timeout;
             }
 
             set
             {
-                targetEntity = value;
+                timeout = value;
             }
         }
         #endregion
 
-        public ActionProperties(int id, string targetSite, string targetEntity)
+        public ActionProperties(int id, int timeout)
         {
             this.Id = id;
+            this.Timeout = timeout;
             this.creationTime = DateTime.Now;
-            this.TargetSite = targetSite;
-            this.TargetEntity = targetEntity;
         }
     }
 
     public class DifundPublishEventProperties : ActionProperties
     {
+
+        private const int TIMEOUT = 1500;
+
         private Event e;
         private int outSeqNumber;
+        private string targetSite;
+        private string targetEntity;
 
         #region "properties"
         public Event E
@@ -378,12 +383,49 @@ namespace Shared_Library
                 outSeqNumber = value;
             }
         }
+
+        public string TargetSite
+        {
+            get
+            {
+                return targetSite;
+            }
+
+            set
+            {
+                targetSite = value;
+            }
+        }
+
+        public string TargetEntity
+        {
+            get
+            {
+                return targetEntity;
+            }
+
+            set
+            {
+                targetEntity = value;
+            }
+        }
         #endregion
 
-        public DifundPublishEventProperties(int id, string targetSite, string targetEntity, Event e, int outSeqNumber) : base(id, targetSite, targetEntity)
+        public DifundPublishEventProperties(int id, string targetSite, string targetEntity, Event e, int outSeqNumber) : base(id, TIMEOUT)
         {
             this.E = e;
             this.OutSeqNumber = outSeqNumber;
+            this.TargetEntity = targetEntity;
+            this.TargetSite = targetSite;
+        }
+    }
+
+    public class WaitHearthBeat : ActionProperties
+    {
+        private const int TIMEOUT = 5000;
+
+        public WaitHearthBeat(int id) : base(id, TIMEOUT)
+        {
         }
     }
 }

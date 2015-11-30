@@ -37,6 +37,7 @@ namespace Shared_Library
         private String routingPolicy = null;
         private String ordering = null;
         private String distributed = null;
+        private String passiveServer = null;
         private List<Connection> connections = null;
 
         #endregion
@@ -107,6 +108,19 @@ namespace Shared_Library
                 connections = value;
             }
         }
+
+        public string PassiveServer
+        {
+            get
+            {
+                return passiveServer;
+            }
+
+            set
+            {
+                passiveServer = value;
+            }
+        }
         #endregion
 
         public SysConfig()
@@ -123,6 +137,7 @@ namespace Shared_Library
             result.Ordering = this.Ordering;
             result.Distributed = this.Distributed;
             result.connections = this.Connections;
+            result.PassiveServer = this.PassiveServer;
 
             return result;
         }
@@ -134,6 +149,7 @@ namespace Shared_Library
             logLevel = (String)info.GetValue("logLevel", typeof(String));
             routingPolicy = (String)info.GetValue("routingPolicy", typeof(String));
             ordering = (String)info.GetValue("ordering", typeof(String));
+            PassiveServer = (String)info.GetValue("passiveServer", typeof(String));
             connections = DeserializeConnections((String)info.GetValue("connections", typeof(String)));
         }
 
@@ -142,6 +158,7 @@ namespace Shared_Library
             info.AddValue("logLevel", logLevel);
             info.AddValue("routingPolicy", routingPolicy);
             info.AddValue("ordering", ordering);
+            info.AddValue("passiveServer", PassiveServer);
             info.AddValue("connections", serializeConnections());
         }
 

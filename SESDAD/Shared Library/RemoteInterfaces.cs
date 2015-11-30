@@ -23,8 +23,9 @@ namespace Shared_Library
 
     public interface IPassiveServer
     {
-        void StoreNewEvent(Event e);
+        void StoreNewEvent(Event e, string sourceSite, int inSeqNumber);
         void EventDispatched(int eventNr, string publisher);
+        void HearthBeat();
     }
 
     public interface IRemoteBroker : IRemoteEntity, IPassiveServer

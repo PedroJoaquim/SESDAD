@@ -20,6 +20,7 @@ namespace Broker
         private ReceiveTable receiveTable = new ReceiveTable();
         private PublishEventManager pEventManager;
         private BrokerFaultManager fManager;
+        private ReplicationStorage repStorage;
 
         #region "properties"
         public ForwardingTable ForwardingTable
@@ -73,11 +74,24 @@ namespace Broker
                 fManager = value;
             }
         }
+
+        public ReplicationStorage RepStorage
+        {
+            get
+            {
+                return repStorage;
+            }
+
+            set
+            {
+                repStorage = value;
+            }
+        }
         #endregion
 
         public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, QUEUE_SIZE, NUM_THREADS)
         {
-            this.FManager = new BrokerFaultManager(this);
+
         }
 
         public override void Register()
@@ -99,14 +113,13 @@ namespace Broker
             this.PuppetMaster = pm;
 
             if (this.SysConfig.Ordering.Equals(SysConfig.FIFO))
-                this.PEventManager = new FIFOPublishEventManager();
+                this.PEventManager = new FIFOPublishEventManager(this);
 
             if (this.SysConfig.Ordering.Equals(SysConfig.NO_ORDER))
-                this.PEventManager = new NoOrderPublishEventManager();
+                this.PEventManager = new NoOrderPublishEventManager(this);
 
             if (this.SysConfig.Ordering.Equals(SysConfig.TOTAL))
-                this.PEventManager = new TotalOrderPublishEventManager();
-
+                this.PEventManager = new TotalOrderPublishEventManager(this);
         }
 
         public override void Status()
@@ -147,7 +160,7 @@ namespace Broker
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
             Console.WriteLine(String.Format("[EVENT RECEIVED] {0}  FROM: {1} #{2}", e.Topic, e.Publisher, e.EventNr));
-            FManager.NewEventArrived(e, timeoutID, sourceEntity, sourceSite); //passive redundancy
+            FManager.NewEventArrived(e, timeoutID, sourceEntity, sourceSite, seqNumber); //passive redundancy
             this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber, timeoutID));
         }
 
@@ -175,16 +188,35 @@ namespace Broker
             this.FManager.ActionACKReceived(timeoutID, entityName, entitySite);
         }
 
-        public void StoreNewEvent(Event e)
+
+        /*
+         *  Passive redundancy
+         */
+
+        public void StoreNewEvent(Event e, string sourceSite, int inSeqNumber)
         {
             CheckFreeze();
-            this.FManager.StoreNewEvent(e);
+            this.RepStorage.StoreNewEvent(e, sourceSite, inSeqNumber);
         }
 
         public void EventDispatched(int eventNr, string publisher)
         {
             CheckFreeze();
-            this.FManager.EventDispatched(eventNr, publisher);
+            this.RepStorage.EventDispatched(eventNr, publisher);
+        }
+
+        public void HearthBeat()
+        {
+            this.RepStorage.ReceivedHeathBeat();
+        }
+
+        public override void ConnectionsCreated()
+        {
+            Console.WriteLine("[PASSIVE SERVER] " + this.SysConfig.PassiveServer);
+            this.FManager = new BrokerFaultManager(this);
+            this.RepStorage = new ReplicationStorage(this);
+            this.FManager.PassiveServer = RemoteNetwork.GetBrokerByName(this.SysConfig.PassiveServer);
+            this.RepStorage.WaitHearthBeat();
         }
     }
 }
