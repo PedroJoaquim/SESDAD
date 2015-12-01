@@ -127,8 +127,6 @@ namespace Shared_Library
                         missedACKs[siteName][entityName] = new Pair<DateTime, int>(DateTime.Now, pair.Second+1);
                     }
                 }
-                
-                Console.WriteLine("MISSED-ACKS[" + entityName + "] = " + missedACKs[siteName][entityName]);
             } 
         }
 
@@ -278,7 +276,6 @@ namespace Shared_Library
                 WaitHearthBeat sp = (WaitHearthBeat)ap;
                 this.MainEntity.ActionTimedout(sp);
             }
-
         }
 
         private int IncActionID()
@@ -424,8 +421,6 @@ namespace Shared_Library
     {
         private const int TIMEOUT = 5000;
 
-        public WaitHearthBeat(int id) : base(id, TIMEOUT)
-        {
-        }
+        public WaitHearthBeat(int id) : base(id, TIMEOUT)   { }
     }
 }

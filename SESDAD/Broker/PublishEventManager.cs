@@ -30,7 +30,7 @@ namespace Broker
             this.B = b;
         }
 
-        public abstract void ExecuteDistribution(string sourceSite, Event e, int seqNumber);
+        public abstract void ExecuteDistribution(string sourceSite, string sourceEntity, Event e, int seqNumber);
         protected abstract int GetOutgoingSeqNumber(string brokerName, string pName);
         public abstract void PublishStoredEvents(List<StoredEvent> storedEvents);
 
@@ -47,6 +47,8 @@ namespace Broker
             }
 
         }
+
+        public abstract void EventDispatchedByMainServer(StoredEvent old);
 
         //function to send the publish event to other brokers or subscribers
         protected void ProcessEventRouting(List<string> interessedEntities, Event e, string sourceSite)
@@ -73,7 +75,7 @@ namespace Broker
             /*
              * Now forward messages to interessed brokers (that can fail)
              */
-
+            
             List<Tuple<string, int>> interessedSitesInfo = new List<Tuple<string, int>>();
 
             foreach (string site in b.RemoteNetwork.GetAllOutSites())
@@ -137,36 +139,37 @@ namespace Broker
         
         public NoOrderPublishEventManager(Broker b) : base(b) { }
 
-        public override void ExecuteDistribution(string sourceSite, Event e, int seqNumber)
+        public override void ExecuteDistribution(string sourceSite, string sourceEntity, Event e, int seqNumber)
         {
             if (AlreadyProcessedEvent(e))
                 return;
 
             List<string> interessedEntities = GetInteressedEntities(e, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
             ProcessEventRouting(interessedEntities, e, sourceSite);
-            B.FManager.SendEventDispatchedAsync(e.EventNr, e.Publisher);
+
+            if (e.SendACK)
+                B.FManager.SendEventDispatchedAsync(e.EventNr, e.Publisher);
         }
 
         public override void PublishStoredEvents(List<StoredEvent> storedEvents)
         {
             foreach (StoredEvent item in storedEvents)
             {
-                new Task(() => ExecuteDistributionStoredEvent(item)).Start();
+                StoredEvent itemCopy = item;
+                itemCopy.E.SendACK = false;
+                new Task(() => ExecuteDistribution(itemCopy.SourceSite, item.SourceEntity, itemCopy.E, itemCopy.InSeqNumber)).Start();
             }
         }
 
-        private void ExecuteDistributionStoredEvent(StoredEvent item)
-        {
-            if (AlreadyProcessedEvent(item.E))
-                return;
-
-            List<string> interessedEntities = GetInteressedEntities(item.E, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
-            ProcessEventRouting(interessedEntities, item.E, item.SourceSite);
-        }
 
         protected override int GetOutgoingSeqNumber(string siteName, string pName)
         {
             return 1; //irrelevant for no order
+        }
+
+        public override void EventDispatchedByMainServer(StoredEvent old)
+        {
+            //ignore no actions need to be performed
         }
     }
 
@@ -178,11 +181,11 @@ namespace Broker
 
         public FIFOPublishEventManager(Broker b) : base(b) { }
 
-        public override void ExecuteDistribution(string sourceSite, Event e, int seqNumber)
+        public override void ExecuteDistribution(string sourceSite, string sourceEntity, Event e, int seqNumber)
         {
             List<string> interessedEntities;
             Event outgoingEvent;
-            PublishEventsStorage storedEvents = GetCreateEventOrder(sourceSite, e.Publisher);
+            PublishEventsStorage storedEvents = GetCreateEventOrder(sourceEntity, e.Publisher);
 
             if (AlreadyProcessedEvent(e))
                 return;
@@ -191,12 +194,15 @@ namespace Broker
             {
                 storedEvents.InsertInOrder(e, seqNumber);
 
-                while(storedEvents.CanSendEvent())
+                while (storedEvents.CanSendEvent())
                 {
                     outgoingEvent = storedEvents.GetFirstEvent();
                     interessedEntities = GetInteressedEntities(outgoingEvent, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
                     ProcessEventRouting(interessedEntities, outgoingEvent, sourceSite);
-                    B.FManager.SendEventDispatchedAsync(outgoingEvent.EventNr, outgoingEvent.Publisher);
+
+                    if(outgoingEvent.SendACK)
+                        B.FManager.SendEventDispatchedAsync(outgoingEvent.EventNr, outgoingEvent.Publisher);
+
                     storedEvents.FirstEventSend();
                 }
                 
@@ -210,18 +216,18 @@ namespace Broker
 
             foreach (StoredEvent item in storedEvents)
             {
-                if(!minNumbers.ContainsKey(item.SourceSite))
+                if(!minNumbers.ContainsKey(item.SourceEntity))
                 {
-                    minNumbers[item.SourceSite] = new Dictionary<string, int>();
-                    minNumbers[item.SourceSite][item.E.Publisher] = 1;
+                    minNumbers[item.SourceEntity] = new Dictionary<string, int>();
+                    minNumbers[item.SourceEntity][item.E.Publisher] = 1;
                 }
-                else if (!minNumbers[item.SourceSite].ContainsKey(item.E.Publisher))
+                else if (!minNumbers[item.SourceEntity].ContainsKey(item.E.Publisher))
                 {
-                    minNumbers[item.SourceSite][item.E.Publisher] = 1;
+                    minNumbers[item.SourceEntity][item.E.Publisher] = 1;
                 }
-                else if(item.InSeqNumber < minNumbers[item.SourceSite][item.E.Publisher])
+                else if(item.InSeqNumber < minNumbers[item.SourceEntity][item.E.Publisher])
                 {
-                    minNumbers[item.SourceSite][item.E.Publisher] = item.InSeqNumber;
+                    minNumbers[item.SourceEntity][item.E.Publisher] = item.InSeqNumber;
                 }
             }
 
@@ -232,13 +238,27 @@ namespace Broker
                 {
                     PublishEventsStorage se = GetCreateEventOrder(item.Key, item2.Key);
                     se.NextSeqNumber = item2.Value;
-
                 }
             }
-    
+
             foreach (StoredEvent item in storedEvents)
             {
-                new Task(() => ExecuteDistribution(item.SourceSite, item.E, item.InSeqNumber)).Start();
+                StoredEvent itemCopy = item;
+                itemCopy.E.SendACK = false;
+                new Task(() => ExecuteDistribution(itemCopy.SourceSite, item.SourceEntity, itemCopy.E, itemCopy.InSeqNumber)).Start();
+            }
+        }
+
+        public override void EventDispatchedByMainServer(StoredEvent old)
+        {
+            PublishEventsStorage storedEvents = GetCreateEventOrder(old.SourceEntity, old.E.Publisher);
+
+            lock (storedEvents)
+            {
+                if (storedEvents.NextSeqNumber <= old.InSeqNumber)
+                {
+                    storedEvents.NextSeqNumber = old.InSeqNumber + 1;
+                }
             }
         }
 
@@ -283,6 +303,7 @@ namespace Broker
             return result;
         }
 
+
     }
 
 
@@ -290,7 +311,7 @@ namespace Broker
     {
         public TotalOrderPublishEventManager (Broker b): base(b) { }
 
-        public override void ExecuteDistribution(string source, Event e, int seqNumber)
+        public override void ExecuteDistribution(string sourceSite, string sourceEntity, Event e, int seqNumber)
         {
             throw new NotImplementedException();
         }
@@ -301,6 +322,11 @@ namespace Broker
         }
 
         public override void PublishStoredEvents(List<StoredEvent> storedEvents)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void EventDispatchedByMainServer(StoredEvent old)
         {
             throw new NotImplementedException();
         }

@@ -359,6 +359,7 @@ namespace Shared_Library
         private string topic;
         private long timestamp;
         private int eventNr;
+        private bool sendACK;
 
         #region "Properties"
         public string Publisher
@@ -412,6 +413,19 @@ namespace Shared_Library
                 eventNr = value;
             }
         }
+
+        public bool SendACK
+        {
+            get
+            {
+                return sendACK;
+            }
+
+            set
+            {
+                sendACK = value;
+            }
+        }
         #endregion
 
         public Event(string publisher, string topic, long timestamp, int eventNr)
@@ -420,6 +434,7 @@ namespace Shared_Library
             this.Topic = topic;
             this.Timestamp = timestamp;
             this.EventNr = eventNr;
+            this.SendACK = true;
         }
 
         public Event(SerializationInfo info, StreamingContext ctxt)
@@ -428,6 +443,7 @@ namespace Shared_Library
             topic = (String)info.GetValue("topic", typeof(String));
             timestamp = (long)info.GetValue("timestamp", typeof(long));
             eventNr = (int)info.GetValue("eventNr", typeof(int));
+            sendACK = (bool)info.GetValue("sendACK", typeof(bool));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -436,6 +452,7 @@ namespace Shared_Library
             info.AddValue("topic", topic);
             info.AddValue("timestamp", timestamp);
             info.AddValue("eventNr", eventNr);
+            info.AddValue("sendACK", sendACK);
         }
     }
 }

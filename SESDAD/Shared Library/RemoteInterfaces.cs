@@ -23,7 +23,7 @@ namespace Shared_Library
 
     public interface IPassiveServer
     {
-        void StoreNewEvent(Event e, string sourceSite, int inSeqNumber);
+        void StoreNewEvent(Event e, string sourceSite, string sourceEntity, int inSeqNumber);
         void EventDispatched(int eventNr, string publisher);
         void HearthBeat();
     }

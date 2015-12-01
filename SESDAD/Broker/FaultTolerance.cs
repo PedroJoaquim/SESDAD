@@ -86,7 +86,7 @@ namespace Broker
             this.actionIDObject = new Object();
             this.waitingEvents = new Dictionary<int, EventInfo>();
             this.timeoutIDMap = new Dictionary<int, int>();
-            this.passiveDead = false;
+            this.PassiveDead = false;
 
             Thread t = new Thread(SendHearthBeats); //send hearth beats
             t.Start();
@@ -105,6 +105,18 @@ namespace Broker
             }
         }
 
+        public bool PassiveDead
+        {
+            get
+            {
+                return passiveDead;
+            }
+
+            set
+            {
+                passiveDead = value;
+            }
+        }
 
         private void SendHearthBeats()
         {
@@ -129,22 +141,6 @@ namespace Broker
                 return newID;
             }
         }
-
-        public void NewEventArrived(Event e, int timeoutID, string sourceEntity, string sourceSite, int inSeqNumber)
-        {
-            RemoteEntity.CheckFreeze();
-
-            if (!passiveDead)
-            {
-                try
-                {
-                    PassiveServer.StoreNewEvent(e, sourceSite, inSeqNumber);
-                } catch (Exception) { passiveDead = true; }
-            }
-
-            this.Events.Produce(new SendACKCommand(timeoutID, sourceEntity, sourceSite));
-        }
-
 
         public int FMMultiplePublishEvent(Event e, List<Tuple<string, int>> targetSites)
         {

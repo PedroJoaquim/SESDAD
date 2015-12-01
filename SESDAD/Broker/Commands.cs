@@ -12,14 +12,16 @@ namespace Broker
         #region "Properties"
         private Event e;
         private string sourceSite;
+        private string sourceEntity;
         private int inSeqNumber;
         private int timeoutID;
         #endregion
 
-        public DifundPublishEventCommand(Event e, string sourceSite, int inSeqNumber, int timeoutID)
+        public DifundPublishEventCommand(Event e, string sourceSite, string sourceEntity, int inSeqNumber, int timeoutID)
         {
             this.e = e;
             this.sourceSite = sourceSite;
+            this.sourceEntity = sourceEntity;
             this.inSeqNumber = inSeqNumber;
             this.timeoutID = timeoutID;
         }
@@ -27,8 +29,7 @@ namespace Broker
         public override void Execute(RemoteEntity entity)
         {
             Broker b = (Broker) entity;
-            b.PEventManager.ExecuteDistribution(this.sourceSite, this.e, this.inSeqNumber);
-            //TODO - fazer replicacao passiva para o outro broker
+            b.PEventManager.ExecuteDistribution(this.sourceSite, this.sourceEntity, this.e, this.inSeqNumber);
         }
 
     }
@@ -163,23 +164,43 @@ namespace Broker
 
     }
 
-    class SendACKCommand : Command
+    class ReplicateCommand : Command
     {
-        private int timeoutID;
-        private string sourceEntity;
-        private string sourceSite;
 
-        public SendACKCommand(int timeoutID, string sourceEntity, string sourceSite)
+        private IPassiveServer passiveServer;
+        private Event e;
+        private string sourceSite;
+        private string sourceEntity;
+        private int inSeqNumber;
+        private int timeoutID;
+
+        public ReplicateCommand(IPassiveServer passiveServer, Event e, string sourceSite, string sourceEntity, int inSeqNumber, int timeoutID)
         {
-            this.timeoutID = timeoutID;
-            this.sourceEntity = sourceEntity;
+            this.passiveServer = passiveServer;
+            this.e = e;
             this.sourceSite = sourceSite;
+            this.sourceEntity = sourceEntity;
+            this.inSeqNumber = inSeqNumber;
+            this.timeoutID = timeoutID;
         }
 
         public override void Execute(RemoteEntity entity)
         {
+            Broker broker = (Broker) entity;
             IRemoteEntity source;
 
+            if (!broker.FManager.PassiveDead)
+            {
+                try
+                {
+                    passiveServer.StoreNewEvent(e, sourceSite, sourceEntity, inSeqNumber);
+                } catch (Exception) { broker.FManager.PassiveDead = true; }
+            }
+
+            /*
+             *  SEND ACK
+             */
+            
             if (sourceSite.Equals(entity.RemoteNetwork.SiteName))
                 source = entity.RemoteNetwork.Publishers[sourceEntity];
             else
@@ -189,32 +210,37 @@ namespace Broker
             {
                 source.ReceiveACK(timeoutID, entity.Name, entity.RemoteNetwork.SiteName);
             } catch (Exception) {/*ignore*/}
+
         }
     }
+
 
     class EventDispatchedCommand : Command
     {
 
-        private int eventInSeqNumber;
+        private int eventNumber;
         private string publisher;
         private IPassiveServer passiveServer;
 
-        public EventDispatchedCommand(int eventInSeqNumber, string publisher, IPassiveServer passiveServer)
+        public EventDispatchedCommand(int eventNumber, string publisher, IPassiveServer passiveServer)
         {
-            this.eventInSeqNumber = eventInSeqNumber;
+            this.eventNumber = eventNumber;
             this.passiveServer = passiveServer;
             this.publisher = publisher;
         }
 
         public override void Execute(RemoteEntity entity)
         {
-            try
+            Broker broker = (Broker) entity;
+
+            if (!broker.FManager.PassiveDead)
             {
-                this.passiveServer.EventDispatched(eventInSeqNumber, publisher);
-            } catch (Exception) { /* ignore */ }
+                try
+                {
+                    this.passiveServer.EventDispatched(eventNumber, publisher);
+                } catch (Exception) { broker.FManager.PassiveDead = true; }
+            }
         }
-
-
     }
 
     class ForwardEventCommand : Command

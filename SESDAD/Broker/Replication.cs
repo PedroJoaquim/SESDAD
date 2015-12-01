@@ -21,11 +21,11 @@ namespace Broker
             this.broker = b;
         }
 
-        public void StoreNewEvent(Event e, string sourceSite, int inSeqNumber)
+        public void StoreNewEvent(Event e, string sourceSite, string sourceEntity, int inSeqNumber)
         {
             lock (this)
             {
-                this.storedEvents.Add(new StoredEvent(inSeqNumber, sourceSite, e));
+                this.storedEvents.Add(new StoredEvent(inSeqNumber, sourceSite, sourceEntity, e));
             }
         }
 
@@ -43,8 +43,11 @@ namespace Broker
                         break;
                     }
                 }
-
+                
+                StoredEvent old = this.storedEvents[index];
+                broker.PEventManager.EventDispatchedByMainServer(old);
                 this.storedEvents.RemoveAt(index);
+                
             }
         }
 
@@ -74,6 +77,7 @@ namespace Broker
     {
         private int inSeqNumber;
         private string sourceSite;
+        private string sourceEntity;
         private Event e;
 
         public int InSeqNumber
@@ -115,10 +119,24 @@ namespace Broker
             }
         }
 
-        public StoredEvent(int inSeqNumber, string sourceSite, Event e)
+        public string SourceEntity
+        {
+            get
+            {
+                return sourceEntity;
+            }
+
+            set
+            {
+                sourceEntity = value;
+            }
+        }
+
+        public StoredEvent(int inSeqNumber, string sourceSite, string sourceEntity, Event e)
         {
             this.InSeqNumber = inSeqNumber;
             this.SourceSite = sourceSite;
+            this.SourceEntity = sourceEntity;
             this.E = e;
         }
     }

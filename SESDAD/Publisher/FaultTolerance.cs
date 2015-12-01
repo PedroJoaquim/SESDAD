@@ -40,7 +40,6 @@ namespace Publisher
 
         public override void ActionACKReceived(int timeoutID, string entityName, string entitySite)
         {
-            Console.WriteLine("ACK RECEIVED");
             TMonitor.PostACK(timeoutID);
             ResetMissedACKs(entitySite, entityName);
         }
@@ -48,7 +47,6 @@ namespace Publisher
         public override void ActionTimedout(ActionProperties ap)
         {
             DifundPublishEventProperties p = (DifundPublishEventProperties) ap;
-            Console.WriteLine("TIMEOUT");
             IncMissedACKs(p.TargetSite, p.TargetEntity);
             this.Events.Produce(new ForwardPublishCommand(p.E, RemoteEntity.RemoteNetwork.SiteName, p.E.EventNr));
         } 

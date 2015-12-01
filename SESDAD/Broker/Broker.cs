@@ -159,9 +159,9 @@ namespace Broker
         #region "interface methods"
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
-            Console.WriteLine(String.Format("[EVENT RECEIVED] {0}  FROM: {1} #{2}", e.Topic, e.Publisher, e.EventNr));
-            FManager.NewEventArrived(e, timeoutID, sourceEntity, sourceSite, seqNumber); //passive redundancy
-            this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, seqNumber, timeoutID));
+            Console.WriteLine(String.Format("[EVENT RECEIVED] {0}  FROM: {1} #{2}      inNumber: {3}", e.Topic, e.Publisher, e.EventNr, seqNumber));
+            this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, sourceEntity, seqNumber, timeoutID));
+            FManager.Events.Produce(new ReplicateCommand(FManager.PassiveServer, e, sourceSite, sourceEntity, seqNumber, timeoutID));
         }
 
         public void DifundSubscribeEvent(string topic, string source)
@@ -193,10 +193,10 @@ namespace Broker
          *  Passive redundancy
          */
 
-        public void StoreNewEvent(Event e, string sourceSite, int inSeqNumber)
+        public void StoreNewEvent(Event e, string sourceSite, string sourceEntity, int inSeqNumber)
         {
             CheckFreeze();
-            this.RepStorage.StoreNewEvent(e, sourceSite, inSeqNumber);
+            this.RepStorage.StoreNewEvent(e, sourceSite, sourceEntity, inSeqNumber);
         }
 
         public void EventDispatched(int eventNr, string publisher)
