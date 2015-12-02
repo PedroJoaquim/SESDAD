@@ -10,6 +10,7 @@ namespace Broker
     class ReplicationStorage : ITimeoutListener
     {
         private List<StoredEvent> storedEvents;
+        private List<int> tooEarlyList;
         private TimeoutMonitor tMonitor;
         private Broker broker;
         private int hearthBeatTimeoutID;
@@ -19,13 +20,21 @@ namespace Broker
             this.storedEvents = new List<StoredEvent>();
             this.tMonitor = new TimeoutMonitor(this);
             this.broker = b;
+            this.tooEarlyList = new List<int>();
         }
 
         public void StoreNewEvent(Event e, string sourceSite, string sourceEntity, int inSeqNumber)
         {
             lock (this)
             {
-                this.storedEvents.Add(new StoredEvent(inSeqNumber, sourceSite, sourceEntity, e));
+                if(this.tooEarlyList.Contains(e.EventNr))
+                {
+                    broker.PEventManager.EventDispatchedByMainServer(new StoredEvent(inSeqNumber, sourceSite, sourceEntity, e));
+                }
+                else
+                {
+                    this.storedEvents.Add(new StoredEvent(inSeqNumber, sourceSite, sourceEntity, e));
+                }
             }
         }
 
@@ -43,16 +52,26 @@ namespace Broker
                         break;
                     }
                 }
-                
-                StoredEvent old = this.storedEvents[index];
-                broker.PEventManager.EventDispatchedByMainServer(old);
-                this.storedEvents.RemoveAt(index);
+
+                if(index == -1)
+                {
+                    this.tooEarlyList.Add(eventNr);
+                }
+                else
+                {
+                    StoredEvent old = this.storedEvents[index];
+                    broker.PEventManager.EventDispatchedByMainServer(old);
+                    this.storedEvents.RemoveAt(index);
+                }
+
                 
             }
         }
 
         public void ActionTimedout(ActionProperties properties)
         {
+            Console.WriteLine("[INFO] Main Server Failed");
+
             if (properties.GetType() == typeof(WaitHearthBeat))
             {
                 broker.PEventManager.PublishStoredEvents(this.storedEvents);

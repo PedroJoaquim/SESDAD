@@ -13,8 +13,8 @@ namespace Broker
 {
     class Broker : RemoteEntity, IRemoteBroker
     {
-        private const int QUEUE_SIZE = 200;
-        private const int NUM_THREADS = 25;
+        private const int QUEUE_SIZE = 500;
+        private const int NUM_THREADS = 200;
 
         private ForwardingTable forwardingTable = new ForwardingTable();
         private ReceiveTable receiveTable = new ReceiveTable();

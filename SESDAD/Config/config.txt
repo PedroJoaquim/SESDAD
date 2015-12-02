@@ -1,5 +1,5 @@
 RoutingPolicy filter
-Ordering FIFO
+Ordering NO
 Site site0 Parent none
 Site site1 Parent site0
 Site site2 Parent site0
@@ -8,6 +8,7 @@ Site site4 Parent site2
 Process broker0 is broker On site0 URL tcp://localhost:3330/broker
 Process broker00 is broker On site0 URL tcp://localhost:3331/broker
 Process broker01 is broker On site0 URL tcp://localhost:3332/broker
+Process publisher03 is publisher On site0 URL tcp://localhost:3333/pub
 Process broker1 is broker On site1 URL tcp://localhost:4330/broker
 Process broker10 is broker On site1 URL tcp://localhost:4331/broker
 Process broker11 is broker On site1 URL tcp://localhost:4332/broker
@@ -26,3 +27,4 @@ Process broker40 is broker On site4 URL tcp://localhost:7331/broker
 Process broker41 is broker On site4 URL tcp://localhost:7332/broker
 Process sub01 is subscriber On site4 URL tcp://localhost:7333/sub
 Process sub02 is subscriber On site4 URL tcp://localhost:7334/sub
+Process sub03 is subscriber On site4 URL tcp://localhost:7335/sub

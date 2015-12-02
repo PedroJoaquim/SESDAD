@@ -66,8 +66,8 @@ namespace Broker
 
     class BrokerFaultManager : FaultManager
     {
-        private const int NUM_THREADS = 25;
-        private const int QUEUE_SIZE = 200;
+        private const int NUM_THREADS = 100;
+        private const int QUEUE_SIZE = 500;
         private const int HEARTH_BEATS_TIME = 3500;
 
         private int actionID;

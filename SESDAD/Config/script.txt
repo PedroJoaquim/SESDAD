@@ -1,13 +1,16 @@
-Subscriber sub01 subscribe /p00-1
 Subscriber sub00 subscribe /p00-0
+Subscriber sub01 subscribe /p00-1
 Subscriber sub02 subscribe /p00-2
+Subscriber sub03 subscribe /p00-3
 Wait 5000
-Publisher publisher00 Publish 60 Ontopic /p00-0 Interval 120
-Publisher publisher01 Publish 60 Ontopic /p00-1 Interval 120
-Publisher publisher02 Publish 60 Ontopic /p00-2 Interval 120
-wait 6000
+Publisher publisher00 Publish 360 Ontopic /p00-0 Interval 120
+Publisher publisher01 Publish 360 Ontopic /p00-1 Interval 120
+Publisher publisher02 Publish 360 Ontopic /p00-2 Interval 120
+Publisher publisher03 Publish 360 Ontopic /p00-3 Interval 120
+wait 2000
 Crash broker00
 Crash broker10
-Crash broker20
+Crash broker2
+wait 2000
 Crash broker30
-Crash broker40
+Crash broker41

@@ -145,9 +145,12 @@ namespace Broker
                 return;
 
             List<string> interessedEntities = GetInteressedEntities(e, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
+            bool sendACK = e.SendACK;
+
+            e.SendACK = true;
             ProcessEventRouting(interessedEntities, e, sourceSite);
 
-            if (e.SendACK)
+            if (sendACK)
                 B.FManager.SendEventDispatchedAsync(e.EventNr, e.Publisher);
         }
 
@@ -186,6 +189,7 @@ namespace Broker
             List<string> interessedEntities;
             Event outgoingEvent;
             PublishEventsStorage storedEvents = GetCreateEventOrder(sourceEntity, e.Publisher);
+            bool sendACK;
 
             if (AlreadyProcessedEvent(e))
                 return;
@@ -197,10 +201,13 @@ namespace Broker
                 while (storedEvents.CanSendEvent())
                 {
                     outgoingEvent = storedEvents.GetFirstEvent();
+                    sendACK = outgoingEvent.SendACK;
+                    outgoingEvent.SendACK = true;
+
                     interessedEntities = GetInteressedEntities(outgoingEvent, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
                     ProcessEventRouting(interessedEntities, outgoingEvent, sourceSite);
 
-                    if(outgoingEvent.SendACK)
+                    if(sendACK)
                         B.FManager.SendEventDispatchedAsync(outgoingEvent.EventNr, outgoingEvent.Publisher);
 
                     storedEvents.FirstEventSend();
@@ -219,11 +226,11 @@ namespace Broker
                 if(!minNumbers.ContainsKey(item.SourceEntity))
                 {
                     minNumbers[item.SourceEntity] = new Dictionary<string, int>();
-                    minNumbers[item.SourceEntity][item.E.Publisher] = 1;
+                    minNumbers[item.SourceEntity][item.E.Publisher] = item.InSeqNumber;
                 }
                 else if (!minNumbers[item.SourceEntity].ContainsKey(item.E.Publisher))
                 {
-                    minNumbers[item.SourceEntity][item.E.Publisher] = 1;
+                    minNumbers[item.SourceEntity][item.E.Publisher] = item.InSeqNumber;
                 }
                 else if(item.InSeqNumber < minNumbers[item.SourceEntity][item.E.Publisher])
                 {

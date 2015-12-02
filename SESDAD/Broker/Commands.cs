@@ -200,7 +200,6 @@ namespace Broker
             /*
              *  SEND ACK
              */
-            
             if (sourceSite.Equals(entity.RemoteNetwork.SiteName))
                 source = entity.RemoteNetwork.Publishers[sourceEntity];
             else
@@ -209,7 +208,7 @@ namespace Broker
             try
             {
                 source.ReceiveACK(timeoutID, entity.Name, entity.RemoteNetwork.SiteName);
-            } catch (Exception) {/*ignore*/}
+            } catch (Exception) {}
 
         }
     }
