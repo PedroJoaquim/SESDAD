@@ -1,3 +1,0 @@
-subscriber sub02 subscribe /testtopic
-wait 3000
-publisher pub01 publish 10 Ontopic /testtopic Interval 1

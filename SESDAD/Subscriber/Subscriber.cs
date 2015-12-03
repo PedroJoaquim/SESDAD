@@ -124,7 +124,7 @@ namespace Subscriber
             
             lock (this)
             {
-
+               
 
                 foreach (Tuple<string, int> item in authHistory)
                 {

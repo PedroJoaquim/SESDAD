@@ -29,13 +29,18 @@ namespace Shared_Library
         void HearthBeat();
     }
 
-    public interface IRemoteBroker : IRemoteEntity, IPassiveServer
+    public interface ISequencer
+    {
+        void NewEventPublished(string topic, string publisher, int eventNr);
+        void DifundSequencerMessage(Event e, string sourceSite, string name, int outSeqNumber);
+        void DisableSequencer();
+    }
+
+    public interface IRemoteBroker : IRemoteEntity, IPassiveServer, ISequencer
     {
         void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID);
         void DifundSubscribeEvent(string topic, string source);
         void DifundUnSubscribeEvent(string topic, string source);
-        void NewEventPublished(string topic, string publisher, int eventNr);
-        void DifundSequencerMessage(Event e, string sourceSite, string name, int outSeqNumber);
     }
 
     public interface IRemotePublisher : IRemoteEntity

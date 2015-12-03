@@ -146,7 +146,14 @@ namespace PuppetMaster
                 Console.Write("[CMD] > ");
                 cmd = Console.ReadLine();
 
-                shell.ProcessCommand(cmd);
+                try
+                {
+                    shell.ProcessCommand(cmd);
+                }
+                catch(Exception)
+                {
+                    Console.WriteLine("[ERROR] Invalid command syntax");
+                }
             }
 
         }

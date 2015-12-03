@@ -127,6 +127,7 @@ namespace Broker
 
         public void DifundUnprocessedMessages()
         {
+
             foreach (KeyValuePair<string, List<Tuple<int, string>>> item in unprocessedTotalOrderMessages)
             {
                 foreach (Tuple<int, string> eventInfo in item.Value)
@@ -176,6 +177,13 @@ namespace Broker
             {
                 broker.IsPassiveSequencer = true;
                 Console.WriteLine("[INFO] Elected as new Sequencer");
+
+                foreach (IRemoteBroker item in broker.RemoteNetwork.InBrokersList)
+                {
+                    try { item.DisableSequencer(); } catch(Exception) { /*ignore*/ }
+                }
+
+
                 return true;
             }
             else

@@ -70,6 +70,7 @@ namespace Broker
                         logDone = true;
                     }
 
+                    Console.WriteLine(String.Format("[EVENT DELIVERED] Topic: {0} Publisher: {1} EventNr: {2} To: {3}", e.Topic, e.Publisher, e.EventNr, entry.Key));
                     entry.Value.NotifyEvent(e);
 
                 }
@@ -358,9 +359,13 @@ namespace Broker
             Event outgoingEvent;
             PublishEventsStorage storedEvents = GetCreateEventOrder(sourceSite, sourceEntity);
 
-
+ 
             lock (storedEvents)
             {
+
+                if (seqNumber == 1 && sourceEntity.Equals(Sequencer.SEQUENCER_PASSIVE_NAME)) //sequencer has changed reset outgoing seqNumbers
+                    ResetOutSeqNumbers();
+
                 storedEvents.InsertInOrder(e, seqNumber);
 
                 while (storedEvents.CanSendEvent())
@@ -384,7 +389,27 @@ namespace Broker
 
         }
 
-       
+        private void ResetOutSeqNumbers()
+        {
+            lock(outTable)
+            {
+                List<Tuple<string, string>> valuesToChange = new List<Tuple<string, string>>();
+
+                foreach (KeyValuePair<string, Dictionary<string, int>> outTableEntry in outTable)
+                {
+                    foreach (KeyValuePair<string, int> entry in outTableEntry.Value)
+                    {
+                        valuesToChange.Add(new Tuple<string, string>(outTableEntry.Key, entry.Key));
+                    }
+                }
+
+                foreach (Tuple<string, string> tp in valuesToChange)
+                {
+                    outTable[tp.Item1][tp.Item2] = 1;
+                }
+            }
+
+        }
 
         private void DifundSequencerMessage(List<string> interessedEntities, Event e, string sourceSite, string sourceEntity)
         {
@@ -418,7 +443,7 @@ namespace Broker
                         if (B.FManager.IsDead(site, brokerName))
                             continue;
 
-                        try { broker.DifundSequencerMessage(e, sourceSite, sourceEntity, outSeqNumber); }
+                        try { broker.DifundSequencerMessage(e, B.RemoteNetwork.SiteName, sourceEntity, outSeqNumber); }
                         catch(Exception) { B.FManager.MarkAsDead(site, brokerName); }
                     }
                 }
@@ -448,12 +473,17 @@ namespace Broker
 
         public override void PublishStoredEvents(List<StoredEvent> storedEvents)
         {
-            //TODO
+            foreach (StoredEvent item in storedEvents)
+            {
+                StoredEvent itemCopy = item;
+                itemCopy.E.SendACK = false;
+                new Task(() => ExecuteDistribution(itemCopy.SourceSite, item.SourceEntity, itemCopy.E, itemCopy.InSeqNumber)).Start();
+            }
         }
 
         public override void EventDispatchedByMainServer(StoredEvent old)
         {
-            throw new NotImplementedException();
+            //ignore
         }
 
         private PublishEventsStorage GetCreateEventOrder(string sourceName, string publisherName)
@@ -526,5 +556,6 @@ namespace Broker
             this.storedEvents.RemoveAt(0);
             this.NextSeqNumber++;
         }
+
     }
 }

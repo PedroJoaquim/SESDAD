@@ -124,6 +124,7 @@ namespace Broker
 
             while(replicaAlive)
             {
+               RemoteEntity.CheckFreeze();
                Thread.Sleep(HEARTH_BEATS_TIME);
                try { PassiveServer.HearthBeat(); }
                catch(Exception) { replicaAlive = false; }

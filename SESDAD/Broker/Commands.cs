@@ -333,9 +333,8 @@ namespace Broker
                     seqEvent.IsSequencerMessage = true;
                     string sourceEntity = broker.IsSequencer ? Sequencer.SEQUENCER_BASE_NAME : Sequencer.SEQUENCER_PASSIVE_NAME;
 
-                    broker.PEventManager.ExecuteDistribution(broker.RemoteNetwork.SiteName, Sequencer.SEQUENCER_BASE_NAME, seqEvent, broker.Sequencer.GetNextSeqNumber());
+                    broker.PEventManager.ExecuteDistribution(broker.RemoteNetwork.SiteName, sourceEntity, seqEvent, broker.Sequencer.GetNextSeqNumber());
                     
-     
                 }
             }
             else

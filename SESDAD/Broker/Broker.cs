@@ -202,7 +202,6 @@ namespace Broker
         #region "interface methods"
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
-            Console.WriteLine(String.Format("[EVENT RECEIVED] {0}  FROM: {1} #{2}      inNumber: {3}", e.Topic, e.Publisher, e.EventNr, seqNumber));
             this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, sourceEntity, seqNumber));
             FManager.Events.Produce(new ReplicateCommand(FManager.PassiveServer, e, sourceSite, sourceEntity, seqNumber, timeoutID));
         }
@@ -303,6 +302,11 @@ namespace Broker
         public void SequencerEventDispatched(int eventNr, string publisher)
         {
             this.Sequencer.ACKForSequencerEventMessage(publisher, eventNr);
+        }
+
+        public void DisableSequencer()
+        {
+            this.IsSequencer = false;
         }
     }
 }

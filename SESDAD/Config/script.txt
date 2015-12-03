@@ -1,8 +1,12 @@
 Subscriber sub00 subscribe /p00-0
 Subscriber sub10 subscribe /p00-1
 Subscriber sub20 subscribe /p00-0
+Subscriber sub20 subscribe /p00-1
 Subscriber sub30 subscribe /p00-0
 Subscriber sub40 subscribe /p00-1
 Subscriber sub50 subscribe /p00-0
+wait 5000
+publisher pub30 publish 50 Ontopic /p00-0 Interval 1000 
+publisher pub50 publish 50 Ontopic /p00-1 Interval 1000 
 wait 15000
-publisher pub30 publish 15 Ontopic /p00-0 Interval 150 
+Freeze broker00
