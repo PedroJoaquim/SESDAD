@@ -18,21 +18,10 @@ namespace Subscriber
 
 
         private List<Tuple<string, int>> canDeliver = new List<Tuple<string, int>>();
-
+        private List<Tuple<string, int>> authHistory = new List<Tuple<string, int>>();
         private Dictionary<string, List<Event>> waitingEvents = new Dictionary<string, List<Event>>();
         private Dictionary<string, List<int>> receivedEvents = new Dictionary<string, List<int>>();
-        public Dictionary<string, List<int>> ReceivedEvents
-        {
-            get
-            {
-                return receivedEvents;
-            }
 
-            set
-            {
-                receivedEvents = value;
-            }
-        }
 
         public List<Tuple<string, int>> CanDeliver
         {
@@ -132,16 +121,19 @@ namespace Subscriber
         public void SequenceMessage(string publisher, int eventNr)
         {
 
+            
             lock (this)
             {
-                foreach (Tuple<string, int> item in CanDeliver)
+
+
+                foreach (Tuple<string, int> item in authHistory)
                 {
                     if (item.Item1.Equals(publisher) && item.Item2 == eventNr)
                         return;
                 }
 
-
                 CanDeliver.Add(new Tuple<string, int>(publisher, eventNr));
+                authHistory.Add(new Tuple<string, int>(publisher, eventNr));
             }
 
             DeliverEvents();
@@ -160,19 +152,19 @@ namespace Subscriber
         {
             lock (this)
             {
-                if (!ReceivedEvents.ContainsKey(e.Publisher))
+                if (!receivedEvents.ContainsKey(e.Publisher))
                 {
-                    ReceivedEvents[e.Publisher] = new List<int>();
-                    ReceivedEvents[e.Publisher].Add(e.EventNr);
+                    receivedEvents[e.Publisher] = new List<int>();
+                    receivedEvents[e.Publisher].Add(e.EventNr);
                     return true;
                 }
                 else
                 {
-                    if (ReceivedEvents[e.Publisher].Contains(e.EventNr))
+                    if (receivedEvents[e.Publisher].Contains(e.EventNr))
                         return false;
                     else
                     {
-                        ReceivedEvents[e.Publisher].Add(e.EventNr);
+                        receivedEvents[e.Publisher].Add(e.EventNr);
                         return true;
                     }
                 }

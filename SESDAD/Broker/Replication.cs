@@ -75,6 +75,10 @@ namespace Broker
             if (properties.GetType() == typeof(WaitHearthBeat))
             {
                 broker.PEventManager.PublishStoredEvents(this.storedEvents);
+                if(broker.Sequencer.CheckIfPassiveSequencer())
+                {
+                    broker.Sequencer.DifundUnprocessedMessages();
+                }
             }
 
             this.storedEvents = new List<StoredEvent>();

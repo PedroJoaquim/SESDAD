@@ -101,6 +101,28 @@ namespace Shared_Library
             }
         }
 
+        public void MarkAsDead(string siteName, string entityName)
+        {
+            lock (missedACKs)
+            {
+                if (!missedACKs.ContainsKey(siteName))
+                {
+                    missedACKs[siteName] = new Dictionary<string, Pair<DateTime, int>>();
+                    missedACKs[siteName][entityName] = new Pair<DateTime, int>();
+                    missedACKs[siteName][entityName].Second = MAX_MISSED_ACKS;
+                }
+                else if(!missedACKs[siteName].ContainsKey(entityName))
+                {
+                    missedACKs[siteName][entityName] = new Pair<DateTime, int>();
+                    missedACKs[siteName][entityName].Second = MAX_MISSED_ACKS;
+                }
+                else
+                {
+                    missedACKs[siteName][entityName].Second = MAX_MISSED_ACKS;
+                }
+            }
+        }
+
         protected void IncMissedACKs(string siteName, string entityName)
         {
             lock (missedACKs)

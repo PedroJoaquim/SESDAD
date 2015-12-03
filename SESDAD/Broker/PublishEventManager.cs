@@ -326,12 +326,13 @@ namespace Broker
 
         private Dictionary<string, Dictionary<string, PublishEventsStorage>> inTable = new Dictionary<string, Dictionary<string, PublishEventsStorage>>();
         private Dictionary<string, Dictionary<string, int>> outTable = new Dictionary<string, Dictionary<string, int>>();
-        private Dictionary<string, List<int>> processedTotalOrderMessages = new Dictionary<string, List<int>>();
+
 
         public TotalOrderPublishEventManager (Broker b): base(b) { }
 
         public override void ExecuteDistribution(string sourceSite, string sourceEntity, Event e, int seqNumber)
         {
+
             if (e.IsSequencerMessage)
             {
                 ExecuteSequencerMessageDistribution(sourceSite, sourceEntity, e, seqNumber);
@@ -357,6 +358,7 @@ namespace Broker
             Event outgoingEvent;
             PublishEventsStorage storedEvents = GetCreateEventOrder(sourceSite, sourceEntity);
 
+
             lock (storedEvents)
             {
                 storedEvents.InsertInOrder(e, seqNumber);
@@ -364,55 +366,27 @@ namespace Broker
                 while (storedEvents.CanSendEvent())
                 {
                     outgoingEvent = storedEvents.GetFirstEvent();
-
                     interessedEntities = GetInteressedEntities(outgoingEvent, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
-
-                    if (!AlreadyProcessedTotalOrderEvent(outgoingEvent))
-                    {
-                        DifundSequencerMessage(interessedEntities, outgoingEvent, sourceSite);
-                    }
-                        
-
+                    DifundSequencerMessage(interessedEntities, outgoingEvent, sourceSite, sourceEntity);
                     storedEvents.FirstEventSend();
+
+                    if(B.IsSequencer)
+                    {
+                        if (!B.FManager.PassiveDead && B.IsSequencer) // send ack for sequencer replication server
+                        {
+                            try { B.FManager.PassiveServer.SequencerEventDispatched(outgoingEvent.EventNr, outgoingEvent.Publisher); } 
+                            catch (Exception) { B.FManager.PassiveDead = true; }
+                        }
+                    }
                 }
             }
 
 
         }
 
-        protected bool AlreadyProcessedTotalOrderEvent(Event e)
-        {
-            List<int> targetEvents;
-            string source = e.Publisher;
-            int seqNumber = e.EventNr;
+       
 
-            lock (processedTotalOrderMessages)
-            {
-                if (!processedTotalOrderMessages.ContainsKey(source))
-                {
-                    processedTotalOrderMessages[source] = new List<int>();
-                    processedTotalOrderMessages[source].Add(seqNumber);
-                    return false;
-                }
-                else
-                {
-                    targetEvents = processedTotalOrderMessages[source];
-                }
-            }
-
-            lock (targetEvents)
-            {
-                if (targetEvents.Contains(seqNumber))
-                    return true;
-                else
-                {
-                    targetEvents.Add(seqNumber);
-                    return false;
-                }
-            }
-        }
-
-        private void DifundSequencerMessage(List<string> interessedEntities, Event e, string sourceSite)
+        private void DifundSequencerMessage(List<string> interessedEntities, Event e, string sourceSite, string sourceEntity)
         {
 
             /*
@@ -423,7 +397,7 @@ namespace Broker
             {
                 if (interessedEntities.Contains(entry.Key))
                 {
-                    entry.Value.SequenceMessage(e.Publisher, e.EventNr);
+                    try { entry.Value.SequenceMessage(e.Publisher, e.EventNr); } catch (Exception) { }
                 }
             }
 
@@ -435,7 +409,7 @@ namespace Broker
             {
                 if (!site.Equals(sourceSite) && interessedEntities.Contains(site))
                 {
-                    int outSeqNumber = GetOutgoingSeqNumber(site, e.Publisher);
+                    int outSeqNumber = GetOutgoingSeqNumber(site, Sequencer.SEQUENCER_BASE_NAME);
 
                     foreach (IRemoteBroker broker in B.RemoteNetwork.OutBrokers[site])
                     {
@@ -444,8 +418,8 @@ namespace Broker
                         if (B.FManager.IsDead(site, brokerName))
                             continue;
 
-                        try { broker.DifundSequencerMessage(e, sourceSite, B.Name, outSeqNumber); }
-                        catch(Exception) { /*ignore*/ }
+                        try { broker.DifundSequencerMessage(e, sourceSite, sourceEntity, outSeqNumber); }
+                        catch(Exception) { B.FManager.MarkAsDead(site, brokerName); }
                     }
                 }
             }
@@ -534,6 +508,7 @@ namespace Broker
 
             this.storedEvents.Add(new Tuple<Event, int>(e, inSeqNumber));
             storedEvents.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+
         }
 
         public bool CanSendEvent()

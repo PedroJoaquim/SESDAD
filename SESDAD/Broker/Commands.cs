@@ -325,13 +325,17 @@ namespace Broker
             Broker broker = (Broker)entity;
             
 
-            if(broker.SysConfig.ParentSite.Equals(SysConfig.NO_PARENT)) //current broker is the sequencer
+            if(broker.SysConfig.ParentSite.Equals(SysConfig.NO_PARENT)) 
             {
-                if (broker.IsSequencer) //current broker is the sequencer
+                if (broker.IsSequencer || broker.IsPassiveSequencer) //current broker is the sequencer
                 {
                     Event seqEvent = new Event(publisher, this.topic, new DateTime().Ticks, this.eventNr);
                     seqEvent.IsSequencerMessage = true;
+                    string sourceEntity = broker.IsSequencer ? Sequencer.SEQUENCER_BASE_NAME : Sequencer.SEQUENCER_PASSIVE_NAME;
+
                     broker.PEventManager.ExecuteDistribution(broker.RemoteNetwork.SiteName, Sequencer.SEQUENCER_BASE_NAME, seqEvent, broker.Sequencer.GetNextSeqNumber());
+                    
+     
                 }
             }
             else
@@ -348,9 +352,11 @@ namespace Broker
                         {
                             parentBroker.NewEventPublished(this.topic, this.publisher, this.eventNr);
                         }
-                        catch(Exception) {  /*ignore*/ }
+                        catch(Exception) { broker.FManager.MarkAsDead(broker.SysConfig.ParentSite, brokerName); }
                     }
                 }
+
+                broker.Sequencer.DispatchedNewEventMessage(publisher, eventNr, topic);
             }
         }
     }

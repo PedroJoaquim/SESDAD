@@ -25,6 +25,7 @@ namespace Shared_Library
     {
         void StoreNewEvent(Event e, string sourceSite, string sourceEntity, int inSeqNumber);
         void EventDispatched(int eventNr, string publisher);
+        void SequencerEventDispatched(int eventNr, string publisher);
         void HearthBeat();
     }
 

@@ -23,6 +23,7 @@ namespace Broker
         private ReplicationStorage repStorage;
         private Sequencer sequencer;
         private bool isSequencer;
+        private bool isPassiveSequencer;
 
         #region "properties"
         public ForwardingTable ForwardingTable
@@ -115,6 +116,19 @@ namespace Broker
                 sequencer = value;
             }
         }
+
+        public bool IsPassiveSequencer
+        {
+            get
+            {
+                return isPassiveSequencer;
+            }
+
+            set
+            {
+                isPassiveSequencer = value;
+            }
+        }
         #endregion
 
         public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, QUEUE_SIZE, NUM_THREADS)
@@ -205,11 +219,27 @@ namespace Broker
 
         public void DifundSequencerMessage(Event e, string sourceSite, string sourceEntity, int seqNumber)
         {
+            lock (Sequencer)
+            {
+                if (Sequencer.AlreadyProcessedTotalOrderMessage(e.Publisher, e.EventNr))
+                    return;
+                else
+                    Sequencer.ProcessedTotalOrderMessage(e.Publisher, e.EventNr);
+            }
+
             this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, sourceEntity, seqNumber));
         }
 
         public void NewEventPublished(string topic, string publisher, int eventNr)
         {
+            lock(Sequencer)
+            {
+                if (Sequencer.AlreadyDispatchedNewEventMessage(publisher, eventNr))
+                    return;
+                else
+                    Sequencer.DispatchedNewEventMessage(publisher, eventNr, topic);
+            }
+
             this.Events.Produce(new TotalOrderNewEventCommand(topic, publisher, eventNr));
         }
         #endregion
@@ -255,39 +285,24 @@ namespace Broker
             this.FManager = new BrokerFaultManager(this);
             this.RepStorage = new ReplicationStorage(this);
             this.FManager.PassiveServer = RemoteNetwork.GetBrokerByName(this.SysConfig.PassiveServer);
-            this.Sequencer = new Sequencer();
-            if(SysConfig.ParentSite.Equals(SysConfig.NO_PARENT))
+            this.Sequencer = new Sequencer(this);
+
+            if (SysConfig.ParentSite.Equals(SysConfig.NO_PARENT))
             {
-                CheckIfSequencer();
+                Sequencer.CheckIfSequencer();
             }
             else
             {
                 IsSequencer = false;
+                IsPassiveSequencer = false;
             }
 
             this.RepStorage.WaitHearthBeat();
         }
 
- 
-
-
-
-        private void CheckIfSequencer()
+        public void SequencerEventDispatched(int eventNr, string publisher)
         {
-            int myCode = Name.GetHashCode();
-
-            foreach (KeyValuePair<string, IRemoteBroker> item in RemoteNetwork.InBrokers)
-            {
-                if(item.Key.GetHashCode() > myCode)
-                {
-                    this.IsSequencer = false;
-                    return;
-                }
-            }
-            Console.WriteLine("[SEQUENCER]");
-            this.IsSequencer = true;
+            this.Sequencer.ACKForSequencerEventMessage(publisher, eventNr);
         }
-
-
     }
 }
