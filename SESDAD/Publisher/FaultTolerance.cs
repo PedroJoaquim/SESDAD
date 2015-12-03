@@ -9,8 +9,8 @@ namespace Publisher
 {
     class PublisherFaultManager : FaultManager
     {
-        private const int NUM_THREADS = 15;
-        private const int QUEUE_SIZE = 100;
+        private const int NUM_THREADS = 50;
+        private const int QUEUE_SIZE = 200;
 
         private int currentEventNr;
 
@@ -31,6 +31,9 @@ namespace Publisher
                 this.Events.Produce(new ForwardPublishCommand(newEvent, RemoteEntity.RemoteNetwork.SiteName, eventNr));
                 Console.WriteLine(String.Format("[PUBLISH EVENT] Topic: {0} EventNr: {1}", newEvent.Topic, newEvent.EventNr));
                 this.currentEventNr++;
+
+                if(RemoteEntity.SysConfig.Ordering.Equals(SysConfig.TOTAL))
+                    this.Events.Produce(new InformNewEventCommand(newEvent.Topic, RemoteEntity.Name, newEvent.EventNr));
             }
         }
 

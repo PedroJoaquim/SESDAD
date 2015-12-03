@@ -21,6 +21,8 @@ namespace Broker
         private PublishEventManager pEventManager;
         private BrokerFaultManager fManager;
         private ReplicationStorage repStorage;
+        private Sequencer sequencer;
+        private bool isSequencer;
 
         #region "properties"
         public ForwardingTable ForwardingTable
@@ -87,6 +89,32 @@ namespace Broker
                 repStorage = value;
             }
         }
+
+        public bool IsSequencer
+        {
+            get
+            {
+                return isSequencer;
+            }
+
+            set
+            {
+                isSequencer = value;
+            }
+        }
+
+        internal Sequencer Sequencer
+        {
+            get
+            {
+                return sequencer;
+            }
+
+            set
+            {
+                sequencer = value;
+            }
+        }
         #endregion
 
         public Broker(String name, String url, String pmUrl) : base(name, url, pmUrl, QUEUE_SIZE, NUM_THREADS)
@@ -120,6 +148,7 @@ namespace Broker
 
             if (this.SysConfig.Ordering.Equals(SysConfig.TOTAL))
                 this.PEventManager = new TotalOrderPublishEventManager(this);
+
         }
 
         public override void Status()
@@ -160,7 +189,7 @@ namespace Broker
         public void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID)
         {
             Console.WriteLine(String.Format("[EVENT RECEIVED] {0}  FROM: {1} #{2}      inNumber: {3}", e.Topic, e.Publisher, e.EventNr, seqNumber));
-            this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, sourceEntity, seqNumber, timeoutID));
+            this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, sourceEntity, seqNumber));
             FManager.Events.Produce(new ReplicateCommand(FManager.PassiveServer, e, sourceSite, sourceEntity, seqNumber, timeoutID));
         }
 
@@ -172,6 +201,16 @@ namespace Broker
         public void DifundUnSubscribeEvent(string topic, string source)
         {
             this.Events.Produce(new DifundUnSubscribeEventCommand(topic, source));
+        }
+
+        public void DifundSequencerMessage(Event e, string sourceSite, string sourceEntity, int seqNumber)
+        {
+            this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, sourceEntity, seqNumber));
+        }
+
+        public void NewEventPublished(string topic, string publisher, int eventNr)
+        {
+            this.Events.Produce(new TotalOrderNewEventCommand(topic, publisher, eventNr));
         }
         #endregion
 
@@ -216,7 +255,39 @@ namespace Broker
             this.FManager = new BrokerFaultManager(this);
             this.RepStorage = new ReplicationStorage(this);
             this.FManager.PassiveServer = RemoteNetwork.GetBrokerByName(this.SysConfig.PassiveServer);
+            this.Sequencer = new Sequencer();
+            if(SysConfig.ParentSite.Equals(SysConfig.NO_PARENT))
+            {
+                CheckIfSequencer();
+            }
+            else
+            {
+                IsSequencer = false;
+            }
+
             this.RepStorage.WaitHearthBeat();
         }
+
+ 
+
+
+
+        private void CheckIfSequencer()
+        {
+            int myCode = Name.GetHashCode();
+
+            foreach (KeyValuePair<string, IRemoteBroker> item in RemoteNetwork.InBrokers)
+            {
+                if(item.Key.GetHashCode() > myCode)
+                {
+                    this.IsSequencer = false;
+                    return;
+                }
+            }
+            Console.WriteLine("[SEQUENCER]");
+            this.IsSequencer = true;
+        }
+
+
     }
 }

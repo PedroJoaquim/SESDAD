@@ -14,16 +14,14 @@ namespace Broker
         private string sourceSite;
         private string sourceEntity;
         private int inSeqNumber;
-        private int timeoutID;
         #endregion
 
-        public DifundPublishEventCommand(Event e, string sourceSite, string sourceEntity, int inSeqNumber, int timeoutID)
+        public DifundPublishEventCommand(Event e, string sourceSite, string sourceEntity, int inSeqNumber)
         {
             this.e = e;
             this.sourceSite = sourceSite;
             this.sourceEntity = sourceEntity;
             this.inSeqNumber = inSeqNumber;
-            this.timeoutID = timeoutID;
         }
 
         public override void Execute(RemoteEntity entity)
@@ -213,7 +211,6 @@ namespace Broker
         }
     }
 
-
     class EventDispatchedCommand : Command
     {
 
@@ -306,6 +303,55 @@ namespace Broker
             catch (Exception) { /*ignore*/ }
 
             Console.WriteLine(String.Format("[FORWARD EVENT RETRANSMISSION] Topic: {0} Publisher: {1} EventNr: {2} To: {3}", e.Topic, e.Publisher, e.EventNr, entity.RemoteNetwork.GetBrokerName(broker)));
+        }
+    }
+
+    class TotalOrderNewEventCommand : Command
+    {
+        private string topic;
+        private string publisher;
+        private int eventNr;
+
+
+        public TotalOrderNewEventCommand(string topic, string publisher, int eventNr)
+        {
+            this.topic = topic;
+            this.publisher = publisher;
+            this.eventNr = eventNr;
+        }
+
+        public override void Execute(RemoteEntity entity)
+        {
+            Broker broker = (Broker)entity;
+            
+
+            if(broker.SysConfig.ParentSite.Equals(SysConfig.NO_PARENT)) //current broker is the sequencer
+            {
+                if (broker.IsSequencer) //current broker is the sequencer
+                {
+                    Event seqEvent = new Event(publisher, this.topic, new DateTime().Ticks, this.eventNr);
+                    seqEvent.IsSequencerMessage = true;
+                    broker.PEventManager.ExecuteDistribution(broker.RemoteNetwork.SiteName, Sequencer.SEQUENCER_BASE_NAME, seqEvent, broker.Sequencer.GetNextSeqNumber());
+                }
+            }
+            else
+            {
+                List<IRemoteBroker> parentBrokers = broker.RemoteNetwork.OutBrokers[broker.SysConfig.ParentSite];
+
+                foreach (IRemoteBroker parentBroker in parentBrokers)
+                {
+                    string brokerName = broker.RemoteNetwork.GetBrokerName(parentBroker);
+
+                    if (!broker.FManager.IsDead(broker.SysConfig.ParentSite, brokerName))
+                    {
+                        try
+                        {
+                            parentBroker.NewEventPublished(this.topic, this.publisher, this.eventNr);
+                        }
+                        catch(Exception) {  /*ignore*/ }
+                    }
+                }
+            }
         }
     }
 }

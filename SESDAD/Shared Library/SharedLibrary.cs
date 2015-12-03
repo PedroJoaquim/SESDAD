@@ -30,7 +30,7 @@ namespace Shared_Library
         public const String FIFO = "fifo";
         public const String TOTAL = "total";
         public const String NO_ORDER = "no";
-
+        public const String NO_PARENT = "#no-site#";
 
         #region "Attributes"
         private String logLevel = null;
@@ -38,6 +38,7 @@ namespace Shared_Library
         private String ordering = null;
         private String distributed = null;
         private String passiveServer = null;
+        private String parentSite = null;
         private List<Connection> connections = null;
 
         #endregion
@@ -121,6 +122,20 @@ namespace Shared_Library
                 passiveServer = value;
             }
         }
+
+        public string ParentSite
+        {
+            get
+            {
+                return parentSite;
+            }
+
+            set
+            {
+                parentSite = value;
+            }
+        }
+
         #endregion
 
         public SysConfig()
@@ -138,6 +153,7 @@ namespace Shared_Library
             result.Distributed = this.Distributed;
             result.connections = this.Connections;
             result.PassiveServer = this.PassiveServer;
+            result.ParentSite = this.ParentSite;
 
             return result;
         }
@@ -150,6 +166,7 @@ namespace Shared_Library
             routingPolicy = (String)info.GetValue("routingPolicy", typeof(String));
             ordering = (String)info.GetValue("ordering", typeof(String));
             PassiveServer = (String)info.GetValue("passiveServer", typeof(String));
+            ParentSite = (String)info.GetValue("parentSite", typeof(String));
             connections = DeserializeConnections((String)info.GetValue("connections", typeof(String)));
         }
 
@@ -159,6 +176,7 @@ namespace Shared_Library
             info.AddValue("routingPolicy", routingPolicy);
             info.AddValue("ordering", ordering);
             info.AddValue("passiveServer", PassiveServer);
+            info.AddValue("parentSite", parentSite);
             info.AddValue("connections", serializeConnections());
         }
 
@@ -360,6 +378,7 @@ namespace Shared_Library
         private long timestamp;
         private int eventNr;
         private bool sendACK;
+        private bool isSequencerMessage;
 
         #region "Properties"
         public string Publisher
@@ -426,6 +445,19 @@ namespace Shared_Library
                 sendACK = value;
             }
         }
+
+        public bool IsSequencerMessage
+        {
+            get
+            {
+                return isSequencerMessage;
+            }
+
+            set
+            {
+                isSequencerMessage = value;
+            }
+        }
         #endregion
 
         public Event(string publisher, string topic, long timestamp, int eventNr)
@@ -435,6 +467,7 @@ namespace Shared_Library
             this.Timestamp = timestamp;
             this.EventNr = eventNr;
             this.SendACK = true;
+            this.IsSequencerMessage = false;
         }
 
         public Event(SerializationInfo info, StreamingContext ctxt)
@@ -444,6 +477,7 @@ namespace Shared_Library
             timestamp = (long)info.GetValue("timestamp", typeof(long));
             eventNr = (int)info.GetValue("eventNr", typeof(int));
             sendACK = (bool)info.GetValue("sendACK", typeof(bool));
+            isSequencerMessage = (bool)info.GetValue("isSequencerMessage", typeof(bool));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -453,6 +487,7 @@ namespace Shared_Library
             info.AddValue("timestamp", timestamp);
             info.AddValue("eventNr", eventNr);
             info.AddValue("sendACK", sendACK);
+            info.AddValue("isSequencerMessage", isSequencerMessage);
         }
     }
 }

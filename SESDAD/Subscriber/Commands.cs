@@ -89,40 +89,4 @@ namespace Subscriber
             }
         }
     }
-
-    class NotifyEvent : Command
-    {
-        #region "Properties"
-        private Event e;
-
-        public Event E
-        {
-            get
-            {
-                return e;
-            }
-
-            set
-            {
-                e = value;
-            }
-        }
-        #endregion
-
-        public NotifyEvent(Event e)
-        {
-            this.E = e;
-        }
-
-        public override void Execute(RemoteEntity entity)
-        {
-            Subscriber s = (Subscriber)entity;
-
-            if(s.ValidEvent(this.E))
-            {
-                entity.PuppetMaster.LogEventDelivery(entity.Name, this.E.Publisher, this.E.Topic, this.E.EventNr);
-                Console.WriteLine(String.Format("[EVENT {3}] {1} -----> {0} #{2}", this.E.Topic, this.E.Publisher, this.E.EventNr, entity.Name));
-            }
-        }
-    }
 }

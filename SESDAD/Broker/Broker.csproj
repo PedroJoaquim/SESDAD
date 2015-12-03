@@ -51,6 +51,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublishEventManager.cs" />
     <Compile Include="Replication.cs" />
+    <Compile Include="Sequencer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

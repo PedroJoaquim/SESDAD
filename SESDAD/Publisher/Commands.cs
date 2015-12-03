@@ -61,4 +61,34 @@ namespace Publisher
         }
 
     }
+
+    class InformNewEventCommand : Command
+    {
+        private string topic;
+        private string publisher;
+        private int eventNr;
+
+        public InformNewEventCommand(string topic, string publisher, int eventNr)
+        {
+            this.topic = topic;
+            this.publisher = publisher;
+            this.eventNr = eventNr;
+        }
+
+        public override void Execute(RemoteEntity entity)
+        {
+            Publisher pEntity = (Publisher)entity;
+            PublisherFaultManager fManager = pEntity.FManager;
+
+            foreach (IRemoteBroker broker in pEntity.RemoteNetwork.InBrokersList)
+            {
+                string brokerName = pEntity.RemoteNetwork.GetBrokerName(broker);
+
+                if (!fManager.IsDead(pEntity.RemoteNetwork.SiteName, brokerName))
+                {
+                    try { broker.NewEventPublished(topic, publisher, eventNr); } catch (Exception) { /*ignore*/ }
+                }
+            }
+        }
+    }
 }

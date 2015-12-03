@@ -91,7 +91,7 @@ namespace Shared_Library
             }
         }
 
-        public bool HasMissedMaxACKs(string siteName, string entityName)
+        public bool IsDead(string siteName, string entityName)
         {
             lock(missedACKs)
             {
@@ -147,7 +147,6 @@ namespace Shared_Library
             }
         }
 
-
         public IRemoteBroker ChooseBroker(string site, string publisher)
         {
             RemoteNetwork rn = RemoteEntity.RemoteNetwork;
@@ -156,7 +155,7 @@ namespace Shared_Library
             int secondIndex = Utils.CalcBrokerForwardIndex(brokers.Count, publisher, true);
             string firstBrokerName = rn.GetBrokerName(brokers[firstIndex]);
 
-            if (HasMissedMaxACKs(site, firstBrokerName))
+            if (IsDead(site, firstBrokerName))
                 return brokers[secondIndex];
             else
                 return brokers[firstIndex];

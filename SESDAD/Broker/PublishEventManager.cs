@@ -59,6 +59,7 @@ namespace Broker
              * Distribute messages to all interessed subscribers
              */
 
+
             foreach (KeyValuePair<string, IRemoteSubscriber> entry in b.RemoteNetwork.Subscribers)
             {
                 if (interessedEntities.Contains(entry.Key))
@@ -70,6 +71,7 @@ namespace Broker
                     }
 
                     entry.Value.NotifyEvent(e);
+
                 }
             }
             /*
@@ -132,6 +134,8 @@ namespace Broker
                 }
             }
         }
+
+        
     }
 
     class NoOrderPublishEventManager : PublishEventManager
@@ -191,6 +195,7 @@ namespace Broker
             PublishEventsStorage storedEvents = GetCreateEventOrder(sourceEntity, e.Publisher);
             bool sendACK;
 
+
             if (AlreadyProcessedEvent(e))
                 return;
 
@@ -200,6 +205,7 @@ namespace Broker
 
                 while (storedEvents.CanSendEvent())
                 {
+                    
                     outgoingEvent = storedEvents.GetFirstEvent();
                     sendACK = outgoingEvent.SendACK;
                     outgoingEvent.SendACK = true;
@@ -212,7 +218,8 @@ namespace Broker
 
                     storedEvents.FirstEventSend();
                 }
-                
+
+
             }
         }
 
@@ -316,27 +323,185 @@ namespace Broker
 
     class TotalOrderPublishEventManager : PublishEventManager
     {
+
+        private Dictionary<string, Dictionary<string, PublishEventsStorage>> inTable = new Dictionary<string, Dictionary<string, PublishEventsStorage>>();
+        private Dictionary<string, Dictionary<string, int>> outTable = new Dictionary<string, Dictionary<string, int>>();
+        private Dictionary<string, List<int>> processedTotalOrderMessages = new Dictionary<string, List<int>>();
+
         public TotalOrderPublishEventManager (Broker b): base(b) { }
 
         public override void ExecuteDistribution(string sourceSite, string sourceEntity, Event e, int seqNumber)
         {
-            throw new NotImplementedException();
+            if (e.IsSequencerMessage)
+            {
+                ExecuteSequencerMessageDistribution(sourceSite, sourceEntity, e, seqNumber);
+                return;
+            }
+                
+            if (AlreadyProcessedEvent(e))
+                return;
+
+            List<string> interessedEntities = GetInteressedEntities(e, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
+            bool sendACK = e.SendACK;
+
+            e.SendACK = true;
+            ProcessEventRouting(interessedEntities, e, sourceSite);
+
+            if (sendACK)
+                B.FManager.SendEventDispatchedAsync(e.EventNr, e.Publisher);
         }
 
-        protected override int GetOutgoingSeqNumber(string brokerName, string pName)
+        private void ExecuteSequencerMessageDistribution(string sourceSite, string sourceEntity, Event e, int seqNumber) //we have to ensure fifo order for sequencer messages
         {
-            throw new NotImplementedException();
+            List<string> interessedEntities;
+            Event outgoingEvent;
+            PublishEventsStorage storedEvents = GetCreateEventOrder(sourceSite, sourceEntity);
+
+            lock (storedEvents)
+            {
+                storedEvents.InsertInOrder(e, seqNumber);
+
+                while (storedEvents.CanSendEvent())
+                {
+                    outgoingEvent = storedEvents.GetFirstEvent();
+
+                    interessedEntities = GetInteressedEntities(outgoingEvent, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
+
+                    if (!AlreadyProcessedTotalOrderEvent(outgoingEvent))
+                    {
+                        DifundSequencerMessage(interessedEntities, outgoingEvent, sourceSite);
+                    }
+                        
+
+                    storedEvents.FirstEventSend();
+                }
+            }
+
+
+        }
+
+        protected bool AlreadyProcessedTotalOrderEvent(Event e)
+        {
+            List<int> targetEvents;
+            string source = e.Publisher;
+            int seqNumber = e.EventNr;
+
+            lock (processedTotalOrderMessages)
+            {
+                if (!processedTotalOrderMessages.ContainsKey(source))
+                {
+                    processedTotalOrderMessages[source] = new List<int>();
+                    processedTotalOrderMessages[source].Add(seqNumber);
+                    return false;
+                }
+                else
+                {
+                    targetEvents = processedTotalOrderMessages[source];
+                }
+            }
+
+            lock (targetEvents)
+            {
+                if (targetEvents.Contains(seqNumber))
+                    return true;
+                else
+                {
+                    targetEvents.Add(seqNumber);
+                    return false;
+                }
+            }
+        }
+
+        private void DifundSequencerMessage(List<string> interessedEntities, Event e, string sourceSite)
+        {
+
+            /*
+             * Distribute messages to all interessed subscribers
+             */
+
+            foreach (KeyValuePair<string, IRemoteSubscriber> entry in B.RemoteNetwork.Subscribers)
+            {
+                if (interessedEntities.Contains(entry.Key))
+                {
+                    entry.Value.SequenceMessage(e.Publisher, e.EventNr);
+                }
+            }
+
+            /*
+             * Distribute messages to all interessed brokers
+             */
+
+            foreach (string site in B.RemoteNetwork.GetAllOutSites())
+            {
+                if (!site.Equals(sourceSite) && interessedEntities.Contains(site))
+                {
+                    int outSeqNumber = GetOutgoingSeqNumber(site, e.Publisher);
+
+                    foreach (IRemoteBroker broker in B.RemoteNetwork.OutBrokers[site])
+                    {
+                        string brokerName = B.RemoteNetwork.GetBrokerName(broker);
+
+                        if (B.FManager.IsDead(site, brokerName))
+                            continue;
+
+                        try { broker.DifundSequencerMessage(e, sourceSite, B.Name, outSeqNumber); }
+                        catch(Exception) { /*ignore*/ }
+                    }
+                }
+            }
+        }
+
+        protected override int GetOutgoingSeqNumber(string siteName, string pName)
+        {
+            string cleanSiteName = siteName.ToLower();
+            string cleanPName = pName.ToLower();
+            int result;
+
+            lock (this.outTable)
+            {
+                if (!this.outTable.ContainsKey(cleanSiteName))
+                    this.outTable[cleanSiteName] = new Dictionary<string, int>();
+
+                if (!this.outTable[cleanSiteName].ContainsKey(cleanPName))
+                    this.outTable[cleanSiteName][cleanPName] = 1;
+
+                result = this.outTable[cleanSiteName][cleanPName];
+                this.outTable[cleanSiteName][cleanPName] = result + 1;
+            }
+
+            return result;
         }
 
         public override void PublishStoredEvents(List<StoredEvent> storedEvents)
         {
-            throw new NotImplementedException();
+            //TODO
         }
 
         public override void EventDispatchedByMainServer(StoredEvent old)
         {
             throw new NotImplementedException();
         }
+
+        private PublishEventsStorage GetCreateEventOrder(string sourceName, string publisherName)
+        {
+            PublishEventsStorage result;
+            string cleanRemoteName = sourceName.ToLower();
+            string cleanPName = publisherName.ToLower();
+
+            lock (this.inTable)
+            {
+                if (!this.inTable.ContainsKey(cleanRemoteName))
+                    this.inTable[cleanRemoteName] = new Dictionary<string, PublishEventsStorage>();
+
+                if (!this.inTable[cleanRemoteName].ContainsKey(cleanPName))
+                    this.inTable[cleanRemoteName][cleanPName] = new PublishEventsStorage();
+
+                result = this.inTable[cleanRemoteName][cleanPName];
+            }
+
+            return result;
+        }
+
     }
 
     class PublishEventsStorage
@@ -366,7 +531,7 @@ namespace Broker
         {
             if (inSeqNumber < NextSeqNumber)
                 return; //discard old publish events
-            
+
             this.storedEvents.Add(new Tuple<Event, int>(e, inSeqNumber));
             storedEvents.Sort((x, y) => x.Item2.CompareTo(y.Item2));
         }

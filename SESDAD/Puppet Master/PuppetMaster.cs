@@ -425,6 +425,7 @@ namespace PuppetMaster
             SysConfig config = this.network.SystemConfig.cloneConfig();
             config.Connections = bEntity.GetConnectionsUrl();
             config.PassiveServer = bEntity.GetPassiveServer();
+            config.ParentSite = bEntity.Site.Parent == null ? SysConfig.NO_PARENT : bEntity.Site.Parent.Name;
             newBroker.RegisterInitializationInfo(config, bEntity.Site.Name);
             PostEntityProcessed();
 

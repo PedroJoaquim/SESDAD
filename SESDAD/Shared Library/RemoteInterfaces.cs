@@ -33,6 +33,8 @@ namespace Shared_Library
         void DifundPublishEvent(Event e, string sourceSite, string sourceEntity, int seqNumber, int timeoutID);
         void DifundSubscribeEvent(string topic, string source);
         void DifundUnSubscribeEvent(string topic, string source);
+        void NewEventPublished(string topic, string publisher, int eventNr);
+        void DifundSequencerMessage(Event e, string sourceSite, string name, int outSeqNumber);
     }
 
     public interface IRemotePublisher : IRemoteEntity
@@ -46,6 +48,7 @@ namespace Shared_Library
         void Subscribe(String topic);
         void Unsubscribe(String topic);
         void NotifyEvent(Event e);
+        void SequenceMessage(string publisher, int eventNr);
     }
 
     public interface IRemotePuppetMaster

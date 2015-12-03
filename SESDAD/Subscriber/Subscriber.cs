@@ -16,8 +16,11 @@ namespace Subscriber
         private const int NUM_THREADS = 1;
         private const int QUEUE_SIZE = 100;
 
-        private Dictionary<string, List<int>> receivedEvents = new Dictionary<string, List<int>>();
 
+        private List<Tuple<string, int>> canDeliver = new List<Tuple<string, int>>();
+
+        private Dictionary<string, List<Event>> waitingEvents = new Dictionary<string, List<Event>>();
+        private Dictionary<string, List<int>> receivedEvents = new Dictionary<string, List<int>>();
         public Dictionary<string, List<int>> ReceivedEvents
         {
             get
@@ -30,6 +33,20 @@ namespace Subscriber
                 receivedEvents = value;
             }
         }
+
+        public List<Tuple<string, int>> CanDeliver
+        {
+            get
+            {
+                return canDeliver;
+            }
+
+            set
+            {
+                canDeliver = value;
+            }
+        }
+
 
         public Subscriber(String name, String url, String pmUrl) : base(name, url, pmUrl, QUEUE_SIZE, NUM_THREADS) { }
 
@@ -75,6 +92,8 @@ namespace Subscriber
             Console.WriteLine(String.Format("###########################################################"));
         }
 
+ 
+
         #region "interface methods"
         public void Subscribe(string topic)
         {
@@ -88,14 +107,60 @@ namespace Subscriber
 
         public void NotifyEvent(Event e)
         {
-            this.Events.Produce(new NotifyEvent(e));
+            if (!ValidEvent(e))
+                return;
+
+            if(!SysConfig.Ordering.Equals(SysConfig.TOTAL))
+            {
+                PresetEvent(e);
+                return;
+            }
+
+            lock (this)
+            {
+                if (!waitingEvents.ContainsKey(e.Publisher))
+                {
+                    waitingEvents[e.Publisher] = new List<Event>();
+                }
+
+                waitingEvents[e.Publisher].Add(e);
+            }
+
+            DeliverEvents();
         }
 
-        internal bool ValidEvent(Event e)
+        public void SequenceMessage(string publisher, int eventNr)
         {
-            lock(this)
+
+            lock (this)
             {
-                if(!ReceivedEvents.ContainsKey(e.Publisher))
+                foreach (Tuple<string, int> item in CanDeliver)
+                {
+                    if (item.Item1.Equals(publisher) && item.Item2 == eventNr)
+                        return;
+                }
+
+
+                CanDeliver.Add(new Tuple<string, int>(publisher, eventNr));
+            }
+
+            DeliverEvents();
+        }
+
+        public override void ReceiveACK(int timeoutID, string entityName, string entitySite)
+        {
+            //IGNORE
+        }
+
+
+
+        #endregion
+
+        private bool ValidEvent(Event e)
+        {
+            lock (this)
+            {
+                if (!ReceivedEvents.ContainsKey(e.Publisher))
                 {
                     ReceivedEvents[e.Publisher] = new List<int>();
                     ReceivedEvents[e.Publisher].Add(e.EventNr);
@@ -114,12 +179,51 @@ namespace Subscriber
             }
         }
 
-        public override void ReceiveACK(int timeoutID, string entityName, string entitySite)
+
+        private void DeliverEvents()
         {
-            //IGNORE
+            lock (this)
+            {
+                Event notifyEvent;
+
+                while ((notifyEvent = HaveEventsToDeliver()) != null)
+                {
+                    PresetEvent(notifyEvent);
+                }
+            }
         }
 
-        #endregion
+        private void PresetEvent(Event notifyEvent)
+        {
+            PuppetMaster.LogEventDelivery(Name, notifyEvent.Publisher, notifyEvent.Topic, notifyEvent.EventNr);
+            Console.WriteLine(String.Format("[EVENT {3}] {1} -----> {0} #{2}", notifyEvent.Topic, notifyEvent.Publisher, notifyEvent.EventNr, Name));
+        }
+
+        private Event HaveEventsToDeliver()
+        {
+            if (CanDeliver.Count == 0)
+                return null;
+
+            Tuple<string, int> canDeliverInfo = CanDeliver.ElementAt(0);
+
+            if (!waitingEvents.ContainsKey(canDeliverInfo.Item1))
+                return null;
+
+            List<Event> targetEvents = waitingEvents[canDeliverInfo.Item1];
+
+            for (int i = 0; i < targetEvents.Count; i++)
+            {
+                if(targetEvents[i].EventNr == canDeliverInfo.Item2)
+                {
+                    Event targetEvent = targetEvents[i];
+                    targetEvents.RemoveAt(i);
+                    CanDeliver.RemoveAt(0);
+                    return targetEvent;
+                }
+            }
+
+            return null;
+        }
 
 
         static void Main(string[] args)
@@ -134,5 +238,7 @@ namespace Subscriber
         {
             //ignore
         }
+
+
     }
 }
