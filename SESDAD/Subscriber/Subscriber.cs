@@ -17,16 +17,16 @@ namespace Subscriber
         private const int NUM_THREADS = 1;
         private const int QUEUE_SIZE = 100;
         private const int SLEEP_MONITOR_TIME = 5000;
-        private const int MONITOR_TIME = 10000;
+        private const int MONITOR_TIME = 15000;
 
-        private List<Tuple<string, int>> canDeliver = new List<Tuple<string, int>>();
+        private List<Tuple<string, int, DateTime>> canDeliver = new List<Tuple<string, int, DateTime>>();
         private List<Tuple<string, int>> authHistory = new List<Tuple<string, int>>();
         private Dictionary<string, List<Event>> waitingEvents = new Dictionary<string, List<Event>>();
         private Dictionary<string, List<int>> receivedEvents = new Dictionary<string, List<int>>();
 
         private DateTime lastTimeDelivered;
 
-        public List<Tuple<string, int>> CanDeliver
+        public List<Tuple<string, int, DateTime>> CanDeliver
         {
             get
             {
@@ -38,7 +38,6 @@ namespace Subscriber
                 canDeliver = value;
             }
         }
-
 
         public Subscriber(String name, String url, String pmUrl) : base(name, url, pmUrl, QUEUE_SIZE, NUM_THREADS) { }
 
@@ -111,7 +110,6 @@ namespace Subscriber
 
             lock (this)
             {
-            
                 if (!waitingEvents.ContainsKey(e.Publisher))
                 {
                     waitingEvents[e.Publisher] = new List<Event>();
@@ -133,8 +131,8 @@ namespace Subscriber
                     if (item.Item1.Equals(publisher) && item.Item2 == eventNr)
                         return;
                 }
-                
-                CanDeliver.Add(new Tuple<string, int>(publisher, eventNr));
+
+                CanDeliver.Add(new Tuple<string, int, DateTime>(publisher, eventNr, DateTime.Now));
                 authHistory.Add(new Tuple<string, int>(publisher, eventNr));
             }
 
@@ -160,30 +158,24 @@ namespace Subscriber
                     DateTime now = DateTime.Now;
                     int diff = (int)((TimeSpan)(now - lastTimeDelivered)).TotalMilliseconds;
                     
-                    if (waitingEvents.Count > 0 && canDeliver.Count > 0 && diff > MONITOR_TIME)
+                    if (waitingEvents.Count > 0 && CanDeliver.Count > 0 && diff > MONITOR_TIME)
                     {
-                        List<int> toRemove = new List<int>();
+                             
+                       while(canDeliver.Count > 0 && !HasMatchingEvent(canDeliver[0].Item1, canDeliver[0].Item2))
+                       {
+                            int diff2 = (int)((TimeSpan)(now - canDeliver[0].Item3)).TotalMilliseconds;
 
-                        for (int i = 0; i < canDeliver.Count; i++)
-                        {
-                            if (waitingEvents.ContainsKey(canDeliver[i].Item1) && ContainsEventNumber(waitingEvents[CanDeliver[i].Item1], CanDeliver[i].Item2))
+                            if (diff2 > MONITOR_TIME)
                             {
-                                break;
+                                CanDeliver.RemoveAt(0);
                             }
                             else
                             {
-                                toRemove.Add(i);
+                                break;
                             }
-                        }
+                       }
 
-                        Console.WriteLine("GOING TO DELETE: " + toRemove.Count);
-
-                        foreach (int item in toRemove)
-                        {
-                            CanDeliver.RemoveAt(item);
-                        }
-
-                        DeliverEvents();
+                      DeliverEvents();
                     }
                 }
             }
@@ -223,7 +215,19 @@ namespace Subscriber
             }
         }
 
+        private bool HasMatchingEvent(string publisher, int eventNr)
+        {
+            if (!waitingEvents.ContainsKey(publisher))
+                return false;
 
+            foreach (Event e in waitingEvents[publisher])
+            {
+                if (e.EventNr == eventNr)
+                    return true;
+            }
+
+            return false;
+        }
         private void DeliverEvents()
         {
             lock (this)
@@ -249,7 +253,7 @@ namespace Subscriber
             if (CanDeliver.Count == 0)
                 return null;
 
-            Tuple<string, int> canDeliverInfo = CanDeliver.ElementAt(0);
+            Tuple<string, int, DateTime> canDeliverInfo = CanDeliver.ElementAt(0);
 
             if (!waitingEvents.ContainsKey(canDeliverInfo.Item1))
                 return null;
@@ -266,7 +270,6 @@ namespace Subscriber
                     return targetEvent;
                 }
             }
-
             return null;
         }
 
@@ -282,8 +285,13 @@ namespace Subscriber
         public override void ConnectionsCreated()
         {
             this.lastTimeDelivered = DateTime.Now;
-            Thread t = new Thread(MonitorDeadLock);
-            t.Start();
+
+            if(SysConfig.Ordering.Equals(SysConfig.TOTAL))
+            {
+                Thread t = new Thread(MonitorDeadLock);
+                t.Start();
+            }
+
         }
 
 

@@ -194,7 +194,7 @@ namespace PuppetMaster
         {
             foreach (KeyValuePair<string, Entity> entry in Network.Entities)
             {
-                entry.Value.GetRemoteEntity().Status();
+                try { entry.Value.GetRemoteEntity().Status(); } catch (Exception) { };
             }
             Log.logCMD(cmd);
         }
@@ -226,11 +226,12 @@ namespace PuppetMaster
 
             if (operation.Equals(SUBSCRIBE))
             {
-                entity.RemoteEntity.Subscribe(topicName);
+                try { entity.RemoteEntity.Subscribe(topicName); }
+                catch(Exception) { /*ignore*/ }
             }
             else
             {
-                entity.RemoteEntity.Unsubscribe(topicName);
+                try { entity.RemoteEntity.Unsubscribe(topicName); } catch (Exception) { /*ignore*/}
             }
 
             Log.logCMD(cmd);

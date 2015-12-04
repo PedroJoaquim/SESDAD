@@ -103,11 +103,14 @@ namespace Broker
             if (!broker.ForwardingTable.TryRemoveEntity(this.topic, this.source))
                 return; //already processed 
 
-            
+            lock(broker)
+            {
+                //if the routing policy is flooding we do not need to send the unsub event to other brokers
+                if (entity.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER))
+                    ProcessFilteredDelivery(broker);
+            }
 
-            //if the routing policy is flooding we do not need to send the unsub event to other brokers
-            if (entity.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER))
-                ProcessFilteredDelivery(broker);
+
         }
 
 

@@ -33,6 +33,7 @@ namespace Subscriber
 
         public override void Execute(RemoteEntity entity)
         {
+
             foreach (KeyValuePair<string, IRemoteBroker> entry in entity.RemoteNetwork.InBrokers)
             {
                 try
@@ -43,8 +44,12 @@ namespace Subscriber
                 catch(Exception)
                 {
                     //ignore
-                }   
+                }
+
+                
             }
+
+            Console.WriteLine("[SUBSCRIBED] " + topic);
         }
     }
 
@@ -86,7 +91,11 @@ namespace Subscriber
                 {
                     //ignore
                 }
+
+
             }
+
+            Console.WriteLine("[UNSUBSCRIBED] " + topic);
         }
     }
 }
