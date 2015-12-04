@@ -218,13 +218,16 @@ namespace Broker
 
         public void DifundSequencerMessage(Event e, string sourceSite, string sourceEntity, int seqNumber)
         {
+
             lock (Sequencer)
             {
                 if (Sequencer.AlreadyProcessedTotalOrderMessage(e.Publisher, e.EventNr))
+                {
                     return;
+                }
                 else
                     Sequencer.ProcessedTotalOrderMessage(e.Publisher, e.EventNr);
-            }
+                }
 
             this.Events.Produce(new DifundPublishEventCommand(e, sourceSite, sourceEntity, seqNumber));
         }

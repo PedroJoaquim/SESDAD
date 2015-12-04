@@ -132,6 +132,14 @@ namespace Broker
             {
                 foreach (Tuple<int, string> eventInfo in item.Value)
                 {
+                    lock (this)
+                    {
+                        if (AlreadyDispatchedNewEventMessage(item.Key, eventInfo.Item1))
+                            continue;
+                        else
+                            DispatchedNewEventMessage(item.Key, eventInfo.Item1, eventInfo.Item2);
+                    }
+
                     broker.Events.Produce(new TotalOrderNewEventCommand(eventInfo.Item2, item.Key, eventInfo.Item1));
                 }
             }

@@ -105,6 +105,7 @@ namespace Subscriber
                 return;
             }
 
+
             lock (this)
             {
                 if (!waitingEvents.ContainsKey(e.Publisher))
