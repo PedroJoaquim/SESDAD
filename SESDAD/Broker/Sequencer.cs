@@ -21,6 +21,7 @@ namespace Broker
         private Dictionary<string, List<Tuple<int, string>>> unprocessedTotalOrderMessages; //for sequencer replica store messages not send
         private Dictionary<string, List<int>> totalOrderMessagesACKs; // messages processed by main sequencer publisher -> eventNr Topic
 
+
         public Sequencer(Broker broker)
         {
             this.broker = broker;

@@ -25,6 +25,19 @@ namespace Broker
             }
         }
 
+        public Dictionary<string, List<int>> ReceivedEvents
+        {
+            get
+            {
+                return receivedEvents;
+            }
+
+            set
+            {
+                receivedEvents = value;
+            }
+        }
+
         protected PublishEventManager(Broker b)
         {
             this.B = b;
@@ -110,17 +123,17 @@ namespace Broker
             string source = e.Publisher;
             int seqNumber = e.EventNr;
 
-            lock(receivedEvents)
+            lock(ReceivedEvents)
             {
-                if(!receivedEvents.ContainsKey(source))
+                if(!ReceivedEvents.ContainsKey(source))
                 {
-                    receivedEvents[source] = new List<int>();
-                    receivedEvents[source].Add(seqNumber);
+                    ReceivedEvents[source] = new List<int>();
+                    ReceivedEvents[source].Add(seqNumber);
                     return false;
                 }
                 else
                 {
-                    targetEvents = receivedEvents[source];
+                    targetEvents = ReceivedEvents[source];
                 }
             }
 
@@ -344,6 +357,7 @@ namespace Broker
                 return;
 
             List<string> interessedEntities = GetInteressedEntities(e, B.SysConfig.RoutingPolicy.Equals(SysConfig.FILTER));
+
             bool sendACK = e.SendACK;
 
             e.SendACK = true;

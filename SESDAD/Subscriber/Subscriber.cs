@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting;
 using System.Collections;
+using System.Threading;
 
 namespace Subscriber
 {
@@ -15,13 +16,15 @@ namespace Subscriber
     {
         private const int NUM_THREADS = 1;
         private const int QUEUE_SIZE = 100;
-
+        private const int SLEEP_MONITOR_TIME = 5000;
+        private const int MONITOR_TIME = 10000;
 
         private List<Tuple<string, int>> canDeliver = new List<Tuple<string, int>>();
         private List<Tuple<string, int>> authHistory = new List<Tuple<string, int>>();
         private Dictionary<string, List<Event>> waitingEvents = new Dictionary<string, List<Event>>();
         private Dictionary<string, List<int>> receivedEvents = new Dictionary<string, List<int>>();
 
+        private DateTime lastTimeDelivered;
 
         public List<Tuple<string, int>> CanDeliver
         {
@@ -107,6 +110,7 @@ namespace Subscriber
 
             lock (this)
             {
+            
                 if (!waitingEvents.ContainsKey(e.Publisher))
                 {
                     waitingEvents[e.Publisher] = new List<Event>();
@@ -121,17 +125,14 @@ namespace Subscriber
         public void SequenceMessage(string publisher, int eventNr)
         {
 
-            
             lock (this)
             {
-               
-
                 foreach (Tuple<string, int> item in authHistory)
                 {
                     if (item.Item1.Equals(publisher) && item.Item2 == eventNr)
                         return;
                 }
-
+                
                 CanDeliver.Add(new Tuple<string, int>(publisher, eventNr));
                 authHistory.Add(new Tuple<string, int>(publisher, eventNr));
             }
@@ -148,6 +149,56 @@ namespace Subscriber
 
         #endregion
 
+        private void MonitorDeadLock()
+        {
+            while(true)
+            {
+                Thread.Sleep(SLEEP_MONITOR_TIME);
+                lock(this)
+                {
+                    DateTime now = DateTime.Now;
+                    int diff = (int)((TimeSpan)(now - lastTimeDelivered)).TotalMilliseconds;
+                    
+                    if (waitingEvents.Count > 0 && canDeliver.Count > 0 && diff > MONITOR_TIME)
+                    {
+                        List<int> toRemove = new List<int>();
+
+                        for (int i = 0; i < canDeliver.Count; i++)
+                        {
+                            if (waitingEvents.ContainsKey(canDeliver[i].Item1) && ContainsEventNumber(waitingEvents[CanDeliver[i].Item1], CanDeliver[i].Item2))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                toRemove.Add(i);
+                            }
+                        }
+
+                        Console.WriteLine("GOING TO DELETE: " + toRemove.Count);
+
+                        foreach (int item in toRemove)
+                        {
+                            CanDeliver.RemoveAt(item);
+                        }
+
+                        DeliverEvents();
+                    }
+                }
+            }
+        }
+
+
+        private bool ContainsEventNumber(List<Event> list, int targetNr)
+        {
+            foreach (Event item in list)
+            {
+                if (item.EventNr == targetNr)
+                    return true;
+            }
+
+            return false;
+        }
         private bool ValidEvent(Event e)
         {
             lock (this)
@@ -181,6 +232,7 @@ namespace Subscriber
                 while ((notifyEvent = HaveEventsToDeliver()) != null)
                 {
                     PresetEvent(notifyEvent);
+                    lastTimeDelivered = DateTime.Now;
                 }
             }
         }
@@ -228,7 +280,9 @@ namespace Subscriber
 
         public override void ConnectionsCreated()
         {
-            //ignore
+            this.lastTimeDelivered = DateTime.Now;
+            Thread t = new Thread(MonitorDeadLock);
+            t.Start();
         }
 
 
