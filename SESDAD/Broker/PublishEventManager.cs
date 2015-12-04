@@ -83,7 +83,7 @@ namespace Broker
                         logDone = true;
                     }
 
-                    Console.WriteLine(String.Format("[EVENT DELIVERED] Topic: {0} Publisher: {1} EventNr: {2} To: {3}", e.Topic, e.Publisher, e.EventNr, entry.Key));
+                  //  Console.WriteLine(String.Format("[EVENT DELIVERED] Topic: {0} Publisher: {1} EventNr: {2} To: {3}", e.Topic, e.Publisher, e.EventNr, entry.Key));
                     entry.Value.NotifyEvent(e);
 
                 }

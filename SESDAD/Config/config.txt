@@ -1,20 +1,19 @@
 RoutingPolicy filter
-Ordering FIFO
+Ordering TOTAL
 LoggingLevel full
 Site site0 Parent none
 Site site1 Parent site0
-Site site2 Parent site0
+Site site2 Parent site1
 Site site3 Parent site1
-Site site4 Parent site2
-Site site5 Parent site2
 Process broker00 is broker On site0 URL tcp://localhost:3330/broker
 Process broker01 is broker On site0 URL tcp://localhost:3331/broker
 Process broker02 is broker On site0 URL tcp://localhost:3332/broker
 Process sub00 is subscriber On site0 URL tcp://localhost:3334/sub
+Process pub00 is publisher On site0 URL tcp://localhost:3335/pub
 Process broker10 is broker On site1 URL tcp://localhost:4330/broker
 Process broker11 is broker On site1 URL tcp://localhost:4331/broker
 Process broker12 is broker On site1 URL tcp://localhost:4332/broker
-Process sub10 is subscriber On site1 URL tcp://localhost:4334/sub
+Process pub10 is publisher On site1 URL tcp://localhost:4334/pub
 Process broker20 is broker On site2 URL tcp://localhost:5330/broker
 Process broker21 is broker On site2 URL tcp://localhost:5331/broker
 Process broker22 is broker On site2 URL tcp://localhost:5332/broker
@@ -22,16 +21,3 @@ Process sub20 is subscriber On site2 URL tcp://localhost:5334/sub
 Process broker30 is broker On site3 URL tcp://localhost:6330/broker
 Process broker31 is broker On site3 URL tcp://localhost:6331/broker
 Process broker32 is broker On site3 URL tcp://localhost:6332/broker
-Process sub30 is subscriber On site3 URL tcp://localhost:6334/sub
-Process pub30 is publisher On site3 URL tcp://localhost:6335/sub
-Process broker40 is broker On site4 URL tcp://localhost:7330/broker
-Process broker41 is broker On site4 URL tcp://localhost:7331/broker
-Process broker42 is broker On site4 URL tcp://localhost:7332/broker
-Process sub40 is subscriber On site4 URL tcp://localhost:7334/sub
-Process broker50 is broker On site5 URL tcp://localhost:8330/broker
-Process broker51 is broker On site5 URL tcp://localhost:8331/broker
-Process broker52 is broker On site5 URL tcp://localhost:8332/broker
-Process sub50 is subscriber On site5 URL tcp://localhost:8334/sub
-Process pub50 is publisher On site5 URL tcp://localhost:8335/pub
-
-
